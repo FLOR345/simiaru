@@ -43,15 +43,16 @@ const Register = ({ setUser }) => {
     }
   };
 
-  // Función para login con Google
+// Función para login con Google
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = `${API_URL}/api/auth/google`;
   };
 
   const handleFacebookLogin = () => {
-    window.location.href = 'http://localhost:5000/api/auth/facebook';
+    window.location.href = `${API_URL}/api/auth/facebook`;
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       <div className="card max-w-md w-full shadow-2xl">
