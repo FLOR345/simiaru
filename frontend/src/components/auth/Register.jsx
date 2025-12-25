@@ -4,6 +4,9 @@ import { ArrowRight, Lock, Mail, User, Facebook } from 'lucide-react';
 import axios from 'axios';
 import logo from '../../assets/logo.jpg';
 
+// URL del backend
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Register = ({ setUser }) => {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
@@ -30,9 +33,10 @@ const Register = ({ setUser }) => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post('/api/auth/register', { nombre, email, password });
+      const { data } = await axios.post(`${API_URL}/api/auth/register`, { nombre, email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.removeItem('isGuest');
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
       setUser(data.user);
       navigate('/dashboard');
@@ -43,9 +47,6 @@ const Register = ({ setUser }) => {
     }
   };
 
-// Función para login con Google
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  
   const handleGoogleLogin = () => {
     window.location.href = `${API_URL}/api/auth/google`;
   };
@@ -53,6 +54,7 @@ const Register = ({ setUser }) => {
   const handleFacebookLogin = () => {
     window.location.href = `${API_URL}/api/auth/facebook`;
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       <div className="card max-w-md w-full shadow-2xl">
