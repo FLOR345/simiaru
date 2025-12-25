@@ -4,6 +4,8 @@ import { Mountain, LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle,
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 
+// URL del backend
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [units, setUnits] = useState([]);
   const [progress, setProgress] = useState([]);
@@ -20,17 +22,17 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     try {
       // Si es invitado, solo cargar unidades sin autenticación
       if (isGuest) {
-        const unitsRes = await axios.get(`/api/lessons/units?idioma=${selectedLanguage}`);
+        const unitsRes = await axios.get(`${API_URL}/api/lessons/units?idioma=${selectedLanguage}`);
         setUnits(unitsRes.data.units);
         setProgress([]); // Invitados no tienen progreso
       } else {
         const token = localStorage.getItem('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        const [unitsRes, progressRes] = await Promise.all([
-          axios.get(`/api/lessons/units?idioma=${selectedLanguage}`),
-          axios.get('/api/progress')
-        ]);
+      const [unitsRes, progressRes] = await Promise.all([
+        axios.get(`${API_URL}/api/lessons/units?idioma=${selectedLanguage}`),
+        axios.get(`${API_URL}/api/progress`)
+      ]);
 
         setUnits(unitsRes.data.units);
         setProgress(progressRes.data.progress);
@@ -494,7 +496,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, selectedLanguage, isGuest })
     try {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const { data } = await axios.get(`/api/lessons/units/${unit.id}/lessons`, { headers });
+      const { data } = await axios.get(`${API_URL}/api/lessons/units/${unit.id}/lessons`, { headers });
       setLessons(data.lessons);
     } catch (error) {
       console.error('Error loading lessons:', error);
