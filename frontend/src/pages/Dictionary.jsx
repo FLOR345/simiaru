@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Search, Volume2, BookOpen, Home, Tag, Sparkles, Filter, X, ArrowRight, Globe, Star, TrendingUp, Zap, CheckCircle, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
-
+// URL del backend
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Dictionary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
@@ -32,7 +33,7 @@ const Dictionary = () => {
 
   const loadStats = async () => {
     try {
-      const { data } = await axios.get(`/api/dictionary/stats?idioma=${selectedLanguage}`);
+      const { data } = await axios.get(`${API_URL}/api/dictionary/stats?idioma=${selectedLanguage}`);
       setStats(data);
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -41,7 +42,7 @@ const Dictionary = () => {
 
   const loadCategories = async () => {
     try {
-      const { data } = await axios.get(`/api/dictionary/categories?idioma=${selectedLanguage}`);
+     const { data } = await axios.get(`${API_URL}/api/dictionary/categories?idioma=${selectedLanguage}`);
       setCategories(data.categories);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -51,7 +52,7 @@ const Dictionary = () => {
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/api/dictionary/search?query=${searchTerm}&idioma=${selectedLanguage}`);
+      const { data } = await axios.get(`${API_URL}/api/dictionary/search?query=${searchTerm}&idioma=${selectedLanguage}`);
       setResults(data.words);
     } catch (error) {
       console.error('Error searching:', error);
@@ -71,7 +72,7 @@ const Dictionary = () => {
     setSelectedCategory(categoria);
     setLoading(true);
     try {
-      const { data } = await axios.get(`/api/dictionary/category?categoria=${categoria}&idioma=${selectedLanguage}`);
+      const { data } = await axios.get(`${API_URL}/api/dictionary/category?categoria=${categoria}&idioma=${selectedLanguage}`);
       setResults(data.words);
       setSearchTerm('');
     } catch (error) {
