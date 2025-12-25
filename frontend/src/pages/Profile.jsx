@@ -62,32 +62,147 @@ const Profile = ({ user, setUser }) => {
     }
   }, [user?.id]);
 
-  const loadProgress = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const { data } = await axios.get('/api/progress', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setProgress(data.progress);
-      
-      const completed = data.progress.filter(p => p.completado);
-      const avgScore = completed.length > 0
-        ? Math.round(completed.reduce((sum, p) => sum + p.porcentaje_aciertos, 0) / completed.length)
-        : 0;
-      
+// ==================== FUNCIÓN loadProgress CORREGIDA ====================
+const loadProgress = async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Verificar que hay token
+    if (!token) {
+      console.error('No hay token de autenticación');
+      setProgress([]);
       setStats({
-        totalLessons: data.progress.length,
-        completedLessons: completed.length,
-        averageScore: avgScore
+        totalLessons: 0,
+        completedLessons: 0,
+        averageScore: 0
       });
-    } catch (error) {
-      console.error('Error loading progress:', error);
-    } finally {
       setLoading(false);
+      return;
     }
-  };
+
+    console.log('🔍 Solicitando progreso del usuario...');
+    
+    const { data } = await axios.get('/api/progress', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    console.log('✅ Respuesta del backend:', data);
+    
+    // ✅ PROTECCIÓN: Manejar la estructura del backend
+    // El backend devuelve: { success: true, progress: [...] }
+    let progressArray = [];
+    
+    if (data.success && Array.isArray(data.progress)) {
+      progressArray = data.progress;
+    } else if (Array.isArray(data)) {
+      // Por si acaso el backend envía directamente el array
+      progressArray = data;
+    } else {
+      console.warn('⚠️ Estructura inesperada del backend:', data);
+      progressArray = [];
+    }
+    
+    console.log(`📊 Total de lecciones encontradas: ${progressArray.length}`);
+    
+    setProgress(progressArray);
+    
+    // ✅ PROTECCIÓN: Filtrar con validación
+    const completed = progressArray.filter(p => {
+      // En PostgreSQL, completado puede ser boolean (true/false) o integer (1/0)
+      return p?.completado === true || 
+             p?.completado === 1 || 
+             p?.completado === '1' ||
+             p?.completado === 't'; // PostgreSQL a veces devuelve 't' para true
+    });
+    
+    console.log(`✅ Lecciones completadas: ${completed.length}`);
+    
+    // ✅ PROTECCIÓN: Calcular promedio con seguridad
+    const avgScore = completed.length > 0
+      ? Math.round(
+          completed.reduce((sum, p) => {
+            const score = Number(p.porcentaje_aciertos) || 0;
+            return sum + score;
+          }, 0) / completed.length
+        )
+      : 0;
+    
+    console.log(`📈 Promedio de aciertos: ${avgScore}%`);
+    
+    setStats({
+      totalLessons: progressArray.length,
+      completedLessons: completed.length,
+      averageScore: avgScore
+    });
+    
+  } catch (error) {
+    console.error('❌ Error cargando progreso:', error);
+    
+    // Mostrar más detalles del error
+    if (error.response) {
+      // El servidor respondió con un error
+      console.error('📛 Error del servidor:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+      
+      // Si es error 401, redirigir al login
+      if (error.response.status === 401) {
+        console.error('🔐 Token inválido o expirado. Redirigiendo al login...');
+        localStorage.removeItem('token');
+        navigate('/login');
+        return;
+      }
+    } else if (error.request) {
+      // La petición se hizo pero no hubo respuesta
+      console.error('🌐 Sin respuesta del servidor:', error.request);
+      console.error('⚠️ Verifica que el backend esté corriendo en Railway');
+    } else {
+      // Algo pasó al configurar la petición
+      console.error('⚙️ Error de configuración:', error.message);
+    }
+    
+    // ✅ Establecer valores por defecto en caso de error
+    setProgress([]);
+    setStats({
+      totalLessons: 0,
+      completedLessons: 0,
+      averageScore: 0
+    });
+  } finally {
+    setLoading(false);
+    console.log('🏁 Carga de progreso finalizada');
+  }
+};
+
+// ==================== EXTRA: Función de inicialización mejorada ====================
+useEffect(() => {
+  // Solo cargar si hay usuario
+  if (user && user.id) {
+    console.log('👤 Usuario detectado:', user.email);
+    loadProgress();
+  } else {
+    console.warn('⚠️ No hay usuario autenticado');
+    setProgress([]);
+    setStats({
+      totalLessons: 0,
+      completedLessons: 0,
+      averageScore: 0
+    });
+    setLoading(false);
+  }
+  
+  // Configurar formulario de edición
+  if (user) {
+    setEditForm({
+      nombre: user.nombre || '',
+      idioma_objetivo: user.idioma_objetivo || 'quechua',
+      notificaciones_email: user.notificaciones_email !== false
+    });
+  }
+}, [user?.id]); // Dependencia específica para evitar re-renders innecesarios
 
   const handleSaveProfile = async () => {
     setSaving(true);
