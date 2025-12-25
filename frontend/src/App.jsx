@@ -9,54 +9,59 @@ import Profile from './pages/Profile';
 import Dictionary from './pages/Dictionary';
 import CultureModule from './pages/CultureModule';
 
+// URL del backend
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function App() {
   const [user, setUser] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  // Verificar si hay token en la URL (viene de Google OAuth)
-  const urlParams = new URLSearchParams(window.location.search);
-  const tokenFromUrl = urlParams.get('token');
-  
-  if (tokenFromUrl) {
-    // Guardar el token de Google
-    localStorage.setItem('token', tokenFromUrl);
+    // Verificar si hay token en la URL (viene de Google OAuth)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
     
-    // Limpiar la URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    
-    // Obtener datos del usuario desde el backend
-    fetch('/api/auth/profile', {
-      headers: { Authorization: `Bearer ${tokenFromUrl}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          setUser(data.user);
-        }
-        setLoading(false);
+    if (tokenFromUrl) {
+      // Guardar el token de Google
+      localStorage.setItem('token', tokenFromUrl);
+      localStorage.removeItem('isGuest');
+      
+      // Limpiar la URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Obtener datos del usuario desde el backend
+      fetch(`${API_URL}/api/auth/profile`, {
+        headers: { Authorization: `Bearer ${tokenFromUrl}` }
       })
-      .catch(err => {
-        console.error('Error getting user:', err);
-        setLoading(false);
-      });
-  } else {
-    // Login normal (sin Google)
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    const guestMode = localStorage.getItem('isGuest');
-    
-    if (token && userData) {
-      setUser(JSON.parse(userData));
+        .then(res => res.json())
+        .then(data => {
+          if (data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+            setIsGuest(false);
+          }
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Error getting user:', err);
+          setLoading(false);
+        });
+    } else {
+      // Login normal (sin Google)
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      const guestMode = localStorage.getItem('isGuest');
+      
+      if (token && userData) {
+        setUser(JSON.parse(userData));
+      }
+      if (guestMode === 'true') {
+        setIsGuest(true);
+      }
+      setLoading(false);
     }
-    if (guestMode === 'true') {
-      setIsGuest(true);
-    }
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
   // Ruta protegida que permite usuarios Y invitados
   const ProtectedRoute = ({ children, guestAllowed = true }) => {
