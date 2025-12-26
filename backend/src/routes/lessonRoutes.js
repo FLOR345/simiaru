@@ -7,6 +7,6 @@ const router = express.Router();
 // Rutas públicas (para modo invitado) - usan optionalProtect
 router.get('/units', optionalProtect, getUnits);
 router.get('/units/:unitId/lessons', optionalProtect, getLessonsByUnit);
-router.get('/lessons/:lessonId', optionalProtect, getLessonContent);
+router.get('/:lessonId', optionalProtect, getLessonContent);
 
 export default router;
