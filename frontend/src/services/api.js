@@ -2,13 +2,18 @@
 import axios from 'axios';
 
 // ==================== CONFIGURACIÓN BASE ====================
-// Obtener la URL del backend desde variables de entorno
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// 🔥 OPCIÓN 1: Si backend está en el MISMO dominio (Vercel monorepo)
+const API_URL = import.meta.env.VITE_API_URL || '';
 
-console.log('🌐 API URL configurada:', API_URL);
+// 🔥 OPCIÓN 2: Si backend está en Railway, descomentar esta línea:
+// const API_URL = import.meta.env.VITE_API_URL || 'https://simiaru-production-49cf.up.railway.app';
+
+// 🔥 OPCIÓN 3: Para desarrollo local con backend separado:
+// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+console.log('🌐 API URL configurada:', API_URL || 'Rutas relativas (mismo dominio)');
 
 // ==================== INSTANCIA DE AXIOS ====================
-// Crear una instancia de axios con configuración por defecto
 const axiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -17,7 +22,6 @@ const axiosInstance = axios.create({
 });
 
 // ==================== INTERCEPTOR DE REQUEST ====================
-// Agregar el token automáticamente a todas las peticiones
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -34,7 +38,6 @@ axiosInstance.interceptors.request.use(
 );
 
 // ==================== INTERCEPTOR DE RESPONSE ====================
-// Manejar respuestas y errores globalmente
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log(`✅ ${response.config.method.toUpperCase()} ${response.config.url} - OK`);
@@ -89,6 +92,7 @@ export const api = {
   getLessonsByUnit: (unitId) => 
     axiosInstance.get(`/api/lessons/units/${unitId}/lessons`),
   
+  // 🔥 CORRECCIÓN: Eliminar "lessons" duplicado
   getLessonContent: (lessonId) => 
     axiosInstance.get(`/api/lessons/${lessonId}`),
 

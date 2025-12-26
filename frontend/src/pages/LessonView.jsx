@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// 🔥 CAMBIO 1: Importar api en lugar de axios
+import { api } from '../services/api';
 import ExerciseTypes from "../components/lessons/ExerciseTypes";
 import { Volume2, X, Check, ArrowLeft, BookOpen, Trophy, Star, Sparkles } from 'lucide-react';
 
@@ -44,20 +45,26 @@ const LessonView = ({ user, isGuest }) => {
     loadLesson();
   }, [lessonId]);
 
+  // 🔥 CAMBIO 2: Usar api.getLessonContent()
   const loadLesson = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      console.log('🔍 Cargando lección:', lessonId);
       
-      const { data } = await axios.get(`/api/lessons/${lessonId}`, config);
-      console.log('Datos recibidos:', data);
+      // ✅ Usar la función de api.js
+      const { data } = await api.getLessonContent(lessonId);
+      
+      console.log('✅ Datos recibidos:', data);
+      console.log('📚 Vocabulario:', data.vocabulary?.length || 0);
+      console.log('✏️ Ejercicios:', data.exercises?.length || 0);
       
       setLesson(data.lesson);
       setVocabulary(data.vocabulary || []);
       setExercises(data.exercises || []);
     } catch (error) {
-      console.error('Error loading lesson:', error);
+      console.error('❌ Error loading lesson:', error);
+      console.error('📍 URL intentada:', error.config?.url);
+      console.error('📊 Respuesta:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -90,23 +97,24 @@ const LessonView = ({ user, isGuest }) => {
   };
 
   const handleAnswer = (isCorrect) => {
-  setFeedback(isCorrect ? 'correct' : 'incorrect');
-  if (isCorrect) {
-    setScore(score + 1);
-  }
-
-  setTimeout(() => {
-    setFeedback(null);
-    if (currentExercise < exercises.length - 1) {
-      setCurrentExercise(currentExercise + 1);
-      window.scrollTo(0, 0);  // <-- AGREGAR AQUÍ
-    } else {
-      setShowResults(true);
-      window.scrollTo(0, 0);  // <-- AGREGAR AQUÍ
+    setFeedback(isCorrect ? 'correct' : 'incorrect');
+    if (isCorrect) {
+      setScore(score + 1);
     }
-  }, 1500);
-};
 
+    setTimeout(() => {
+      setFeedback(null);
+      if (currentExercise < exercises.length - 1) {
+        setCurrentExercise(currentExercise + 1);
+        window.scrollTo(0, 0);
+      } else {
+        setShowResults(true);
+        window.scrollTo(0, 0);
+      }
+    }, 1500);
+  };
+
+  // 🔥 CAMBIO 3: Usar api.saveProgress()
   const finishLesson = async () => {
     const percentage = exercises.length > 0 
       ? Math.round((score / exercises.length) * 100) 
@@ -114,15 +122,14 @@ const LessonView = ({ user, isGuest }) => {
     
     if (!isGuest && user) {
       try {
-        const token = localStorage.getItem('token');
-        await axios.post('/api/progress/save', {
+        // ✅ Usar la función de api.js
+        await api.saveProgress({
           leccionId: parseInt(lessonId),
           porcentajeAciertos: percentage
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
         });
+        console.log('✅ Progreso guardado');
       } catch (error) {
-        console.error('Error guardando progreso:', error);
+        console.error('❌ Error guardando progreso:', error);
       }
     }
     
@@ -365,15 +372,15 @@ const LessonView = ({ user, isGuest }) => {
           {/* Botón comenzar ejercicios */}
           <div className="sticky bottom-4">
             <button
-                onClick={() => {
-                  console.log('Comenzando ejercicios, total:', exercises.length);
-                  if (exercises.length > 0) {
-                    setShowVocab(false);
-                    window.scrollTo(0, 0);  // <-- AGREGAR AQUÍ
-                  } else {
-                    finishLesson();
-                  }
-                }}
+              onClick={() => {
+                console.log('Comenzando ejercicios, total:', exercises.length);
+                if (exercises.length > 0) {
+                  setShowVocab(false);
+                  window.scrollTo(0, 0);
+                } else {
+                  finishLesson();
+                }
+              }}
               disabled={exercises.length === 0}
               className={`w-full py-5 bg-gradient-to-r ${theme.gradient} text-white font-bold text-lg rounded-2xl hover:shadow-2xl transition transform hover:scale-[1.02] flex items-center justify-center gap-3 ${
                 exercises.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
@@ -470,7 +477,7 @@ const LessonView = ({ user, isGuest }) => {
             </div>
           )}
 
-          {/* Componente de ejercicios - AQUÍ USA ExerciseTypes */}
+          {/* Componente de ejercicios */}
           <ExerciseTypes exercise={exercise} onAnswer={handleAnswer} />
         </div>
       </div>
