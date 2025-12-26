@@ -90,7 +90,7 @@ export const api = {
     axiosInstance.get(`/api/lessons/units/${unitId}/lessons`),
   
   getLessonContent: (lessonId) => 
-    axiosInstance.get(`/api/lessons/lessons/${lessonId}`),
+    axiosInstance.get(`/api/lessons/${lessonId}`),
 
   // ===== PROGRESS =====
   saveProgress: (data) => 
