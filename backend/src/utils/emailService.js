@@ -3,15 +3,20 @@
 
 import nodemailer from 'nodemailer';
 
-// Configurar transporter de Gmail
+// URL del frontend (producción o desarrollo)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 // Configurar transporter de Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'flormelany01@gmail.com',
-    pass: 'vybywwadtwozjvkw'
+    user: process.env.EMAIL_USER || 'flormelany01@gmail.com',
+    pass: process.env.EMAIL_PASS || 'vybywwadtwozjvkw'
   }
 });
+
+// Email desde
+const EMAIL_FROM = process.env.EMAIL_FROM || '"SimiAru" <flormelany01@gmail.com>';
 
 // Verificar conexión al iniciar
 transporter.verify((error, success) => {
@@ -25,7 +30,7 @@ transporter.verify((error, success) => {
 // 🔥 Recordatorio de racha diaria
 export const sendStreakReminder = async (usuario) => {
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: EMAIL_FROM,
     to: usuario.email,
     subject: `🔥 ¡${usuario.nombre}, no pierdas tu racha de ${usuario.racha_actual} días!`,
     html: `
@@ -48,7 +53,7 @@ export const sendStreakReminder = async (usuario) => {
               Llevas <strong>${usuario.racha_actual} días</strong> consecutivos aprendiendo. 
               ¡No dejes que se rompa!
             </p>
-            <a href="http://localhost:5173/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; margin: 20px 0;">
+            <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; margin: 20px 0;">
               🎯 Continuar Aprendiendo
             </a>
             <p style="color: #dc2626; font-style: italic; font-size: 16px;">
@@ -79,7 +84,7 @@ export const sendLessonCompleted = async (usuario, leccion, porcentaje) => {
   const esExcelente = porcentaje >= 80;
   
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: EMAIL_FROM,
     to: usuario.email,
     subject: esExcelente 
       ? `🎉 ¡Excelente ${usuario.nombre}! Completaste "${leccion.titulo}" con ${porcentaje}%`
@@ -101,7 +106,7 @@ export const sendLessonCompleted = async (usuario, leccion, porcentaje) => {
               <div style="font-size: 48px; font-weight: bold; color: ${esExcelente ? '#059669' : '#1d4ed8'};">${porcentaje}%</div>
               <div style="font-size: 14px;">DE ACIERTOS</div>
             </div>
-            <a href="http://localhost:5173/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
+            <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
               🚀 Siguiente Lección
             </a>
           </div>
@@ -124,7 +129,7 @@ export const sendLessonCompleted = async (usuario, leccion, porcentaje) => {
 // 😢 Alerta de racha perdida
 export const sendStreakLost = async (usuario, rachaAnterior) => {
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: EMAIL_FROM,
     to: usuario.email,
     subject: `😢 ${usuario.nombre}, tu racha de ${rachaAnterior} días se reinició`,
     html: `
@@ -144,7 +149,7 @@ export const sendStreakLost = async (usuario, rachaAnterior) => {
               <div style="color: #991b1b; font-size: 14px;">DÍAS PERDIDOS</div>
             </div>
             <p>¡Pero no te desanimes! Cada día es una nueva oportunidad.</p>
-            <a href="http://localhost:5173/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
+            <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
               🔥 ¡Empezar nueva racha!
             </a>
           </div>
@@ -167,7 +172,7 @@ export const sendStreakLost = async (usuario, rachaAnterior) => {
 // 🎊 Bienvenida a nuevo usuario
 export const sendWelcome = async (usuario) => {
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: EMAIL_FROM,
     to: usuario.email,
     subject: `🎊 ¡Bienvenido a SimiAru, ${usuario.nombre}! - Allillanchu!`,
     html: `
@@ -188,7 +193,7 @@ export const sendWelcome = async (usuario) => {
               <p style="color: #92400e; font-size: 14px;">Esta será una de las primeras frases que aprenderás</p>
             </div>
             <p>Estás a punto de descubrir la riqueza de las lenguas <strong>Quechua</strong> y <strong>Aymara</strong>.</p>
-            <a href="http://localhost:5173/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 18px 50px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 25px 0;">
+            <a href="${FRONTEND_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 18px 50px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 18px; margin: 25px 0;">
               🚀 ¡Comenzar mi primera lección!
             </a>
           </div>
@@ -214,7 +219,7 @@ export const sendWelcome = async (usuario) => {
 // 🏆 Nueva insignia obtenida
 export const sendBadgeEarned = async (usuario, insignia) => {
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: EMAIL_FROM,
     to: usuario.email,
     subject: `🏆 ¡${usuario.nombre}, ganaste la insignia "${insignia.nombre}"!`,
     html: `
@@ -233,7 +238,7 @@ export const sendBadgeEarned = async (usuario, insignia) => {
               <div style="font-size: 24px; font-weight: bold; color: #854d0e;">${insignia.nombre}</div>
               <div style="color: #a16207; font-size: 14px; margin-top: 10px;">${insignia.descripcion}</div>
             </div>
-            <a href="http://localhost:5173/profile" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
+            <a href="${FRONTEND_URL}/profile" style="display: inline-block; background: linear-gradient(135deg, #f97316, #dc2626); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold;">
               👤 Ver mi perfil
             </a>
           </div>
