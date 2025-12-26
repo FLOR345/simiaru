@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Award, Flame, Star, TrendingUp, Mountain, ArrowLeft, Calendar, Target, Trophy, Crown, CheckCircle, Clock, Zap, BookOpen, Globe, Sparkles, Play, ArrowRight, Shield, Medal, Edit3, Camera, Bell, BellOff, Save, X, Lock } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
-
+// URL del backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://simiaru-production-49cf.up.railway.app';
 const Profile = ({ user, setUser }) => {
   const [progress, setProgress] = useState([]);
   const [stats, setStats] = useState({
@@ -45,7 +46,7 @@ const Profile = ({ user, setUser }) => {
     const checkPassword = async () => {
       try {
         const token = localStorage.getItem('token');
-        const { data } = await axios.get('/api/auth/has-password', {
+        const { data } = await axios.get(`${API_URL}/api/auth/has-password`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPasswordInfo({
@@ -83,7 +84,7 @@ const loadProgress = async () => {
 
     console.log('🔍 Solicitando progreso del usuario...');
     
-    const { data } = await axios.get('/api/progress', {
+    const { data } = await axios.get(`${API_URL}/api/progress`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     
@@ -209,7 +210,7 @@ useEffect(() => {
     setMessage(null);
     try {
       const token = localStorage.getItem('token');
-      const { data } = await axios.put('/api/auth/profile', editForm, {
+      const { data } = await axios.put(`${API_URL}/api/auth/profile`, editForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -242,7 +243,7 @@ useEffect(() => {
     setMessage(null);
     try {
       const token = localStorage.getItem('token');
-      const { data } = await axios.put('/api/auth/change-password', {
+      const { data } = await axios.put(`${API_URL}/api/auth/change-password`, {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword
       }, {
