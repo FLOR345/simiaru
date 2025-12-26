@@ -27,7 +27,7 @@ const LessonView = ({ user, isGuest }) => {
       const token = localStorage.getItem('token');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       
-      const { data } = await axios.get(`/api/lessons/lessons/${lessonId}`, config);
+      const { data } = await axios.get(`/api/lessons/${lessonId}`, config);
       console.log('Datos recibidos:', data);
       
       setLesson(data.lesson);
