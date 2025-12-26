@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'simiaru_secret_key_2025_muy_segura';
+const JWT_SECRET = process.env.JWT_SECRET || 'simiaru_secret_key_2025_muy_segura';
 
 // Protección obligatoria - requiere token válido
 export const protect = async (req, res, next) => {
