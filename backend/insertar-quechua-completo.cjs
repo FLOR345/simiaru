@@ -2,6 +2,7 @@
 // Fuente: Diccionario Ilustrado de la Lengua Quechua - Ministerio de Educación de Chile
 // TODAS las palabras del documento original - Adaptado a la estructura de SIMIARU
 
+require('dotenv').config();
 const { Client } = require('pg');
 
 
@@ -9,7 +10,7 @@ const client = new Client({
   host: 'localhost',
   port: 5432,
   user: 'postgres',
-  password: 'simiaru123',
+  password: process.env.DB_PASSWORD,
   database: 'simiaru'
 });
 
@@ -913,7 +914,7 @@ async function insertarVocabulario() {
     port: 5432,
     database: 'simiaru',
     user: 'postgres',
-    password: 'simiaru123'
+    password: process.env.DB_PASSWORD
   });
 
   try {

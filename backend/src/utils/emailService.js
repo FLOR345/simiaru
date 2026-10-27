@@ -7,12 +7,17 @@ import { Resend } from 'resend';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://simiaru-3j6b.vercel.app';
 
 // Configurar Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Si no hay clave, el servidor arranca igual y solo los correos quedan desactivados
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : { emails: { send: async () => { throw new Error('RESEND_API_KEY no configurada: correo no enviado'); } } };
 
 // Email desde (Resend requiere verificar dominio, por ahora usa el de prueba)
 const EMAIL_FROM = 'SimiAru <onboarding@resend.dev>';
 
-console.log('✅ Servicio de email configurado con Resend');
+console.log(process.env.RESEND_API_KEY
+  ? '✅ Servicio de email configurado con Resend'
+  : '⚠️ RESEND_API_KEY no configurada: los correos están desactivados');
 
 // 🔥 Recordatorio de racha diaria
 export const sendStreakReminder = async (usuario) => {

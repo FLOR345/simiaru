@@ -1,6 +1,7 @@
 // insertar-seeds.js
 // Ejecutar con: node insertar-seeds.js
 
+import 'dotenv/config';
 import pg from 'pg';
 
 const { Pool } = pg;
@@ -8,7 +9,7 @@ const { Pool } = pg;
 // Usar la misma configuracion que tu database.js
 const pool = new Pool({
   user: 'postgres',
-  password: 'simiaru123',
+  password: process.env.DB_PASSWORD,
   host: 'localhost',
   port: 5432,
   database: 'simiaru'

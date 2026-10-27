@@ -2,13 +2,14 @@
 // Fuente: Diccionario Aymara - Ministerio de Educación de Chile
 // TODAS las palabras del documento original
 
+require('dotenv').config();
 const { Client } = require('pg');
 
 const client = new Client({
   host: 'localhost',
   port: 5432,
   user: 'postgres',
-  password: 'simiaru123',
+  password: process.env.DB_PASSWORD,
   database: 'simiaru'
 });
 

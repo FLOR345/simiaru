@@ -60,7 +60,7 @@ async function createUser({ nombre, email, avatar, googleId, facebookId }) {
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET || 'simiaru_secret_key_2025_muy_segura'
+  secretOrKey: process.env.JWT_SECRET
 };
 
 passport.use(

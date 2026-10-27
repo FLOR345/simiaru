@@ -1,11 +1,18 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'simiaru_secret_key_2025_muy_segura';
+// Se lee en cada llamada para asegurar que dotenv ya cargó el .env
+export const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('Falta JWT_SECRET en el archivo .env');
+  }
+  return secret;
+};
 
 export const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: userId }, getJwtSecret(), { expiresIn: '7d' });
 };
 
 export const verifyToken = (token) => {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, getJwtSecret());
 };

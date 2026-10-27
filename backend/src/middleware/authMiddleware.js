@@ -1,6 +1,4 @@
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'simiaru_secret_key_2025_muy_segura';
+import { verifyToken } from '../utils/jwt.js';
 
 // Protección obligatoria - requiere token válido
 export const protect = async (req, res, next) => {
@@ -11,7 +9,7 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ message: 'No autorizado - Token no proporcionado' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {
@@ -28,7 +26,7 @@ export const optionalProtect = async (req, res, next) => {
     if (token) {
       // Si hay token, intentar verificarlo
       try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = verifyToken(token);
         req.user = decoded;
       } catch (error) {
         // Token inválido, pero permitir continuar como invitado

@@ -5,7 +5,13 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const connectionString = 'postgresql://neondb_owner:npg_hkjRGt1yl0mz@ep-fancy-boat-acnwlqpn-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require';
+// La cadena de conexión se lee del archivo .env (nunca escribirla aquí)
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error('❌ Falta DATABASE_URL en el archivo .env. Revisa backend/.env.example');
+  process.exit(1);
+}
 
 console.log('🔗 Conectando a Neon...');
 
@@ -23,7 +29,7 @@ export const connectDB = async () => {
     console.log('📅 Server time:', result.rows[0].now);
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    // No cerrar el proceso, intentar continuar
-    console.log('⚠️ Continuando sin base de datos...');
+    console.error('⚠️ El servidor sigue encendido, pero las rutas que usan la base de datos fallarán.');
+    console.error('   Revisa que DATABASE_URL en .env sea correcta (¿cambiaste la contraseña en Neon?).');
   }
 };

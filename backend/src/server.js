@@ -1,5 +1,13 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
+
+// Verificar que existan las variables obligatorias antes de arrancar
+const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'SESSION_SECRET'];
+const missingEnv = requiredEnv.filter((name) => !process.env[name]);
+if (missingEnv.length > 0) {
+  console.error(`❌ Faltan variables en .env: ${missingEnv.join(', ')}`);
+  console.error('   Copia backend/.env.example a backend/.env y complétalo.');
+  process.exit(1);
+}
 
 import express from 'express';
 import cors from 'cors';
@@ -30,7 +38,7 @@ app.use(express.json());
 
 // ===== CONFIGURAR SESIONES (para Passport) =====
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'simiaru-session-secret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { 
