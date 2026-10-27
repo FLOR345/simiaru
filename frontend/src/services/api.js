@@ -3,10 +3,10 @@ import axios from 'axios';
 
 // ==================== CONFIGURACIÓN BASE ====================
 // 🔥 OPCIÓN 1: Si backend está en el MISMO dominio (Vercel monorepo)
-const API_URL = import.meta.env.VITE_API_URL || 'https://simiaru-production-49cf.up.railway.app';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // 🔥 OPCIÓN 2: Si backend está en Railway, descomentar esta línea:
-// const API_URL = import.meta.env.VITE_API_URL || 'https://simiaru-production-49cf.up.railway.app';
+// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // 🔥 OPCIÓN 3: Para desarrollo local con backend separado:
 // const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';

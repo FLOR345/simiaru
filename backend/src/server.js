@@ -23,6 +23,9 @@ import { initCronJobs } from './utils/cronJobs.js';
 
 const app = express();
 
+// Render (y otros servicios) ponen un proxy delante: necesario para cookies seguras
+app.set('trust proxy', 1);
+
 // Middleware CORS configurado
 app.use(cors({
   origin: [
@@ -80,7 +83,7 @@ initCronJobs();
 // ===== INICIAR SERVIDOR =====
 const PORT = process.env.PORT || 5000;
 
-// 🔥 CORRECCIÓN: Agregar '0.0.0.0' para Railway
+// '0.0.0.0' permite que Render reciba las peticiones
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
