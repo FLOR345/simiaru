@@ -9,16 +9,23 @@ export const searchWord = async (req, res) => {
       return res.json({ success: true, words: [] });
     }
     
+    // % y _ se buscan como texto, no como comodines de LIKE
+    const like = (text) => `%${text.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+    const term = query.trim();
+    // En la palabra originaria se ignoran los apóstrofos: p'unchay, p’unchay y punchay se encuentran entre sí
+    const termWithoutApostrophes = term.replace(/['’‘´`ʼ]/g, '');
+
     const result = await pool.query(
       `SELECT v.*, l.titulo as leccion_nombre, u.nombre as unidad_nombre
-       FROM vocabulario v 
+       FROM vocabulario v
        JOIN lecciones l ON v.leccion_id = l.id
        JOIN unidades u ON l.unidad_id = u.id
-       WHERE (v.palabra_espanol ILIKE $1 OR v.palabra_objetivo ILIKE $1) 
+       WHERE (v.palabra_espanol ILIKE $1
+              OR translate(v.palabra_objetivo, '''’‘´\`ʼ', '') ILIKE $3)
        AND u.idioma = $2
        ORDER BY v.palabra_espanol
        LIMIT 50`,
-      [`%${query}%`, idioma]
+      [like(term), idioma, like(termWithoutApostrophes)]
     );
     
     res.json({ success: true, words: result.rows });
