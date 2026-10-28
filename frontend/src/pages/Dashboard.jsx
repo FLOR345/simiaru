@@ -5,7 +5,7 @@ import axios from 'axios';
 import logo from '../assets/logo.jpg';
 
 // URL del backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../config.js';
 const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [units, setUnits] = useState([]);
   const [progress, setProgress] = useState([]);

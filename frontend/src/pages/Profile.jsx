@@ -4,7 +4,7 @@ import { User, Mail, Award, Flame, Star, TrendingUp, Mountain, ArrowLeft, Calend
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 // URL del backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../config.js';
 const Profile = ({ user, setUser }) => {
   const [progress, setProgress] = useState([]);
   const [stats, setStats] = useState({

@@ -10,7 +10,7 @@ import Dictionary from './pages/Dictionary';
 import CultureModule from './pages/CultureModule';
 
 // URL del backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from './config.js';
 
 function App() {
   const [user, setUser] = useState(null);

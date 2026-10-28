@@ -2,16 +2,9 @@
 import axios from 'axios';
 
 // ==================== CONFIGURACIÓN BASE ====================
-// 🔥 OPCIÓN 1: Si backend está en el MISMO dominio (Vercel monorepo)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../config.js'; // ver src/config.js
 
-// 🔥 OPCIÓN 2: Si backend está en Railway, descomentar esta línea:
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-// 🔥 OPCIÓN 3: Para desarrollo local con backend separado:
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-console.log('🌐 API URL configurada:', API_URL || 'Rutas relativas (mismo dominio)');
+console.log('🌐 API URL configurada:', API_URL);
 
 // ==================== INSTANCIA DE AXIOS ====================
 const axiosInstance = axios.create({

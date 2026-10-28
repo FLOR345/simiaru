@@ -4,7 +4,7 @@ import { Search, Volume2, BookOpen, Home, Tag, Sparkles, Filter, X, ArrowRight, 
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 // URL del backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../config.js';
 const Dictionary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
