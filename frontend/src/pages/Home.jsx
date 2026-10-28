@@ -1,11 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX, Github } from 'lucide-react';
-import { useState } from 'react';
+import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX, Github, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/logo.jpg';
 
 const Home = ({ enableGuestMode }) => {
   const [activeTab, setActiveTab] = useState('quechua');
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Escape cierra el menú de celular
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
 
   // Entrar como invitado: avisa a App (estado) y lo recuerda para la próxima visita
   const handleGuestMode = () => {
@@ -39,7 +50,7 @@ const Home = ({ enableGuestMode }) => {
 
       {/* ==================== HEADER PREMIUM ==================== */}
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl shadow-sm z-50 border-b border-gray-100">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex justify-between items-center">
             {/* Logo Premium */}
             <Link to="/" className="flex items-center gap-3 group">
@@ -47,22 +58,22 @@ const Home = ({ enableGuestMode }) => {
                 <img 
                   src={logo} 
                   alt="" 
-                  className="h-12 w-auto transform group-hover:scale-110 transition duration-300"
+                  className="h-10 sm:h-12 w-auto transform group-hover:scale-110 transition duration-300"
                 />
                 <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition"></div>
               </div>
-              <span className="text-2xl font-black bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-black bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
                 SimiAru
               </span>
             </Link>
             
             {/* Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden xl:flex items-center gap-8 whitespace-nowrap">
               <a href="#how-it-works" className="text-gray-700 hover:text-green-600 font-semibold transition-all hover:scale-105 scroll-smooth">
                 Cómo funciona
               </a>
               <a href="#features" className="text-gray-700 hover:text-blue-600 font-semibold transition-all hover:scale-105 scroll-smooth">
-                Características
+                Qué incluye
               </a>
               <a href="#languages" className="text-gray-700 hover:text-purple-600 font-semibold transition-all hover:scale-105 scroll-smooth">
                 Idiomas
@@ -73,30 +84,81 @@ const Home = ({ enableGuestMode }) => {
             </nav>
 
             {/* CTA Buttons */}
-            <div className="flex items-center gap-3">
-              {/* Botón Modo Invitado */}
-              <button 
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* En escritorio: invitado e inicio de sesión a la vista; en celular y tablet van en el menú */}
+              <button
+                type="button"
                 onClick={handleGuestMode}
-                className="hidden md:flex items-center gap-2 px-5 py-2.5 text-gray-600 font-semibold hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all"
+                className="hidden lg:flex items-center gap-2 px-5 py-2.5 whitespace-nowrap text-gray-600 font-semibold hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all"
               >
                 <UserX className="w-4 h-4" />
                 Probar sin cuenta
               </button>
-              <Link 
-                to="/login" 
-                className="hidden md:block px-6 py-2.5 text-gray-700 font-bold hover:text-green-600 transition-all"
+              <Link
+                to="/login"
+                className="hidden lg:block px-6 py-2.5 whitespace-nowrap text-gray-700 font-bold hover:text-green-600 transition-all"
               >
                 Iniciar sesión
               </Link>
-              <Link 
-                to="/register" 
-                className="px-8 py-3 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white font-bold rounded-full hover:shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+              <Link
+                to="/register"
+                className="min-h-11 px-4 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base whitespace-nowrap bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white font-bold rounded-full hover:shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
               >
                 Empezar gratis
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="hidden sm:block w-5 h-5" />
               </Link>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-expanded={menuOpen}
+                aria-controls="menu-movil"
+                aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+                className="xl:hidden w-11 h-11 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
+
+          {/* Menú de celular y tablet */}
+          {menuOpen && (
+            <nav id="menu-movil" aria-label="Menú" className="xl:hidden mt-3 pt-2 pb-2 border-t border-gray-100">
+              <ul>
+                {[
+                  ['#how-it-works', 'Cómo funciona'],
+                  ['#features', 'Qué incluye'],
+                  ['#languages', 'Idiomas'],
+                  ['#proyecto', 'El proyecto'],
+                ].map(([href, label]) => (
+                  <li key={href}>
+                    <a
+                      href={href}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center min-h-12 px-2 text-gray-800 font-semibold rounded-lg hover:bg-gray-50"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid grid-cols-2 gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={handleGuestMode}
+                  className="min-h-12 px-3 flex items-center justify-center gap-2 border-2 border-orange-400 text-orange-700 text-sm font-bold whitespace-nowrap rounded-xl"
+                >
+                  <UserX className="w-4 h-4" />
+                  Probar sin cuenta
+                </button>
+                <Link
+                  to="/login"
+                  className="min-h-12 px-3 flex items-center justify-center border-2 border-gray-300 text-gray-800 text-sm font-bold whitespace-nowrap rounded-xl"
+                >
+                  Iniciar sesión
+                </Link>
+              </div>
+            </nav>
+          )}
         </div>
       </header>
 
@@ -125,7 +187,7 @@ const Home = ({ enableGuestMode }) => {
               
               {/* Título Impactante */}
               <div className="space-y-4">
-                <h1 className="text-6xl lg:text-7xl font-black leading-tight">
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight">
                   <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                     Aprende
                   </span>
@@ -134,7 +196,7 @@ const Home = ({ enableGuestMode }) => {
                     Quechua y Aymara
                   </span>
                 </h1>
-                <p className="text-2xl text-gray-600 font-medium leading-relaxed">
+                <p className="text-xl sm:text-2xl text-gray-600 font-medium leading-relaxed">
                   Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
                 </p>
               </div>
@@ -176,19 +238,19 @@ const Home = ({ enableGuestMode }) => {
               {/* Stats Rápidos */}
               <div className="grid grid-cols-3 gap-6 pt-8 border-t-2 border-gray-200">
                 <div className="text-center">
-                  <div className="text-4xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-1">
+                  <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-1">
                     100%
                   </div>
                   <div className="text-sm text-gray-600 font-semibold">Gratis</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
+                  <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
                     2
                   </div>
                   <div className="text-sm text-gray-600 font-semibold">Idiomas</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
+                  <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
                     26
                   </div>
                   <div className="text-sm text-gray-600 font-semibold">Lecciones</div>
@@ -199,7 +261,7 @@ const Home = ({ enableGuestMode }) => {
             {/* Imagen/Mockup Derecha */}
             <div className="relative animate-fade-in-right">
               {/* Card Principal con Logo */}
-              <div className="relative bg-white rounded-3xl shadow-2xl p-12 transform hover:scale-105 transition-all duration-500">
+              <div className="relative bg-white rounded-3xl shadow-2xl p-8 sm:p-12 transform hover:scale-105 transition-all duration-500">
                 <img 
                   src={logo} 
                   alt="Mascota de SimiAru: una llama con chullo y chalina andina" 
@@ -253,7 +315,7 @@ const Home = ({ enableGuestMode }) => {
             <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-bold inline-block">
               🎯 CÓMO FUNCIONA
             </span>
-            <h2 className="text-5xl font-black text-gray-900">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
               Aprende en <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">3 pasos</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -347,7 +409,7 @@ const Home = ({ enableGuestMode }) => {
             <span className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-bold inline-block">
               🎯 POR QUÉ SIMIARU
             </span>
-            <h2 className="text-5xl font-black text-gray-900">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
               Qué incluye <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">SimiAru</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -443,7 +505,7 @@ const Home = ({ enableGuestMode }) => {
                 </p>
                 <button 
                   onClick={handleGuestMode}
-                  className="flex items-center gap-2 text-orange-600 font-bold text-sm hover:text-orange-700 transition-colors"
+                  className="min-h-11 flex items-center gap-2 text-orange-600 font-bold text-sm hover:text-orange-700 transition-colors"
                 >
                   <Play className="w-5 h-5" />
                   <span>Probar sin cuenta <span aria-hidden="true">→</span></span>
@@ -480,7 +542,7 @@ const Home = ({ enableGuestMode }) => {
             <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold inline-block">
               🌍 IDIOMAS DISPONIBLES
             </span>
-            <h2 className="text-5xl font-black text-gray-900">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
               Elige tu <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">idioma</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -530,7 +592,7 @@ const Home = ({ enableGuestMode }) => {
           {activeTab === 'quechua' && (
             <div id="panel-quechua" role="tabpanel" aria-labelledby="tab-quechua" className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
               <div className="grid md:grid-cols-2">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 p-12 text-white">
+                <div className="bg-gradient-to-br from-green-500 to-green-600 p-8 sm:p-12 text-white">
                   <div className="flex items-center gap-4 mb-8">
                     <Globe className="w-16 h-16" />
                     <div>
@@ -572,7 +634,7 @@ const Home = ({ enableGuestMode }) => {
                     </button>
                   </div>
                 </div>
-                <div className="p-12 bg-gradient-to-br from-green-50 to-white">
+                <div className="p-8 sm:p-12 bg-gradient-to-br from-green-50 to-white">
                   <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás</h4>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
@@ -621,7 +683,7 @@ const Home = ({ enableGuestMode }) => {
           {activeTab === 'aymara' && (
             <div id="panel-aymara" role="tabpanel" aria-labelledby="tab-aymara" className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
               <div className="grid md:grid-cols-2">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-12 text-white">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-8 sm:p-12 text-white">
                   <div className="flex items-center gap-4 mb-8">
                     <Mountain className="w-16 h-16" />
                     <div>
@@ -663,7 +725,7 @@ const Home = ({ enableGuestMode }) => {
                     </button>
                   </div>
                 </div>
-                <div className="p-12 bg-gradient-to-br from-blue-50 to-white">
+                <div className="p-8 sm:p-12 bg-gradient-to-br from-blue-50 to-white">
                   <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás</h4>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
@@ -717,7 +779,7 @@ const Home = ({ enableGuestMode }) => {
             <span className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-bold inline-block">
               🌱 EL PROYECTO
             </span>
-            <h2 className="text-5xl font-black text-gray-900">
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
               Una herramienta <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">abierta</span> para lenguas originarias
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -725,27 +787,27 @@ const Home = ({ enableGuestMode }) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
             <div className="text-center">
-              <div className="text-5xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
                 26
               </div>
               <p className="text-gray-600 font-semibold">Lecciones</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                 1,500+
               </div>
               <p className="text-gray-600 font-semibold">Palabras en el diccionario</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                 285
               </div>
               <p className="text-gray-600 font-semibold">Ejercicios</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
                 69
               </div>
               <p className="text-gray-600 font-semibold">Contenidos culturales</p>
@@ -764,7 +826,7 @@ const Home = ({ enableGuestMode }) => {
         
         <div className="container mx-auto px-6 relative z-10 text-center">
           <div className="max-w-4xl mx-auto space-y-8">
-            <h2 className="text-5xl md:text-6xl font-black text-white leading-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-white leading-tight">
               Empieza con la <span className="text-yellow-300">Unidad 1</span>
             </h2>
             <p className="text-2xl text-white/90 leading-relaxed">
@@ -829,11 +891,11 @@ const Home = ({ enableGuestMode }) => {
             <nav aria-label="Aprende">
               <h4 className="text-lg font-bold mb-2">Aprende</h4>
               <ul>
-                <li><a href="#languages" className="inline-block py-2 text-gray-400 hover:text-white transition">Quechua y aymara</a></li>
-                <li><a href="#how-it-works" className="inline-block py-2 text-gray-400 hover:text-white transition">Cómo funciona</a></li>
-                <li><Link to="/dictionary" className="inline-block py-2 text-gray-400 hover:text-white transition">Diccionario</Link></li>
+                <li><a href="#languages" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Quechua y aymara</a></li>
+                <li><a href="#how-it-works" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Cómo funciona</a></li>
+                <li><Link to="/dictionary" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Diccionario</Link></li>
                 <li>
-                  <button type="button" onClick={handleGuestMode} className="inline-block py-2 text-gray-400 hover:text-white transition">
+                  <button type="button" onClick={handleGuestMode} className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">
                     Probar sin cuenta
                   </button>
                 </li>
@@ -844,10 +906,10 @@ const Home = ({ enableGuestMode }) => {
             <nav aria-label="Proyecto">
               <h4 className="text-lg font-bold mb-2">Proyecto</h4>
               <ul>
-                <li><a href="#proyecto" className="inline-block py-2 text-gray-400 hover:text-white transition">Sobre SimiAru</a></li>
-                <li><a href="https://github.com/FLOR345/simiaru" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Código en GitHub</a></li>
-                <li><a href="https://github.com/FLOR345/simiaru/issues" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Reportar un problema</a></li>
-                <li><a href="https://github.com/FLOR345/simiaru/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Licencia MIT</a></li>
+                <li><a href="#proyecto" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Sobre SimiAru</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru" target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Código en GitHub</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru/issues" target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Reportar un problema</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-11 text-gray-400 hover:text-white transition">Licencia MIT</a></li>
               </ul>
             </nav>
           </div>
