@@ -68,13 +68,13 @@ const Home = ({ enableGuestMode }) => {
                 to="/login" 
                 className="hidden md:block px-6 py-2.5 text-gray-700 font-bold hover:text-green-600 transition-all"
               >
-                Iniciar Sesión
+                Iniciar sesión
               </Link>
               <Link 
                 to="/register" 
                 className="px-8 py-3 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white font-bold rounded-full hover:shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
               >
-                Empezar Gratis
+                Empezar gratis
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -100,7 +100,7 @@ const Home = ({ enableGuestMode }) => {
               <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                  Gratis • Sin Publicidad • Sin Límites
+                  Gratis • Sin publicidad • Código abierto
                 </span>
               </div>
               
@@ -116,7 +116,7 @@ const Home = ({ enableGuestMode }) => {
                   </span>
                 </h1>
                 <p className="text-2xl text-gray-600 font-medium leading-relaxed">
-                  La forma más divertida, efectiva y auténtica de dominar las lenguas ancestrales de los Andes 🦙
+                  Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
                 </p>
               </div>
 
@@ -126,7 +126,7 @@ const Home = ({ enableGuestMode }) => {
                   to="/register" 
                   className="group px-10 py-5 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 transition-all duration-300 text-center text-lg flex items-center justify-center gap-3"
                 >
-                  Comenzar Ahora
+                  Empezar gratis
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 
@@ -136,7 +136,7 @@ const Home = ({ enableGuestMode }) => {
                   className="group px-10 py-5 bg-white border-2 border-orange-400 text-orange-600 font-bold rounded-2xl hover:bg-orange-50 hover:border-orange-500 hover:shadow-xl transition-all duration-300 text-center text-lg flex items-center justify-center gap-3"
                 >
                   <UserX className="w-6 h-6" />
-                  Probar sin Registro
+                  Probar sin cuenta
                 </button>
               </div>
 
@@ -235,7 +235,7 @@ const Home = ({ enableGuestMode }) => {
               🎯 CÓMO FUNCIONA
             </span>
             <h2 className="text-5xl font-black text-gray-900">
-              Aprende en <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">3 simples pasos</span>
+              Aprende en <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">3 pasos</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Tu viaje hacia las lenguas andinas comienza aquí
@@ -267,7 +267,7 @@ const Home = ({ enableGuestMode }) => {
               </div>
               <h3 className="text-2xl font-black mb-4 text-gray-900">Practica diariamente</h3>
               <p className="text-gray-600 leading-relaxed">
-                Solo 10 minutos al día para mantener tu racha, ganar puntos y progresar constantemente
+                Unos minutos al día bastan para mantener tu racha, ganar puntos y avanzar de lección
               </p>
             </div>
 
@@ -279,9 +279,9 @@ const Home = ({ enableGuestMode }) => {
                 </div>
                 <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-purple-200 rounded-full blur-2xl opacity-50"></div>
               </div>
-              <h3 className="text-2xl font-black mb-4 text-gray-900">¡Domina el idioma!</h3>
+              <h3 className="text-2xl font-black mb-4 text-gray-900">Conecta con la cultura</h3>
               <p className="text-gray-600 leading-relaxed">
-                Alcanza fluidez mientras exploras la cultura andina y conectas con tus raíces
+                Suma vocabulario mientras lees cuentos, proverbios, adivinanzas y canciones
               </p>
             </div>
           </div>
@@ -292,29 +292,29 @@ const Home = ({ enableGuestMode }) => {
               <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h4 className="font-bold text-gray-900 mb-2">Progreso visible</h4>
-              <p className="text-sm text-gray-600">Ve tu avance en tiempo real</p>
+              <h4 className="font-bold text-gray-900 mb-2">Progreso guardado</h4>
+              <p className="text-sm text-gray-600">Retoma donde lo dejaste</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-blue-600" />
               </div>
-              <h4 className="font-bold text-gray-900 mb-2">Aprende rápido</h4>
-              <p className="text-sm text-gray-600">Método eficiente y comprobado</p>
+              <h4 className="font-bold text-gray-900 mb-2">Lecciones cortas</h4>
+              <p className="text-sm text-gray-600">Vocabulario por temas cotidianos</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Heart className="w-8 h-8 text-purple-600" />
               </div>
               <h4 className="font-bold text-gray-900 mb-2">Contenido cultural</h4>
-              <p className="text-sm text-gray-600">Aprende más que un idioma</p>
+              <p className="text-sm text-gray-600">Cuentos, proverbios y canciones</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <UserX className="w-8 h-8 text-orange-600" />
               </div>
-              <h4 className="font-bold text-gray-900 mb-2">Modo invitado</h4>
-              <p className="text-sm text-gray-600">Prueba sin registrarte</p>
+              <h4 className="font-bold text-gray-900 mb-2">Sin cuenta</h4>
+              <p className="text-sm text-gray-600">Prueba la Unidad 1 sin registrarte</p>
             </div>
           </div>
         </div>
@@ -329,10 +329,10 @@ const Home = ({ enableGuestMode }) => {
               🎯 POR QUÉ SIMIARU
             </span>
             <h2 className="text-5xl font-black text-gray-900">
-              Aprende de forma <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">inteligente</span>
+              Qué incluye <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">SimiAru</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Combinamos tecnología moderna con sabiduría ancestral para crear la mejor experiencia de aprendizaje
+              Vocabulario, ejercicios y cultura del altiplano en un solo lugar, gratis y sin publicidad
             </p>
           </div>
 
@@ -346,9 +346,9 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Lecciones Interactivas</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Lecciones interactivas</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Ejercicios gamificados con pronunciación por voz y retroalimentación instantánea
+                  Ejercicios con voz sintetizada y corrección al instante
                 </p>
                 <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
@@ -364,9 +364,9 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <Heart className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Cultura Viva</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Cultura viva</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Sumérgete en proverbios, canciones y cuentos tradicionales auténticos
+                  Cuentos, proverbios, adivinanzas y canciones en quechua y aymara, con su traducción
                 </p>
                 <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
@@ -382,9 +382,9 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <Trophy className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Sistema de Logros</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Rachas e insignias</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Gana Ayni Points, mantén rachas y desbloquea insignias culturales únicas
+                  Gana Ayni Points por cada lección, mantén tu racha diaria y desbloquea insignias
                 </p>
                 <div className="flex items-center gap-2 text-purple-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
@@ -400,13 +400,13 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <Target className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Progreso Inteligente</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Tu progreso, guardado</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Algoritmo adaptativo que se ajusta a tu nivel y velocidad de aprendizaje
+                  Cada lección registra tus aciertos para que veas tu avance y retomes donde lo dejaste
                 </p>
                 <div className="flex items-center gap-2 text-pink-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
-                  <span>Personalizado para ti</span>
+                  <span>Progreso por lección</span>
                 </div>
               </div>
             </div>
@@ -418,16 +418,16 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <UserX className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Modo Invitado</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Prueba sin cuenta</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Prueba la aplicación sin crear una cuenta. Explora la Unidad 1 completamente gratis
+                  Explora la Unidad 1 sin crear una cuenta. Para guardar tu progreso, regístrate gratis
                 </p>
                 <button 
                   onClick={handleGuestMode}
                   className="flex items-center gap-2 text-orange-600 font-bold text-sm hover:text-orange-700 transition-colors"
                 >
                   <Play className="w-5 h-5" />
-                  <span>Probar ahora →</span>
+                  <span>Probar sin cuenta →</span>
                 </button>
               </div>
             </div>
@@ -439,13 +439,13 @@ const Home = ({ enableGuestMode }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Sin Publicidad</h3>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Sin publicidad</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Experiencia de aprendizaje pura sin distracciones ni interrupciones molestas
+                  Aprende sin anuncios ni interrupciones
                 </p>
                 <div className="flex items-center gap-2 text-cyan-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
-                  <span>Gratis para siempre</span>
+                  <span>Gratis y de código abierto</span>
                 </div>
               </div>
             </div>
@@ -465,7 +465,7 @@ const Home = ({ enableGuestMode }) => {
               Elige tu <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">idioma</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Lenguas ancestrales del altiplano andino con contenido auténtico y culturalmente rico
+              Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones
             </p>
           </div>
 
@@ -506,12 +506,12 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                   </div>
                   <p className="text-xl text-green-50 mb-8 leading-relaxed">
-                    El idioma del Imperio Inca, hablado por más de 10 millones de personas en los Andes. Conecta con tus raíces y descubre la lengua de Machu Picchu.
+                    La lengua del Tahuantinsuyo, hablada hoy por millones de personas en los Andes. SimiAru enseña la variedad Cusco-Collao, la que se habla en Puno.
                   </p>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">8 unidades temáticas</span>
+                      <span className="text-lg">6 unidades temáticas</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
@@ -519,11 +519,11 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Pronunciación por voz</span>
+                      <span className="text-lg">Voz sintetizada</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Contenido cultural auténtico</span>
+                      <span className="text-lg">31 textos culturales</span>
                     </div>
                   </div>
                   <div className="flex gap-3 mt-8">
@@ -540,15 +540,15 @@ const Home = ({ enableGuestMode }) => {
                   </div>
                 </div>
                 <div className="p-12 bg-gradient-to-br from-green-50 to-white">
-                  <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás:</h4>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás</h4>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                         <span className="text-green-600 font-bold">1</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Saludos y Presentación</h5>
-                        <p className="text-gray-600 text-sm">Rimaykullayki, Allin p'unchay</p>
+                        <h5 className="font-bold text-gray-900">Saludos y presentaciones</h5>
+                        <p className="text-gray-600 text-sm">Rimaykullayki (hola)</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -556,8 +556,8 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-green-600 font-bold">2</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Familia y Sociedad</h5>
-                        <p className="text-gray-600 text-sm">Tayta, Mama, Wawqi, Ñana</p>
+                        <h5 className="font-bold text-gray-900">La familia</h5>
+                        <p className="text-gray-600 text-sm">Tayta, Mama, Wawqiy, Ñaña</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -565,7 +565,7 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-green-600 font-bold">3</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Números y Tiempo</h5>
+                        <h5 className="font-bold text-gray-900">Números del 1 al 20</h5>
                         <p className="text-gray-600 text-sm">Huk, Iskay, Kimsa...</p>
                       </div>
                     </div>
@@ -574,8 +574,8 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-green-600 font-bold">4</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Comida y Naturaleza</h5>
-                        <p className="text-gray-600 text-sm">Papa, Sara, Kinwa, Pachamama</p>
+                        <h5 className="font-bold text-gray-900">Colores, animales y comidas</h5>
+                        <p className="text-gray-600 text-sm">Puka, Kuntur, Sara</p>
                       </div>
                     </div>
                   </div>
@@ -597,12 +597,12 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                   </div>
                   <p className="text-xl text-blue-50 mb-8 leading-relaxed">
-                    La lengua del lago Titicaca y las montañas sagradas. Más de 2 millones de hablantes mantienen viva esta hermosa lengua del altiplano.
+                    La lengua del lago Titicaca, hablada por alrededor de 2 millones de personas en Perú, Bolivia y Chile. SimiAru enseña el aymara central.
                   </p>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">8 unidades temáticas</span>
+                      <span className="text-lg">6 unidades temáticas</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
@@ -610,11 +610,11 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Pronunciación por voz</span>
+                      <span className="text-lg">Voz sintetizada</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Sabiduría del Titicaca</span>
+                      <span className="text-lg">38 textos culturales</span>
                     </div>
                   </div>
                   <div className="flex gap-3 mt-8">
@@ -631,15 +631,15 @@ const Home = ({ enableGuestMode }) => {
                   </div>
                 </div>
                 <div className="p-12 bg-gradient-to-br from-blue-50 to-white">
-                  <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás:</h4>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-6">Lo que aprenderás</h4>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                         <span className="text-blue-600 font-bold">1</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Saludos y Presentación</h5>
-                        <p className="text-gray-600 text-sm">Kamisaraki, Suma urukiwa</p>
+                        <h5 className="font-bold text-gray-900">Saludos y presentaciones</h5>
+                        <p className="text-gray-600 text-sm">Kamisaraki (¿cómo estás?)</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -647,8 +647,8 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-blue-600 font-bold">2</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Familia y Comunidad</h5>
-                        <p className="text-gray-600 text-sm">Awkisa, Tayka, Jilata, Kullaka</p>
+                        <h5 className="font-bold text-gray-900">La familia</h5>
+                        <p className="text-gray-600 text-sm">Awki, Tayka, Jilata, Kullaka</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -656,7 +656,7 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-blue-600 font-bold">3</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Números y Calendario</h5>
+                        <h5 className="font-bold text-gray-900">Números del 1 al 10</h5>
                         <p className="text-gray-600 text-sm">Maya, Paya, Kimsa...</p>
                       </div>
                     </div>
@@ -665,8 +665,8 @@ const Home = ({ enableGuestMode }) => {
                         <span className="text-blue-600 font-bold">4</span>
                       </div>
                       <div>
-                        <h5 className="font-bold text-gray-900">Vida en el Altiplano</h5>
-                        <p className="text-gray-600 text-sm">Ch'uqi, Uma, Qarwa, Quta</p>
+                        <h5 className="font-bold text-gray-900">Colores, animales y comidas</h5>
+                        <p className="text-gray-600 text-sm">Qarwa, Kunturi, Ch'uqi</p>
                       </div>
                     </div>
                   </div>
@@ -732,34 +732,34 @@ const Home = ({ enableGuestMode }) => {
         <div className="container mx-auto px-6 relative z-10 text-center">
           <div className="max-w-4xl mx-auto space-y-8">
             <h2 className="text-5xl md:text-6xl font-black text-white leading-tight">
-              Comienza tu aventura andina <span className="text-yellow-300">hoy</span>
+              Empieza con la <span className="text-yellow-300">Unidad 1</span>
             </h2>
             <p className="text-2xl text-white/90 leading-relaxed">
-              Empieza hoy a conectar con tus raíces aprendiendo lenguas ancestrales
+              Crea tu cuenta para guardar tu progreso, o pruébala sin registrarte
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <Link 
                 to="/register" 
                 className="px-12 py-6 bg-white text-green-600 font-black rounded-2xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 text-xl"
               >
-                Empezar Gratis Ahora
+                Empezar gratis
               </Link>
               <button 
                 onClick={handleGuestMode}
                 className="px-12 py-6 bg-orange-500 text-white font-black rounded-2xl hover:bg-orange-600 hover:shadow-2xl transform hover:scale-110 transition-all duration-300 text-xl flex items-center gap-3"
               >
                 <UserX className="w-6 h-6" />
-                Modo Invitado
+                Probar sin cuenta
               </button>
             </div>
             <div className="text-white/90 text-sm pt-4">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <CheckCircle className="w-5 h-5 text-yellow-300" />
-                <span className="font-semibold">Sin tarjeta de crédito</span>
+                <span className="font-semibold">Gratis y sin publicidad</span>
               </div>
               <div className="flex items-center justify-center gap-2">
                 <CheckCircle className="w-5 h-5 text-yellow-300" />
-                <span className="font-semibold">Prueba sin registrarte con el modo invitado</span>
+                <span className="font-semibold">Sin cuenta, explora la Unidad 1 completa</span>
               </div>
             </div>
           </div>
@@ -829,7 +829,7 @@ const Home = ({ enableGuestMode }) => {
           {/* Copyright */}
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">
-              © 2025 SimiAru. Todos los derechos reservados.
+              © 2026 SimiAru
             </p>
             <p className="text-gray-400 text-sm">
               Hecho con <span className="text-red-500">❤️</span> para preservar lenguas ancestrales
