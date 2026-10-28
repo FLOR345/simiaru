@@ -189,7 +189,7 @@ const Home = ({ enableGuestMode }) => {
 
           {/* Menú de celular y tablet */}
           {menuOpen && (
-            <nav id="menu-movil" aria-label="Menú" className="xl:hidden mt-3 pt-2 pb-2 border-t border-stone-200">
+            <nav id="menu-movil" aria-label="Menú" className="menu-entrada xl:hidden mt-3 pt-2 pb-2 border-t border-stone-200">
               <ul>
                 {NAV_LINKS.map(([href, label]) => (
                   <li key={href}>
@@ -229,7 +229,7 @@ const Home = ({ enableGuestMode }) => {
         <section className="relative pt-32 pb-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8 animate-fade-in-up">
+              <div className="space-y-8">
                 <p className="inline-flex items-center px-4 py-2 border border-stone-300 rounded-full text-sm font-semibold text-stone-700">
                   Gratis • Sin publicidad • Código abierto
                 </p>
@@ -238,7 +238,7 @@ const Home = ({ enableGuestMode }) => {
                   <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
                     Aprende
                     <br />
-                    <span className="text-green-700">Quechua</span> y <span className="text-blue-800">Aymara</span>
+                    <span className="lengua-subrayado text-green-700">Quechua</span> y <span className="lengua-subrayado lengua-segunda text-blue-800">Aymara</span>
                   </h1>
                   <p className="text-xl sm:text-2xl text-stone-600 leading-relaxed max-w-xl">
                     Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
@@ -251,7 +251,7 @@ const Home = ({ enableGuestMode }) => {
                     className="group px-9 py-4 bg-green-700 hover:bg-green-800 text-white font-bold rounded-2xl transition-colors text-center text-lg flex items-center justify-center gap-3"
                   >
                     Empezar gratis
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-6 h-6 motion-safe:group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <button
                     type="button"
@@ -278,7 +278,7 @@ const Home = ({ enableGuestMode }) => {
                 </div>
               </div>
 
-              <div className="animate-fade-in-right">
+              <div>
                 <div className="bg-white rounded-3xl border border-stone-200 p-8 sm:p-12">
                   <img
                     src={logo}
@@ -610,26 +610,57 @@ const Home = ({ enableGuestMode }) => {
           outline: 3px solid #15803d;
           outline-offset: 2px;
         }
-        @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+        /* Momento propio: una línea "tejida" bajo cada lengua, en su color */
+        .lengua-subrayado {
+          position: relative;
+          display: inline-block;
         }
-        .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out;
+        .lengua-subrayado::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: -0.04em;
+          height: 0.09em;
+          border-radius: 999px;
+          background: currentColor;
+          opacity: 0.35;
+          animation: tejido 700ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
         }
-        @keyframes fade-in-right {
-          from { opacity: 0; transform: translateX(30px); }
-          to { opacity: 1; transform: translateX(0); }
+        .lengua-segunda::after {
+          animation-delay: 330ms;
         }
-        .animate-fade-in-right {
-          animation: fade-in-right 1s ease-out 0.3s both;
+        @keyframes tejido {
+          from { clip-path: inset(0 100% 0 0); }
+          to { clip-path: inset(0 0 0 0); }
         }
+        /* Cambio de pestaña: lo justo para notar el cambio */
         @keyframes fade-in {
           from { opacity: 0; }
           to { opacity: 1; }
         }
         .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
+          animation: fade-in 200ms ease-out;
+        }
+        /* Menú del celular */
+        @keyframes menu-entrada {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .menu-entrada {
+          animation: menu-entrada 200ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* Movimiento reducido: sin desplazamientos; se conservan color y opacidad */
+        @media (prefers-reduced-motion: reduce) {
+          html {
+            scroll-behavior: auto;
+          }
+          .lengua-subrayado::after {
+            animation: none;
+          }
+          .menu-entrada {
+            animation: fade-in 150ms ease-out;
+          }
         }
         /* Ajuste para el encabezado fijo */
         section {
