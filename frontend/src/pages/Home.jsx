@@ -603,15 +603,6 @@ const Home = ({ enableGuestMode }) => {
         h1, h2, h3 {
           text-wrap: balance;
         }
-        ::selection {
-          background: #bbf7d0;
-          color: #14532d;
-        }
-        a:focus-visible,
-        button:focus-visible {
-          outline: 3px solid #15803d;
-          outline-offset: 2px;
-        }
         /* Momento propio: una línea "tejida" bajo cada lengua, en su color */
         .lengua-subrayado {
           position: relative;

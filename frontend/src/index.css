@@ -14,6 +14,18 @@ body {
   min-height: 100vh;
 }
 
+/* Foco del teclado y selección de texto con la paleta de SimiAru, en todas las pantallas */
+::selection {
+  background: #bbf7d0;
+  color: #14532d;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #15803d;
+  outline-offset: 2px;
+}
+
 @layer components {
   .btn-primary {
     @apply bg-wiphala-green hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl;
