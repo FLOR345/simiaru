@@ -1,7 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Mountain, Heart, BookOpen, Globe, Trophy, Zap, Target, CheckCircle, ArrowRight, Play, Shield, UserX, Github, Menu, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { API_URL } from '../config';
 import logo from '../assets/logo.jpg';
+import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
+import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
+import fotoTari from '../assets/fotos/tari-aymara.jpg';
+import fotoSikuris from '../assets/fotos/sikuris-puno.jpg';
+import fotoPapas from '../assets/fotos/papas-nativas.jpg';
+import fotoLlamas from '../assets/fotos/llamas-litografia.jpg';
+import videoLago from '../assets/video/titicaca-timelapse.webm';
+import posterLago from '../assets/video/titicaca-timelapse.jpg';
 
 // Paleta con significado (ver PRODUCT.md):
 // - verde = quechua y acción principal, azul lago = aymara, terracota = probar sin cuenta
@@ -86,6 +95,194 @@ const NAV_LINKS = [
 ];
 
 const REPO = 'https://github.com/FLOR345/simiaru';
+
+// Fotos y video de Wikimedia Commons (créditos en el pie de página)
+const FOTOS_CULTURA = [
+  [fotoSikuris, 'Sikuris con zampoñas y bombo bailando en una fiesta de Puno', 'Sikuris en Puno', 1100, 875, '-rotate-3'],
+  [fotoTari, 'Tari, una bolsa tejida aymara, junto a una laguna de altura', 'Tari aymara', 900, 1599, 'rotate-2'],
+  [fotoLlamas, 'Litografía de 1853: llamas cargadas cruzando los Andes', 'Llamas en los Andes, 1853', 1260, 640, '-rotate-1'],
+];
+
+// ==================== LA PALABRA VIVA ====================
+// Palabras de ejemplo: se muestran al instante, sin esperar al servidor
+const EJEMPLOS = {
+  agua: ['yaku', 'uma'],
+  sol: ['inti', 'inti'],
+  casa: ['wasi', 'uta'],
+  lago: ['qucha', 'quta'],
+  palabra: ['simi', 'aru'],
+  papa: ['papa', "ch'uqi"],
+};
+
+// Quita tildes y mayúsculas para comparar lo escrito con el diccionario (conserva la ñ)
+const normalizar = (texto) =>
+  String(texto ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/(?!̃)[̀-ͯ]/g, '')
+    .normalize('NFC')
+    .trim();
+
+// De todas las coincidencias, la palabra exacta primero; si no, la que empieza igual
+const elegirTraduccion = (palabras, termino) => {
+  if (!Array.isArray(palabras) || palabras.length === 0) return null;
+  const t = normalizar(termino);
+  const exacta = palabras.find((p) => normalizar(p.palabra_espanol) === t);
+  const empieza = palabras.find((p) => normalizar(p.palabra_espanol).startsWith(t));
+  return (exacta || empieza || palabras[0]).palabra_objetivo || null;
+};
+
+const PalabraViva = () => {
+  const [palabra, setPalabra] = useState('agua');
+  const [resultado, setResultado] = useState({ estado: 'listo', quechua: 'yaku', aymara: 'uma' });
+  const consulta = useRef(0);
+
+  useEffect(() => {
+    const termino = normalizar(palabra);
+    const id = ++consulta.current;
+
+    if (EJEMPLOS[termino]) {
+      const [quechua, aymara] = EJEMPLOS[termino];
+      setResultado({ estado: 'listo', quechua, aymara });
+      return undefined;
+    }
+    if (termino.length < 2) {
+      setResultado({ estado: 'vacio' });
+      return undefined;
+    }
+
+    setResultado((previo) => ({ ...previo, estado: 'buscando' }));
+    // El servidor gratuito se duerme: si tarda más de 10 s, se avisa en vez de dejar esperando
+    const corte = new AbortController();
+    let limite;
+    const espera = setTimeout(async () => {
+      limite = setTimeout(() => corte.abort(), 10000);
+      try {
+        const buscar = async (idioma) => {
+          const url = `${API_URL}/api/dictionary/search?query=${encodeURIComponent(termino)}&idioma=${idioma}`;
+          const respuesta = await fetch(url, { signal: corte.signal });
+          if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+          const datos = await respuesta.json();
+          return elegirTraduccion(datos.words, termino);
+        };
+        const [quechua, aymara] = await Promise.all([buscar('quechua'), buscar('aymara')]);
+        if (id !== consulta.current) return;
+        setResultado(quechua || aymara ? { estado: 'listo', quechua, aymara } : { estado: 'sin-resultado' });
+      } catch {
+        if (id === consulta.current) setResultado({ estado: 'error' });
+      } finally {
+        clearTimeout(limite);
+      }
+    }, 450);
+
+    return () => {
+      clearTimeout(espera);
+      clearTimeout(limite);
+      corte.abort();
+    };
+  }, [palabra]);
+
+  const sinDato = <span className="text-stone-500 font-semibold">(aún no está)</span>;
+
+  return (
+    <div className="max-w-4xl mx-auto bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-12 text-center">
+      <p className="text-2xl sm:text-4xl font-bold leading-snug">
+        <label htmlFor="palabra-viva" className="sr-only">
+          Escribe una palabra en castellano
+        </label>
+        <input
+          id="palabra-viva"
+          type="text"
+          value={palabra}
+          maxLength={24}
+          autoComplete="off"
+          spellCheck="false"
+          onChange={(e) => setPalabra(e.target.value)}
+          style={{ width: `${Math.max(palabra.length, 3) + 1.5}ch` }}
+          className="max-w-full px-2 text-center font-extrabold text-stone-900 bg-white border-b-4 border-green-700 rounded-t-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+        />{' '}
+        <span aria-live="polite" aria-atomic="true">
+          {resultado.estado === 'listo' && (
+            <>
+              en quechua es{' '}
+              <strong lang="qu" className="text-green-700">{resultado.quechua || sinDato}</strong>; en aymara,{' '}
+              <strong lang="ay" className="text-blue-800">{resultado.aymara || sinDato}</strong>.
+            </>
+          )}
+          {resultado.estado === 'buscando' && <span className="text-stone-500">lo busco en el diccionario…</span>}
+          {resultado.estado === 'vacio' && <span className="text-stone-500">escribe una palabra en castellano.</span>}
+          {resultado.estado === 'sin-resultado' && (
+            <span className="text-stone-500">no está en el diccionario todavía. Prueba otra.</span>
+          )}
+          {resultado.estado === 'error' && (
+            <span className="text-stone-500 text-xl sm:text-2xl">
+              no pude consultar el diccionario; el servidor puede tardar en despertar. Prueba de nuevo en un momento.
+            </span>
+          )}
+        </span>
+      </p>
+
+      <div className="mt-8 flex flex-wrap justify-center items-center gap-2">
+        <span className="text-stone-600 font-semibold mr-1">Prueba con:</span>
+        {Object.keys(EJEMPLOS).map((ejemplo) => (
+          <button
+            key={ejemplo}
+            type="button"
+            onClick={() => setPalabra(ejemplo)}
+            className={`toque min-h-11 px-4 rounded-full border-2 font-semibold ${
+              normalizar(palabra) === ejemplo
+                ? 'bg-green-700 border-green-700 text-white'
+                : 'bg-white border-stone-300 text-stone-700 hover:border-stone-400'
+            }`}
+          >
+            {ejemplo}
+          </button>
+        ))}
+      </div>
+      <p className="mt-6 text-sm text-stone-600">
+        Las traducciones salen del diccionario de SimiAru, con más de 1,500 palabras.
+      </p>
+    </div>
+  );
+};
+
+// Time-lapse del Titicaca en miniatura, dentro de la frase. Con movimiento reducido queda quieto.
+const MiniaturaLago = ({ className }) => {
+  const video = useRef(null);
+
+  useEffect(() => {
+    const consulta = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const aplicar = () => {
+      const el = video.current;
+      if (!el) return;
+      if (consulta?.matches) el.pause();
+      else el.play?.().catch(() => {});
+    };
+    aplicar();
+    consulta?.addEventListener?.('change', aplicar);
+    return () => consulta?.removeEventListener?.('change', aplicar);
+  }, []);
+
+  return (
+    <video
+      ref={video}
+      className={className}
+      src={videoLago}
+      poster={posterLago}
+      width="854"
+      height="480"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden="true"
+    />
+  );
+};
+
+// Miniatura en línea con el texto, pegada a su palabra para que nunca abra una línea
+const miniatura = 'inline-block h-[0.95em] w-[1.5em] mx-1 align-[-0.15em] object-cover rounded-md';
 
 const Home = ({ enableGuestMode }) => {
   const [activeTab, setActiveTab] = useState('quechua');
@@ -299,14 +496,25 @@ const Home = ({ enableGuestMode }) => {
                 </div>
               </div>
 
-              <div>
-                <div className="bg-white rounded-3xl border border-stone-200 p-8 sm:p-12">
+              {/* Foto del Titicaca con la mascota encima */}
+              <div className="relative pb-10 lg:pb-0">
+                <figure className="foto-entrada rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
+                  <img
+                    src={fotoTiticaca}
+                    alt="Amanecer sobre el lago Titicaca, con los totorales de Puno en sombra"
+                    width="1920"
+                    height="929"
+                    fetchpriority="high"
+                    className="w-full h-full object-cover"
+                  />
+                </figure>
+                <div className="absolute -bottom-2 left-4 sm:left-6 lg:-left-8 lg:bottom-8 bg-white rounded-3xl border border-stone-200 p-3 sm:p-4 shadow-xl">
                   <img
                     src={logo}
                     alt="Mascota de SimiAru: una llama con chullo y chalina andina"
                     width="253"
                     height="299"
-                    className="w-full max-w-sm h-auto mx-auto"
+                    className="w-24 sm:w-32 h-auto"
                   />
                 </div>
               </div>
@@ -314,8 +522,27 @@ const Home = ({ enableGuestMode }) => {
           </div>
         </section>
 
+        {/* ==================== LA PALABRA VIVA ==================== */}
+        <section id="palabra" className="py-24 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12 space-y-4">
+              <h2 className="text-4xl md:text-5xl font-bold">
+                Prueba una <span className="text-green-700">palabra</span>
+              </h2>
+              <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
+                Aprende las palabras del{' '}
+                <span className="whitespace-nowrap">lago<MiniaturaLago className={miniatura} />,</span> del{' '}
+                <span className="whitespace-nowrap">tejido<img className={miniatura} src={fotoTari} alt="" width="900" height="1599" loading="lazy" />,</span> de la{' '}
+                <span className="whitespace-nowrap">chacra<img className={miniatura} src={fotoPapas} alt="" width="1300" height="747" loading="lazy" /></span> y de la{' '}
+                <span className="whitespace-nowrap">fiesta<img className={miniatura} src={fotoSikuris} alt="" width="1100" height="875" loading="lazy" />,</span> en quechua y en aymara
+              </p>
+            </div>
+            <PalabraViva />
+          </div>
+        </section>
+
         {/* ==================== CÓMO FUNCIONA ==================== */}
-        <section id="how-it-works" className="py-24 bg-white">
+        <section id="how-it-works" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold">
@@ -351,7 +578,7 @@ const Home = ({ enableGuestMode }) => {
         </section>
 
         {/* ==================== QUÉ INCLUYE ==================== */}
-        <section id="features" className="py-24 bg-stone-50">
+        <section id="features" className="py-24 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold">
@@ -364,7 +591,7 @@ const Home = ({ enableGuestMode }) => {
 
             <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {FEATURES.map(([Icon, title, text, tag]) => (
-                <li key={title} className="bg-white rounded-2xl p-7 border border-stone-200">
+                <li key={title} className="bg-stone-50 rounded-2xl p-7 border border-stone-200">
                   <div className="flex items-center gap-3 mb-3">
                     <Icon className="w-6 h-6 text-green-700 shrink-0" aria-hidden="true" />
                     <h3 className="text-xl font-bold">{title}</h3>
@@ -377,7 +604,7 @@ const Home = ({ enableGuestMode }) => {
                 </li>
               ))}
 
-              <li className="bg-white rounded-2xl p-7 border-2 border-orange-700">
+              <li className="bg-stone-50 rounded-2xl p-7 border-2 border-orange-700">
                 <div className="flex items-center gap-3 mb-3">
                   <UserX className="w-6 h-6 text-orange-700 shrink-0" aria-hidden="true" />
                   <h3 className="text-xl font-bold">Prueba sin cuenta</h3>
@@ -399,12 +626,30 @@ const Home = ({ enableGuestMode }) => {
         </section>
 
         {/* ==================== IDIOMAS ==================== */}
-        <section id="languages" className="py-24 bg-white">
+        <section id="languages" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold">Elige tu idioma</h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones</p>
             </div>
+
+            <figure className="max-w-5xl mx-auto mb-12">
+              <div className="rounded-3xl overflow-hidden aspect-[16/9] sm:aspect-[21/9]">
+                <img
+                  src={fotoPuno}
+                  alt="Puno desde un cerro: casas de ladrillo hasta la orilla del lago Titicaca y los cerros al fondo"
+                  width="1600"
+                  height="642"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <figcaption className="mt-4 text-center text-stone-600">
+                <strong className="text-stone-900">Dos lenguas, un mismo lago.</strong> En Puno, el quechua y el aymara
+                conviven en la misma calle, a veces en la misma familia.
+              </figcaption>
+            </figure>
 
             <div className="flex justify-center gap-4 mb-10" role="tablist" aria-label="Idioma">
               {languageKeys.map((key) => {
@@ -492,6 +737,33 @@ const Home = ({ enableGuestMode }) => {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* ==================== CULTURA VIVA ==================== */}
+        <section id="cultura" className="py-24 bg-white overflow-hidden">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16 space-y-4">
+              <h2 className="text-4xl md:text-5xl font-bold">
+                Cultura <span className="text-green-700">viva</span>
+              </h2>
+              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
+                69 cuentos, proverbios, adivinanzas y canciones, en quechua y en aymara, cada uno con su traducción
+              </p>
+            </div>
+
+            <ul className="grid sm:grid-cols-3 gap-10 sm:gap-6 max-w-5xl mx-auto items-center">
+              {FOTOS_CULTURA.map(([src, alt, caption, width, height, giro]) => (
+                <li key={caption}>
+                  <figure className={`copia ${giro} bg-white p-3 pb-4 rounded-xl border border-stone-200 shadow-lg`}>
+                    <div className="aspect-[4/3] overflow-hidden rounded-lg">
+                      <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                    </div>
+                    <figcaption className="mt-3 text-center font-semibold text-stone-700">{caption}</figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -611,6 +883,20 @@ const Home = ({ enableGuestMode }) => {
             <p className="text-stone-400 text-sm">© 2026 SimiAru</p>
             <p className="text-stone-400 text-sm">Hecho para preservar lenguas ancestrales</p>
           </div>
+
+          <p className="mt-8 text-stone-400 text-sm leading-relaxed max-w-4xl [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-white">
+            Fotos y video de Wikimedia Commons, recortados para esta página:{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Amanecer_en_el_lago_Titicaca,_Puno,_Per%C3%BA,_2015-08-01,_DD_01.JPG">amanecer en el Titicaca</a> y{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Vista_de_Puno_y_el_Titicaca,_Per%C3%BA,_2015-08-01,_DD_53-54_PAN.JPG">vista de Puno</a>, de Diego Delso;{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Tari_textil_Aymara.jpg">tari aymara</a>, de Jhulis (las tres{' '}
+            <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>);{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Types_of_Potatoes_in_Peru.jpg">papas nativas</a>, de Cathetovar (
+            <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>);{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Sikuris,_Puno-Peru.jpg">sikuris de Puno</a> (CC0);{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Llamas_traversing_the_Andes_laden_with_silver_Titicaca_balsa_off_Puno_-_-_sketched_by_L._Gibbon_;_JQ_;_lith._of_P.S._Duval_%26_Co._Philada._LCCN2014649307.tif">litografía de L. Gibbon, 1853</a> (dominio público) y{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Lake_Titicaca_time-lapse.webm">time-lapse del Titicaca</a>, de Jemma Saunders (
+            <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>).
+          </p>
         </div>
       </footer>
 
@@ -662,6 +948,23 @@ const Home = ({ enableGuestMode }) => {
           transform-origin: top;
           animation: menu-entrada 180ms cubic-bezier(0.23, 1, 0.32, 1);
         }
+        /* Foto de inicio: se abre de abajo hacia arriba una sola vez, al cargar */
+        @keyframes foto-entrada {
+          from { clip-path: inset(100% 0 0 0); }
+          to { clip-path: inset(0 0 0 0); }
+        }
+        .foto-entrada {
+          animation: foto-entrada 900ms cubic-bezier(0.77, 0, 0.175, 1) 100ms both;
+        }
+        /* Fotos de cultura: con mouse, la copia se endereza y sube un poco */
+        .copia {
+          transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        @media (hover: hover) and (pointer: fine) {
+          .copia:hover {
+            transform: rotate(0deg) translateY(-4px);
+          }
+        }
         /* Ícono de menú / cerrar: entra un poco más pequeño, nunca desde cero */
         @keyframes icono-cambio {
           from { opacity: 0; transform: scale(0.9) rotate(-45deg); }
@@ -679,8 +982,12 @@ const Home = ({ enableGuestMode }) => {
             animation: none;
           }
           .menu-entrada,
-          .icono-cambio {
+          .icono-cambio,
+          .foto-entrada {
             animation: fade-in 150ms ease-out;
+          }
+          .copia {
+            transition: none;
           }
         }
         /* Ajuste para el encabezado fijo */
