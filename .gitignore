@@ -29,3 +29,6 @@ Thumbs.db
 # Temporal
 *.tmp
 *.temp
+.taste-skill/
+.claude/
+frontend/assets/
