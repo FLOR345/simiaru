@@ -1,7 +1,81 @@
 import { useState, useEffect } from 'react';
 import { Volume2, Check, X, RotateCcw } from 'lucide-react';
 
-const ExerciseTypes = ({ exercise, onAnswer }) => {
+// ==================== COMPARACIÓN DE RESPUESTAS ====================
+// Acepta diferencias de escritura que no cambian la palabra:
+// - mayúsculas, espacios y signos de puntuación al inicio o al final;
+// - cualquier tipo de apóstrofo (' ’ ‘ ´ `), muy común en quechua y aymara (p'unchay, ch'uqi);
+// - tildes en vocales (mamá = mama). La ñ se conserva porque es otra letra.
+export const normalizeAnswer = (value) =>
+  String(value ?? '')
+    .toLowerCase()
+    .replace(/[’‘´`ʼ]/g, "'")
+    .replace(/[áàäâ]/g, 'a')
+    .replace(/[éèëê]/g, 'e')
+    .replace(/[íìïî]/g, 'i')
+    .replace(/[óòöô]/g, 'o')
+    .replace(/[úùüû]/g, 'u')
+    .replace(/^[\s¿¡.,;:!?"]+|[\s¿¡.,;:!?"]+$/g, '')
+    .replace(/\s+/g, ' ');
+
+const sameAnswer = (a, b) => normalizeAnswer(a) === normalizeAnswer(b);
+
+// Convierte JSON guardado como texto sin romperse si no lo es
+const safeJsonParse = (value, defaultValue = []) => {
+  if (!value) return defaultValue;
+  if (typeof value === 'object') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return Array.isArray(defaultValue) ? [value] : value;
+  }
+};
+
+// Pronunciación con la voz del navegador (síntesis en español; ver PRODUCT.md)
+const speakWord = (word) => {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = 'es-PE';
+  utterance.rate = 0.8;
+  window.speechSynthesis.speak(utterance);
+};
+
+const optionClass = (active) =>
+  `w-full p-4 text-left rounded-xl border-2 transition-colors ${
+    active ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
+  }`;
+
+const textInputClass =
+  'w-full px-4 py-4 border-2 border-stone-300 rounded-xl focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none text-lg';
+
+const VerifyButton = ({ disabled, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="w-full min-h-12 py-4 px-6 rounded-xl font-bold transition-colors bg-green-700 hover:bg-green-800 text-white disabled:bg-stone-200 disabled:text-stone-500 disabled:cursor-not-allowed"
+  >
+    Verificar
+  </button>
+);
+
+const ResetButton = ({ onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-lg transition-colors font-semibold"
+  >
+    <RotateCcw className="w-4 h-4" aria-hidden="true" />
+    Reiniciar
+  </button>
+);
+
+/**
+ * Muestra un ejercicio y llama a onAnswer(esCorrecta, respuestaCorrectaLegible).
+ * Con answered=true queda bloqueado mientras se muestra la corrección.
+ */
+const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageLabel = 'Quechua' }) => {
   const [selected, setSelected] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,7 +84,7 @@ const ExerciseTypes = ({ exercise, onAnswer }) => {
   const [fillBlanks, setFillBlanks] = useState({});
   const [selectedWords, setSelectedWords] = useState([]);
 
-  // Reset state when exercise changes
+  // Reiniciar al cambiar de ejercicio
   useEffect(() => {
     setSelected(null);
     setUserAnswer('');
@@ -20,575 +94,416 @@ const ExerciseTypes = ({ exercise, onAnswer }) => {
     setSelectedWords([]);
   }, [exercise?.id]);
 
-  // Helper function to safely parse JSON
-  const safeJsonParse = (value, defaultValue = []) => {
-    if (!value) return defaultValue;
-    if (typeof value === 'object') return value;
-    try {
-      return JSON.parse(value);
-    } catch (e) {
-      // If it's not valid JSON, return as single item array or the value itself
-      if (Array.isArray(defaultValue)) {
-        return [value];
-      }
-      return value;
-    }
+  if (!exercise) {
+    return <p className="text-center text-stone-600 p-6">No hay ejercicio disponible</p>;
+  }
+
+  const answer = (isCorrect, correctText) => {
+    if (answered) return;
+    onAnswer(isCorrect, correctText);
   };
 
   const handleSubmit = () => {
-    if (!exercise) return;
-    
     switch (exercise.tipo) {
       case 'multiple_choice':
         if (selected === null) return;
-        onAnswer(selected === exercise.respuesta_correcta);
+        answer(sameAnswer(selected, exercise.respuesta_correcta), exercise.respuesta_correcta);
         break;
-        
+
       case 'listen_write':
+      case 'translate':
         if (!userAnswer.trim()) return;
-        onAnswer(userAnswer.toLowerCase().trim() === exercise.respuesta_correcta.toLowerCase().trim());
+        answer(sameAnswer(userAnswer, exercise.respuesta_correcta), exercise.respuesta_correcta);
         break;
-        
-      case 'true_false':
+
+      case 'true_false': {
         if (selected === null) return;
         const correctBool = exercise.respuesta_correcta === 'true' || exercise.respuesta_correcta === true;
-        onAnswer(selected === correctBool);
+        answer(selected === correctBool, correctBool ? 'Verdadero' : 'Falso');
         break;
-        
-      case 'fill_blanks':
+      }
+
+      case 'fill_blanks': {
         const answers = Object.values(fillBlanks);
         if (answers.length === 0) return;
         const correctAnswers = safeJsonParse(exercise.respuesta_correcta, []);
-        const isCorrect = answers.every((ans, idx) => 
-          ans.toLowerCase().trim() === (correctAnswers[idx] || '').toLowerCase().trim()
-        );
-        onAnswer(isCorrect);
+        const isCorrect = answers.every((ans, idx) => sameAnswer(ans, correctAnswers[idx] || ''));
+        answer(isCorrect, correctAnswers.join(', '));
         break;
-        
-      case 'matching':
+      }
+
+      case 'matching': {
         const correctPairs = safeJsonParse(exercise.respuesta_correcta, {});
-        const isMatch = Object.keys(correctPairs).every(key => 
-          matchingPairs[key] === correctPairs[key]
-        );
-        onAnswer(isMatch && Object.keys(matchingPairs).length === Object.keys(correctPairs).length);
+        const keys = Object.keys(correctPairs);
+        const isMatch = keys.length === Object.keys(matchingPairs).length && keys.every((key) => matchingPairs[key] === correctPairs[key]);
+        answer(isMatch, keys.map((key) => `${key} = ${correctPairs[key]}`).join('; '));
         break;
-        
+      }
+
       case 'word_order':
-      case 'drag_words':
-        // Handle both array format ["word1", "word2"] and single word "word1"
+      case 'drag_words': {
         let correctOrder = safeJsonParse(exercise.respuesta_correcta, []);
-        
-        // If it's a single word (not array), wrap it
-        if (!Array.isArray(correctOrder)) {
-          correctOrder = [correctOrder];
-        }
-        
-        // Compare selected words with correct order
-        const isOrderCorrect = selectedWords.length === correctOrder.length &&
-          selectedWords.every((word, idx) => 
-            word.toLowerCase().trim() === (correctOrder[idx] || '').toLowerCase().trim()
-          );
-        onAnswer(isOrderCorrect);
+        if (!Array.isArray(correctOrder)) correctOrder = [correctOrder];
+        const isOrderCorrect =
+          selectedWords.length === correctOrder.length && selectedWords.every((word, idx) => sameAnswer(word, correctOrder[idx] || ''));
+        answer(isOrderCorrect, correctOrder.join(' '));
         break;
-        
-      case 'translate':
-        if (!userAnswer.trim()) return;
-        const userAns = userAnswer.toLowerCase().trim();
-        const correctAns = exercise.respuesta_correcta.toLowerCase().trim();
-        onAnswer(userAns === correctAns);
-        break;
-        
+      }
+
       default:
-        console.log('Tipo de ejercicio no manejado:', exercise.tipo);
+        break;
     }
   };
 
-  // Text-to-Speech para pronunciar palabras
-  const speakWord = (word) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = 'es-PE';
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
+  // Enter envía la respuesta en los campos de texto
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const playAudio = () => {
+    setIsPlaying(true);
+    const fallback = () => {
+      setIsPlaying(false);
+      speakWord(exercise.respuesta_correcta);
+    };
     if (exercise.audio_url) {
-      setIsPlaying(true);
       const audio = new Audio(exercise.audio_url);
       audio.onended = () => setIsPlaying(false);
-      audio.onerror = () => {
-        setIsPlaying(false);
-        speakWord(exercise.respuesta_correcta);
-      };
-      audio.play().catch(() => {
-        setIsPlaying(false);
-        speakWord(exercise.respuesta_correcta);
-      });
+      audio.onerror = fallback;
+      audio.play().catch(fallback);
     } else {
-      setIsPlaying(true);
       speakWord(exercise.respuesta_correcta);
       setTimeout(() => setIsPlaying(false), 1500);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
+  const questionId = `pregunta-${exercise.id}`;
 
-  if (!exercise) {
-    return <div className="text-center text-gray-500 p-6">No hay ejercicio disponible</div>;
-  }
-
-  // =====================================================
   // 1. OPCIÓN MÚLTIPLE
-  // =====================================================
   if (exercise.tipo === 'multiple_choice') {
     const opciones = safeJsonParse(exercise.opciones, []);
-    
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {exercise.pregunta}
-        </h2>
-        <div className="space-y-3 mb-6">
+        <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
+        <div className="space-y-3 mb-6" role="group" aria-labelledby={questionId}>
           {opciones.map((opcion, index) => (
             <button
               key={index}
+              type="button"
+              aria-pressed={selected === opcion}
+              disabled={answered}
               onClick={() => setSelected(opcion)}
-              className={`w-full p-4 text-left rounded-xl border-2 transition-all ${
-                selected === opcion
-                  ? 'border-green-600 bg-green-50 shadow-md'
-                  : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-              }`}
+              className={optionClass(selected === opcion)}
             >
-              <span className="font-medium">{opcion}</span>
+              <span className="font-semibold">{opcion}</span>
             </button>
           ))}
         </div>
-        <button
-          onClick={handleSubmit}
-          disabled={selected === null}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            selected === null
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={selected === null} />}
       </div>
     );
   }
 
-  // =====================================================
   // 2. ESCUCHAR Y ESCRIBIR
-  // =====================================================
   if (exercise.tipo === 'listen_write') {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          🎧 Escucha y escribe lo que oyes
-        </h2>
+        <h2 id={questionId} className="text-2xl font-bold mb-6">Escucha y escribe lo que oyes</h2>
         <button
+          type="button"
           onClick={playAudio}
           disabled={isPlaying}
-          className={`flex items-center gap-3 mx-auto mb-6 px-8 py-4 rounded-full transition-all ${
-            isPlaying
-              ? 'bg-blue-400 text-white'
-              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
-          }`}
+          className="flex items-center gap-3 mx-auto mb-6 px-8 min-h-12 rounded-full bg-green-700 hover:bg-green-800 text-white font-bold transition-colors disabled:bg-green-600"
         >
-          <Volume2 className={`w-6 h-6 ${isPlaying ? 'animate-pulse' : ''}`} />
-          {isPlaying ? 'Reproduciendo...' : 'Escuchar 🔊'}
+          <Volume2 className="w-6 h-6" aria-hidden="true" />
+          {isPlaying ? 'Reproduciendo…' : 'Escuchar'}
         </button>
         <input
           type="text"
+          aria-labelledby={questionId}
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
           value={userAnswer}
+          disabled={answered}
           onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Escribe aquí lo que escuchaste..."
-          className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-600 focus:border-green-600 focus:outline-none mb-6 text-lg"
+          onKeyDown={handleKeyDown}
+          placeholder="Escribe aquí lo que escuchaste"
+          className={`${textInputClass} mb-6`}
         />
-        <button
-          onClick={handleSubmit}
-          disabled={!userAnswer.trim()}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            !userAnswer.trim()
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={!userAnswer.trim()} />}
       </div>
     );
   }
 
-  // =====================================================
   // 3. VERDADERO O FALSO
-  // =====================================================
   if (exercise.tipo === 'true_false') {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {exercise.pregunta}
-        </h2>
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => setSelected(true)}
-            className={`flex-1 p-6 rounded-xl border-2 transition-all flex items-center justify-center gap-3 ${
-              selected === true
-                ? 'border-green-600 bg-green-50 shadow-md'
-                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-            }`}
-          >
-            <Check className="w-8 h-8 text-green-600" />
-            <span className="text-xl font-bold">Verdadero</span>
-          </button>
-          <button
-            onClick={() => setSelected(false)}
-            className={`flex-1 p-6 rounded-xl border-2 transition-all flex items-center justify-center gap-3 ${
-              selected === false
-                ? 'border-red-600 bg-red-50 shadow-md'
-                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-            }`}
-          >
-            <X className="w-8 h-8 text-red-600" />
-            <span className="text-xl font-bold">Falso</span>
-          </button>
+        <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
+        <div className="flex gap-4 mb-6" role="group" aria-labelledby={questionId}>
+          {[
+            [true, 'Verdadero', Check, 'text-green-700'],
+            [false, 'Falso', X, 'text-red-700'],
+          ].map(([value, label, Icon, iconClass]) => (
+            <button
+              key={label}
+              type="button"
+              aria-pressed={selected === value}
+              disabled={answered}
+              onClick={() => setSelected(value)}
+              className={`flex-1 p-6 rounded-xl border-2 transition-colors flex items-center justify-center gap-3 ${
+                selected === value ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
+              }`}
+            >
+              <Icon className={`w-8 h-8 ${iconClass}`} aria-hidden="true" />
+              <span className="text-xl font-bold">{label}</span>
+            </button>
+          ))}
         </div>
-        <button
-          onClick={handleSubmit}
-          disabled={selected === null}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            selected === null
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={selected === null} />}
       </div>
     );
   }
 
-  // =====================================================
-  // 4. COMPLETAR ESPACIOS (FILL BLANKS)
-  // =====================================================
+  // 4. COMPLETAR ESPACIOS
   if (exercise.tipo === 'fill_blanks') {
     const parts = exercise.pregunta.split('___');
-    
+    const blanks = parts.length - 1;
+    const incomplete = Object.keys(fillBlanks).length < blanks || Object.values(fillBlanks).some((v) => !v.trim());
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">
-          ✏️ Completa los espacios en blanco
-        </h2>
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl mb-6 text-lg border-2 border-blue-200">
+        <h2 className="text-2xl font-bold mb-6">Completa los espacios en blanco</h2>
+        <p className="bg-stone-50 p-6 rounded-xl mb-6 text-lg border-2 border-stone-200 leading-loose">
           {parts.map((part, index) => (
             <span key={index}>
               {part}
-              {index < parts.length - 1 && (
+              {index < blanks && (
                 <input
                   type="text"
+                  aria-label={`Espacio ${index + 1} de ${blanks}`}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   value={fillBlanks[index] || ''}
-                  onChange={(e) => setFillBlanks({...fillBlanks, [index]: e.target.value})}
-                  onKeyPress={handleKeyPress}
-                  className="inline-block mx-2 px-4 py-2 border-b-2 border-blue-600 bg-white focus:outline-none focus:border-green-600 min-w-[120px] rounded-lg"
-                  placeholder="..."
+                  disabled={answered}
+                  onChange={(e) => setFillBlanks({ ...fillBlanks, [index]: e.target.value })}
+                  onKeyDown={handleKeyDown}
+                  className="inline-block mx-2 px-3 py-1.5 border-b-2 border-green-700 bg-white focus:outline-none focus:ring-2 focus:ring-green-700 min-w-[120px] rounded-lg"
                 />
               )}
             </span>
           ))}
-        </div>
-        <button
-          onClick={handleSubmit}
-          disabled={Object.keys(fillBlanks).length === 0 || Object.values(fillBlanks).some(v => !v.trim())}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            Object.keys(fillBlanks).length === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        </p>
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={incomplete} />}
       </div>
     );
   }
 
-  // =====================================================
-  // 5. EMPAREJAR (MATCHING)
-  // =====================================================
+  // 5. EMPAREJAR
   if (exercise.tipo === 'matching') {
-    let leftItems = [];
-    let rightItems = [];
-    
-    try {
-      const opciones = safeJsonParse(exercise.opciones, {});
-      leftItems = opciones.columna_izquierda || [];
-      rightItems = opciones.columna_derecha || [];
-      
-      // If no columns found, try to get from respuesta_correcta
-      if (leftItems.length === 0) {
-        const correct = safeJsonParse(exercise.respuesta_correcta, {});
-        leftItems = Object.keys(correct);
-        rightItems = Object.values(correct);
-      }
-    } catch (e) {
-      console.error('Error parsing matching data:', e);
+    const opciones = safeJsonParse(exercise.opciones, {});
+    let leftItems = opciones.columna_izquierda || [];
+    let rightItems = opciones.columna_derecha || [];
+    if (leftItems.length === 0) {
+      const correct = safeJsonParse(exercise.respuesta_correcta, {});
+      leftItems = Object.keys(correct);
+      rightItems = Object.values(correct);
     }
 
-    const handleLeftClick = (item) => {
-      setSelectedLeft(item);
-    };
-
-    const handleRightClick = (item) => {
-      if (selectedLeft) {
-        setMatchingPairs(prev => ({...prev, [selectedLeft]: item}));
-        setSelectedLeft(null);
-      }
-    };
-
-    const resetPairs = () => {
-      setMatchingPairs({});
-      setSelectedLeft(null);
-    };
-
     const isRightMatched = (rightItem) => Object.values(matchingPairs).includes(rightItem);
+    const allMatched = Object.keys(matchingPairs).length === leftItems.length;
 
     return (
       <div className="max-w-3xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          🔗 {exercise.pregunta}
-        </h2>
-        <p className="text-gray-600 mb-6">Selecciona un elemento de la izquierda y luego su pareja de la derecha</p>
-        
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          {/* Columna Izquierda */}
+        <h2 className="text-2xl font-bold mb-2">{exercise.pregunta}</h2>
+        <p className="text-stone-600 mb-6">Elige una palabra de la izquierda y luego su pareja de la derecha</p>
+
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6">
           <div className="space-y-3">
-            <h3 className="font-bold text-gray-700 text-center mb-2">Quechua</h3>
+            <h3 className="font-bold text-stone-700 text-center mb-2">{languageLabel}</h3>
             {leftItems.map((item, index) => (
               <button
                 key={index}
-                onClick={() => handleLeftClick(item)}
-                disabled={!!matchingPairs[item]}
-                className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                type="button"
+                onClick={() => setSelectedLeft(item)}
+                aria-pressed={selectedLeft === item}
+                disabled={answered || !!matchingPairs[item]}
+                className={`w-full p-4 rounded-xl border-2 transition-colors text-left ${
                   matchingPairs[item]
-                    ? 'bg-green-100 border-green-500 text-green-800'
+                    ? 'bg-green-50 border-green-700 text-green-900'
                     : selectedLeft === item
-                    ? 'bg-blue-100 border-blue-600 shadow-md'
-                    : 'bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                      ? 'bg-stone-100 border-stone-900'
+                      : 'bg-white border-stone-300 hover:border-stone-500'
                 }`}
               >
-                <span className="font-medium">{item}</span>
-                {matchingPairs[item] && (
-                  <span className="ml-2 text-green-600">→ {matchingPairs[item]}</span>
-                )}
+                <span className="font-semibold">{item}</span>
+                {matchingPairs[item] && <span className="block text-sm text-green-800">= {matchingPairs[item]}</span>}
               </button>
             ))}
           </div>
-          
-          {/* Columna Derecha */}
+
           <div className="space-y-3">
-            <h3 className="font-bold text-gray-700 text-center mb-2">Español</h3>
+            <h3 className="font-bold text-stone-700 text-center mb-2">Español</h3>
             {rightItems.map((item, index) => (
               <button
                 key={index}
-                onClick={() => handleRightClick(item)}
-                disabled={isRightMatched(item) || !selectedLeft}
-                className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                type="button"
+                onClick={() => {
+                  if (!selectedLeft) return;
+                  setMatchingPairs((prev) => ({ ...prev, [selectedLeft]: item }));
+                  setSelectedLeft(null);
+                }}
+                disabled={answered || isRightMatched(item) || !selectedLeft}
+                className={`w-full p-4 rounded-xl border-2 transition-colors text-left ${
                   isRightMatched(item)
-                    ? 'bg-green-100 border-green-500 text-green-800'
-                    : selectedLeft && !isRightMatched(item)
-                    ? 'bg-white border-orange-400 hover:bg-orange-50 cursor-pointer'
-                    : 'bg-gray-100 border-gray-300 cursor-not-allowed'
+                    ? 'bg-green-50 border-green-700 text-green-900'
+                    : selectedLeft
+                      ? 'bg-white border-orange-700 hover:bg-orange-50'
+                      : 'bg-stone-50 border-stone-200 text-stone-600 cursor-not-allowed'
                 }`}
               >
-                <span className="font-medium">{item}</span>
+                <span className="font-semibold">{item}</span>
               </button>
             ))}
           </div>
         </div>
-        
-        <div className="flex gap-4 mb-4">
-          <button
-            onClick={resetPairs}
-            className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reiniciar
-          </button>
-          <span className="text-gray-600 py-2">
-            Emparejados: {Object.keys(matchingPairs).length} de {leftItems.length}
+
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          {!answered && (
+            <ResetButton
+              onClick={() => {
+                setMatchingPairs({});
+                setSelectedLeft(null);
+              }}
+            />
+          )}
+          <span className="text-stone-600" aria-live="polite">
+            Emparejadas: {Object.keys(matchingPairs).length} de {leftItems.length}
           </span>
         </div>
-        
-        <button
-          onClick={handleSubmit}
-          disabled={Object.keys(matchingPairs).length !== leftItems.length}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            Object.keys(matchingPairs).length !== leftItems.length
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={!allMatched} />}
       </div>
     );
   }
 
-  // =====================================================
-  // 6. ORDENAR PALABRAS (WORD ORDER / DRAG WORDS)
-  // =====================================================
+  // 6. ORDENAR PALABRAS
   if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
-    let words = [];
-    
-    try {
-      const opciones = safeJsonParse(exercise.opciones, {});
-      words = opciones.palabras || [];
-      
-      // If no palabras found, try to parse opciones as array
-      if (words.length === 0 && Array.isArray(opciones)) {
-        words = opciones;
-      }
-    } catch (e) {
-      console.error('Error parsing word_order options:', e);
-    }
-
-    const availableWords = words.filter(w => !selectedWords.includes(w));
-
-    const addWord = (word) => {
-      setSelectedWords([...selectedWords, word]);
-    };
-
-    const removeWord = (index) => {
-      setSelectedWords(selectedWords.filter((_, i) => i !== index));
-    };
-
-    const resetWords = () => {
-      setSelectedWords([]);
-    };
+    const opciones = safeJsonParse(exercise.opciones, {});
+    let words = opciones.palabras || [];
+    if (words.length === 0 && Array.isArray(opciones)) words = opciones;
+    const availableWords = words.filter((w) => !selectedWords.includes(w));
 
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          📝 {exercise.pregunta}
-        </h2>
-        
-        {/* Área de respuesta */}
-        <div className="mb-6">
-          <p className="text-gray-600 mb-2">Tu respuesta:</p>
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-dashed border-blue-300 min-h-[80px] flex flex-wrap gap-2 items-center">
-            {selectedWords.length === 0 ? (
-              <span className="text-gray-400 italic">Selecciona las palabras en orden...</span>
-            ) : (
-              selectedWords.map((word, index) => (
-                <button
-                  key={index}
-                  onClick={() => removeWord(index)}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 shadow-md transition"
-                >
-                  {word} ✕
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-        
-        {/* Palabras disponibles */}
-        <div className="mb-6">
-          <p className="text-gray-600 mb-2">Palabras disponibles:</p>
-          <div className="flex flex-wrap gap-2">
-            {availableWords.map((word, index) => (
+        <h2 className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
+
+        <p className="text-stone-600 mb-2" id={`${questionId}-respuesta`}>Tu respuesta</p>
+        <div
+          className="p-4 bg-stone-50 rounded-xl border-2 border-dashed border-stone-300 min-h-[80px] flex flex-wrap gap-2 items-center mb-6"
+          aria-labelledby={`${questionId}-respuesta`}
+          aria-live="polite"
+        >
+          {selectedWords.length === 0 ? (
+            <span className="text-stone-600">Toca las palabras en orden</span>
+          ) : (
+            selectedWords.map((word, index) => (
               <button
                 key={index}
-                onClick={() => addWord(word)}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition font-medium"
+                type="button"
+                disabled={answered}
+                onClick={() => setSelectedWords(selectedWords.filter((_, i) => i !== index))}
+                aria-label={`Quitar ${word}`}
+                className="inline-flex items-center gap-1.5 px-4 min-h-11 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-semibold"
               >
                 {word}
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
-            ))}
+            ))
+          )}
+        </div>
+
+        <p className="text-stone-600 mb-2">Palabras disponibles</p>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {availableWords.map((word, index) => (
+            <button
+              key={index}
+              type="button"
+              disabled={answered}
+              onClick={() => setSelectedWords([...selectedWords, word])}
+              className="px-4 min-h-11 bg-white border-2 border-stone-300 rounded-lg hover:border-green-700 transition-colors font-semibold"
+            >
+              {word}
+            </button>
+          ))}
+        </div>
+
+        {!answered && (
+          <div className="mb-4">
+            <ResetButton onClick={() => setSelectedWords([])} />
           </div>
-        </div>
-        
-        <div className="flex gap-4 mb-4">
-          <button
-            onClick={resetWords}
-            className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reiniciar
-          </button>
-        </div>
-        
-        <button
-          onClick={handleSubmit}
-          disabled={selectedWords.length === 0}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            selectedWords.length === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        )}
+
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={selectedWords.length === 0} />}
       </div>
     );
   }
 
-  // =====================================================
   // 7. TRADUCIR
-  // =====================================================
   if (exercise.tipo === 'translate') {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          🌐 Traduce la siguiente palabra o frase
-        </h2>
-        <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl mb-6 text-center border-2 border-blue-200">
-          <p className="text-2xl font-bold text-gray-800">{exercise.pregunta}</p>
+        <h2 className="text-2xl font-bold mb-6">Traduce la siguiente palabra o frase</h2>
+        <div className="p-6 bg-stone-50 rounded-xl mb-6 text-center border-2 border-stone-200">
+          <p id={questionId} className="text-2xl font-bold">{exercise.pregunta}</p>
           <button
+            type="button"
             onClick={() => speakWord(exercise.pregunta)}
-            className="mt-3 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full transition"
-            title="Escuchar pronunciación"
+            aria-label={`Escuchar ${exercise.pregunta}`}
+            className="mt-3 w-11 h-11 inline-flex items-center justify-center text-green-800 hover:bg-green-50 rounded-full transition-colors"
           >
-            <Volume2 className="w-6 h-6" />
+            <Volume2 className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
+        <label htmlFor={`${questionId}-traduccion`} className="block font-bold mb-2">
+          Tu traducción
+        </label>
         <input
+          id={`${questionId}-traduccion`}
           type="text"
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
           value={userAnswer}
+          disabled={answered}
           onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Escribe tu traducción aquí..."
-          className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-600 focus:border-green-600 focus:outline-none mb-6 text-lg"
+          onKeyDown={handleKeyDown}
+          className={`${textInputClass} mb-6`}
         />
-        <button
-          onClick={handleSubmit}
-          disabled={!userAnswer.trim()}
-          className={`w-full py-4 px-6 rounded-xl font-bold transition-all ${
-            !userAnswer.trim()
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:shadow-lg'
-          }`}
-        >
-          Verificar
-        </button>
+        {!answered && <VerifyButton onClick={handleSubmit} disabled={!userAnswer.trim()} />}
       </div>
     );
   }
 
-  // =====================================================
   // TIPO NO SOPORTADO
-  // =====================================================
   return (
-    <div className="text-center p-6">
-      <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
-        <p className="text-red-600 font-bold">Tipo de ejercicio no soportado: {exercise.tipo}</p>
-      </div>
+    <div className="p-6">
+      <p className="bg-red-50 border border-red-300 rounded-xl p-6 text-red-800 font-bold mb-4" role="alert">
+        Este tipo de ejercicio todavía no se puede mostrar ({exercise.tipo}).
+      </p>
+      {onSkip && (
+        <button
+          type="button"
+          onClick={onSkip}
+          className="w-full min-h-12 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors"
+        >
+          Saltar este ejercicio
+        </button>
+      )}
     </div>
   );
 };
