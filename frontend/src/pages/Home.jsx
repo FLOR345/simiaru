@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Star, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX } from 'lucide-react';
+import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX } from 'lucide-react';
 import { useState } from 'react';
 import logo from '../assets/logo.jpg';
 
@@ -49,8 +49,8 @@ const Home = ({ enableGuestMode }) => {
               <a href="#languages" className="text-gray-700 hover:text-purple-600 font-semibold transition-all hover:scale-105 scroll-smooth">
                 Idiomas
               </a>
-              <a href="#testimonials" className="text-gray-700 hover:text-pink-600 font-semibold transition-all hover:scale-105 scroll-smooth">
-                Testimonios
+              <a href="#proyecto" className="text-gray-700 hover:text-pink-600 font-semibold transition-all hover:scale-105 scroll-smooth">
+                El proyecto
               </a>
             </nav>
 
@@ -147,24 +147,11 @@ const Home = ({ enableGuestMode }) => {
               </div>
 
               {/* Social Proof */}
-              <div className="flex items-center gap-8 pt-4">
-                <div className="flex -space-x-3">
-                  {[1,2,3,4,5].map(i => (
-                    <div key={i} className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 border-4 border-white flex items-center justify-center text-white font-bold">
-                      {i}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1 mb-1">
-                    {[1,2,3,4,5].map(i => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 font-semibold">
-                    <span className="text-gray-900 font-bold">1,000+</span> estudiantes activos
-                  </p>
-                </div>
+              <div className="flex items-center gap-3 pt-4">
+                <Heart className="w-6 h-6 text-pink-500" />
+                <p className="text-sm text-gray-600 font-semibold">
+                  <span className="text-gray-900 font-bold">1,500+</span> palabras en quechua y aymara, gratis y de código abierto
+                </p>
               </div>
 
               {/* Stats Rápidos */}
@@ -183,7 +170,7 @@ const Home = ({ enableGuestMode }) => {
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1">
-                    80+
+                    26
                   </div>
                   <div className="text-sm text-gray-600 font-semibold">Lecciones</div>
                 </div>
@@ -266,7 +253,7 @@ const Home = ({ enableGuestMode }) => {
               </div>
               <h3 className="text-2xl font-black mb-4 text-gray-900">Elige tu idioma</h3>
               <p className="text-gray-600 leading-relaxed">
-                Comienza con Quechua o Aymara, ambos con contenido auténtico y hablantes nativos
+                Comienza con Quechua o Aymara, con vocabulario y contenido cultural de fuentes documentadas
               </p>
             </div>
 
@@ -361,11 +348,11 @@ const Home = ({ enableGuestMode }) => {
                 </div>
                 <h3 className="text-2xl font-black text-gray-900 mb-4">Lecciones Interactivas</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Ejercicios gamificados con audios de hablantes nativos y retroalimentación instantánea
+                  Ejercicios gamificados con pronunciación por voz y retroalimentación instantánea
                 </p>
                 <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
-                  <span>80+ Lecciones disponibles</span>
+                  <span>26 lecciones disponibles</span>
                 </div>
               </div>
             </div>
@@ -383,7 +370,7 @@ const Home = ({ enableGuestMode }) => {
                 </p>
                 <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
-                  <span>50+ Contenidos culturales</span>
+                  <span>69 contenidos culturales</span>
                 </div>
               </div>
             </div>
@@ -401,7 +388,7 @@ const Home = ({ enableGuestMode }) => {
                 </p>
                 <div className="flex items-center gap-2 text-purple-600 font-bold text-sm">
                   <CheckCircle className="w-5 h-5" />
-                  <span>20+ Insignias desbloqueables</span>
+                  <span>7 insignias desbloqueables</span>
                 </div>
               </div>
             </div>
@@ -528,11 +515,11 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">40+ lecciones interactivas</span>
+                      <span className="text-lg">13 lecciones interactivas</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Audios de hablantes nativos</span>
+                      <span className="text-lg">Pronunciación por voz</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
@@ -619,11 +606,11 @@ const Home = ({ enableGuestMode }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">40+ lecciones interactivas</span>
+                      <span className="text-lg">13 lecciones interactivas</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
-                      <span className="text-lg">Audios de hablantes nativos</span>
+                      <span className="text-lg">Pronunciación por voz</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-6 h-6" />
@@ -690,113 +677,45 @@ const Home = ({ enableGuestMode }) => {
         </div>
       </section>
 
-      {/* ==================== TESTIMONIOS ==================== */}
-      <section id="testimonials" className="py-24 bg-white">
+      {/* ==================== EL PROYECTO ==================== */}
+      <section id="proyecto" className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16 space-y-4">
             <span className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-bold inline-block">
-              💬 TESTIMONIOS
+              🌱 EL PROYECTO
             </span>
             <h2 className="text-5xl font-black text-gray-900">
-              Lo que dicen nuestros <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">estudiantes</span>
+              Una herramienta <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">abierta</span> para lenguas originarias
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Miles de personas ya están aprendiendo y conectando con sus raíces
+              SimiAru es un proyecto gratuito y de código abierto para aprender quechua y aymara. Su contenido sigue creciendo y cualquier persona puede revisar y mejorar el código.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            
-            {/* Testimonio 1 */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-2 border-green-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1,2,3,4,5].map(i => (
-                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-gray-800 text-lg mb-6 leading-relaxed">
-                "SimiAru me ayudó a reconectar con mis raíces. Ahora puedo hablar con mis abuelos en Quechua. Es emocionante aprender el idioma de mis ancestros."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold text-xl">
-                  M
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">María Quispe</h4>
-                  <p className="text-sm text-gray-600">Estudiante de Quechua - Cusco</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonio 2 */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-2 border-blue-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1,2,3,4,5].map(i => (
-                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-gray-800 text-lg mb-6 leading-relaxed">
-                "La plataforma es increíble. Los audios de hablantes nativos y el contenido cultural hacen que aprender Aymara sea auténtico y divertido."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
-                  J
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Juan Mamani</h4>
-                  <p className="text-sm text-gray-600">Estudiante de Aymara - Puno</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonio 3 */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-2 border-purple-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1,2,3,4,5].map(i => (
-                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-gray-800 text-lg mb-6 leading-relaxed">
-                "Como profesora, uso SimiAru con mis estudiantes. Es la mejor herramienta digital para enseñar lenguas andinas. ¡Felicitaciones!"
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                  C
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Carmen Huamán</h4>
-                  <p className="text-sm text-gray-600">Profesora - Arequipa</p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Stats */}
-          <div className="mt-20 grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             <div className="text-center">
               <div className="text-5xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                1,000+
+                26
               </div>
-              <p className="text-gray-600 font-semibold">Estudiantes Activos</p>
+              <p className="text-gray-600 font-semibold">Lecciones</p>
             </div>
             <div className="text-center">
               <div className="text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                4.9/5
+                1,500+
               </div>
-              <p className="text-gray-600 font-semibold">Calificación Promedio</p>
+              <p className="text-gray-600 font-semibold">Palabras en el diccionario</p>
             </div>
             <div className="text-center">
               <div className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                10M+
+                285
               </div>
-              <p className="text-gray-600 font-semibold">Palabras Aprendidas</p>
+              <p className="text-gray-600 font-semibold">Ejercicios</p>
             </div>
             <div className="text-center">
               <div className="text-5xl font-black bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
-                50k+
+                69
               </div>
-              <p className="text-gray-600 font-semibold">Lecciones Completadas</p>
+              <p className="text-gray-600 font-semibold">Contenidos culturales</p>
             </div>
           </div>
         </div>
@@ -816,7 +735,7 @@ const Home = ({ enableGuestMode }) => {
               Comienza tu aventura andina <span className="text-yellow-300">hoy</span>
             </h2>
             <p className="text-2xl text-white/90 leading-relaxed">
-              Únete a miles de estudiantes que ya están conectando con sus raíces y aprendiendo lenguas ancestrales
+              Empieza hoy a conectar con tus raíces aprendiendo lenguas ancestrales
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <Link 
