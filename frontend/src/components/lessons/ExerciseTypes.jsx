@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Volume2, Check, X, RotateCcw } from 'lucide-react';
 
 // ==================== COMPARACIÓN DE RESPUESTAS ====================
@@ -29,6 +29,16 @@ const safeJsonParse = (value, defaultValue = []) => {
   } catch {
     return Array.isArray(defaultValue) ? [value] : value;
   }
+};
+
+// Mezcla una copia de la lista (Fisher-Yates) para que la respuesta no esté siempre en la misma posición
+const shuffle = (list) => {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 };
 
 // Pronunciación con la voz del navegador (síntesis en español; ver PRODUCT.md)
@@ -92,6 +102,24 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
     setSelectedLeft(null);
     setFillBlanks({});
     setSelectedWords([]);
+  }, [exercise?.id]);
+
+  // Orden aleatorio, fijo mientras dure cada ejercicio
+  const shuffled = useMemo(() => {
+    if (!exercise) return {};
+    const opciones = safeJsonParse(exercise.opciones, exercise.tipo === 'multiple_choice' ? [] : {});
+    if (exercise.tipo === 'multiple_choice') return { options: shuffle(Array.isArray(opciones) ? opciones : []) };
+    if (exercise.tipo === 'matching') {
+      let right = opciones.columna_derecha || [];
+      if (right.length === 0) right = Object.values(safeJsonParse(exercise.respuesta_correcta, {}));
+      return { right: shuffle(right) };
+    }
+    if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
+      const words = opciones.palabras || (Array.isArray(opciones) ? opciones : []);
+      return { words: shuffle(words) };
+    }
+    return {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise?.id]);
 
   if (!exercise) {
@@ -184,7 +212,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
 
   // 1. OPCIÓN MÚLTIPLE
   if (exercise.tipo === 'multiple_choice') {
-    const opciones = safeJsonParse(exercise.opciones, []);
+    const opciones = shuffled.options || [];
     return (
       <div className="max-w-2xl mx-auto p-6">
         <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
@@ -313,6 +341,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
       leftItems = Object.keys(correct);
       rightItems = Object.values(correct);
     }
+    rightItems = shuffled.right || rightItems;
 
     const isRightMatched = (rightItem) => Object.values(matchingPairs).includes(rightItem);
     const allMatched = Object.keys(matchingPairs).length === leftItems.length;
@@ -393,9 +422,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
 
   // 6. ORDENAR PALABRAS
   if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
-    const opciones = safeJsonParse(exercise.opciones, {});
-    let words = opciones.palabras || [];
-    if (words.length === 0 && Array.isArray(opciones)) words = opciones;
+    const words = shuffled.words || [];
     const availableWords = words.filter((w) => !selectedWords.includes(w));
 
     return (
