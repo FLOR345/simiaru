@@ -80,7 +80,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home setIsGuest={setIsGuest} />} />
+        <Route path="/" element={<Home enableGuestMode={() => setIsGuest(true)} />} />
         <Route path="/login" element={<Login setUser={setUser} setIsGuest={setIsGuest} />} />
         <Route path="/register" element={<Register setUser={setUser} />} />
         <Route 

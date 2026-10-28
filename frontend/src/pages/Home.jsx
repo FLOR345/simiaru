@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX } from 'lucide-react';
+import { Mountain, Heart, BookOpen, Globe, Trophy, Users, Zap, Crown, Award, Target, Sparkles, TrendingUp, CheckCircle, ArrowRight, Play, Shield, Smartphone, UserX, Github } from 'lucide-react';
 import { useState } from 'react';
 import logo from '../assets/logo.jpg';
 
@@ -7,18 +7,36 @@ const Home = ({ enableGuestMode }) => {
   const [activeTab, setActiveTab] = useState('quechua');
   const navigate = useNavigate();
 
-  // Función para entrar como invitado
+  // Entrar como invitado: avisa a App (estado) y lo recuerda para la próxima visita
   const handleGuestMode = () => {
-    if (enableGuestMode) {
-      enableGuestMode();
+    enableGuestMode?.();
+    try {
+      localStorage.setItem('isGuest', 'true');
+    } catch {
+      // Navegación privada o almacenamiento bloqueado: el modo invitado dura solo esta visita
     }
-    localStorage.setItem('isGuest', 'true');
     navigate('/dashboard');
+  };
+
+  // Pestañas de idioma: flechas izquierda/derecha cambian de pestaña (patrón ARIA tabs)
+  const languages = ['quechua', 'aymara'];
+  const handleTabKey = (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next = languages[(languages.indexOf(activeTab) + 1) % languages.length];
+    setActiveTab(next);
+    document.getElementById(`tab-${next}`)?.focus();
   };
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
-      
+      <a
+        href="#contenido"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-3 focus:bg-white focus:text-gray-900 focus:font-bold focus:rounded-lg focus:shadow-lg"
+      >
+        Saltar al contenido
+      </a>
+
       {/* ==================== HEADER PREMIUM ==================== */}
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl shadow-sm z-50 border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">
@@ -28,7 +46,7 @@ const Home = ({ enableGuestMode }) => {
               <div className="relative">
                 <img 
                   src={logo} 
-                  alt="SIMIARU" 
+                  alt="" 
                   className="h-12 w-auto transform group-hover:scale-110 transition duration-300"
                 />
                 <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition"></div>
@@ -82,6 +100,7 @@ const Home = ({ enableGuestMode }) => {
         </div>
       </header>
 
+      <main id="contenido">
       {/* ==================== HERO ÉPICO ==================== */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         {/* Background con Gradiente Animado */}
@@ -183,7 +202,7 @@ const Home = ({ enableGuestMode }) => {
               <div className="relative bg-white rounded-3xl shadow-2xl p-12 transform hover:scale-105 transition-all duration-500">
                 <img 
                   src={logo} 
-                  alt="SIMIARU App" 
+                  alt="Mascota de SimiAru: una llama con chullo y chalina andina" 
                   className="w-full h-auto mx-auto"
                 />
                 
@@ -427,7 +446,7 @@ const Home = ({ enableGuestMode }) => {
                   className="flex items-center gap-2 text-orange-600 font-bold text-sm hover:text-orange-700 transition-colors"
                 >
                   <Play className="w-5 h-5" />
-                  <span>Probar sin cuenta →</span>
+                  <span>Probar sin cuenta <span aria-hidden="true">→</span></span>
                 </button>
               </div>
             </div>
@@ -470,8 +489,15 @@ const Home = ({ enableGuestMode }) => {
           </div>
 
           {/* Tabs */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div className="flex justify-center gap-4 mb-12" role="tablist" aria-label="Idioma">
             <button
+              type="button"
+              role="tab"
+              id="tab-quechua"
+              aria-selected={activeTab === 'quechua'}
+              aria-controls="panel-quechua"
+              tabIndex={activeTab === 'quechua' ? 0 : -1}
+              onKeyDown={handleTabKey}
               onClick={() => setActiveTab('quechua')}
               className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
                 activeTab === 'quechua'
@@ -482,6 +508,13 @@ const Home = ({ enableGuestMode }) => {
               Quechua
             </button>
             <button
+              type="button"
+              role="tab"
+              id="tab-aymara"
+              aria-selected={activeTab === 'aymara'}
+              aria-controls="panel-aymara"
+              tabIndex={activeTab === 'aymara' ? 0 : -1}
+              onKeyDown={handleTabKey}
               onClick={() => setActiveTab('aymara')}
               className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
                 activeTab === 'aymara'
@@ -495,7 +528,7 @@ const Home = ({ enableGuestMode }) => {
 
           {/* Content Quechua */}
           {activeTab === 'quechua' && (
-            <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
+            <div id="panel-quechua" role="tabpanel" aria-labelledby="tab-quechua" className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
               <div className="grid md:grid-cols-2">
                 <div className="bg-gradient-to-br from-green-500 to-green-600 p-12 text-white">
                   <div className="flex items-center gap-4 mb-8">
@@ -528,7 +561,7 @@ const Home = ({ enableGuestMode }) => {
                   </div>
                   <div className="flex gap-3 mt-8">
                     <Link to="/register" className="px-6 py-3 bg-white text-green-600 font-bold rounded-xl hover:shadow-2xl transform hover:scale-105 transition">
-                      Empezar →
+                      Empezar <span aria-hidden="true">→</span>
                     </Link>
                     <button 
                       onClick={handleGuestMode}
@@ -586,7 +619,7 @@ const Home = ({ enableGuestMode }) => {
 
           {/* Content Aymara */}
           {activeTab === 'aymara' && (
-            <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
+            <div id="panel-aymara" role="tabpanel" aria-labelledby="tab-aymara" className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
               <div className="grid md:grid-cols-2">
                 <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-12 text-white">
                   <div className="flex items-center gap-4 mb-8">
@@ -619,7 +652,7 @@ const Home = ({ enableGuestMode }) => {
                   </div>
                   <div className="flex gap-3 mt-8">
                     <Link to="/register" className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl hover:shadow-2xl transform hover:scale-105 transition">
-                      Empezar →
+                      Empezar <span aria-hidden="true">→</span>
                     </Link>
                     <button 
                       onClick={handleGuestMode}
@@ -766,64 +799,57 @@ const Home = ({ enableGuestMode }) => {
         </div>
       </section>
 
+      </main>
+
       {/* ==================== FOOTER PREMIUM ==================== */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            {/* Columna 1 - Branding */}
+          <div className="grid md:grid-cols-3 gap-12 mb-12">
+            {/* Columna 1 - Marca */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <img src={logo} alt="SIMIARU" className="h-12 w-auto" />
+                <img src={logo} alt="" className="h-12 w-auto" />
                 <span className="text-2xl font-black">SimiAru</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
                 Preservando y difundiendo las lenguas ancestrales de los Andes para las futuras generaciones.
               </p>
-              <div className="flex gap-4">
-                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-green-600 rounded-full flex items-center justify-center transition">
-                  <span className="text-xl">📘</span>
-                </a>
-                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition">
-                  <span className="text-xl">🐦</span>
-                </a>
-                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition">
-                  <span className="text-xl">📷</span>
-                </a>
-              </div>
+              <a
+                href="https://github.com/FLOR345/simiaru"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Código de SimiAru en GitHub (se abre en otra pestaña)"
+                className="inline-flex w-11 h-11 bg-gray-800 hover:bg-gray-700 rounded-full items-center justify-center transition"
+              >
+                <Github className="w-5 h-5" aria-hidden="true" />
+              </a>
             </div>
 
             {/* Columna 2 - Aprende */}
-            <div>
-              <h4 className="text-lg font-bold mb-4">Aprende</h4>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Quechua</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Aymara</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Cultura Viva</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Diccionario</a></li>
+            <nav aria-label="Aprende">
+              <h4 className="text-lg font-bold mb-2">Aprende</h4>
+              <ul>
+                <li><a href="#languages" className="inline-block py-2 text-gray-400 hover:text-white transition">Quechua y aymara</a></li>
+                <li><a href="#how-it-works" className="inline-block py-2 text-gray-400 hover:text-white transition">Cómo funciona</a></li>
+                <li><Link to="/dictionary" className="inline-block py-2 text-gray-400 hover:text-white transition">Diccionario</Link></li>
+                <li>
+                  <button type="button" onClick={handleGuestMode} className="inline-block py-2 text-gray-400 hover:text-white transition">
+                    Probar sin cuenta
+                  </button>
+                </li>
               </ul>
-            </div>
+            </nav>
 
-            {/* Columna 3 - Recursos */}
-            <div>
-              <h4 className="text-lg font-bold mb-4">Recursos</h4>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Guías</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">FAQ</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Soporte</a></li>
+            {/* Columna 3 - Proyecto */}
+            <nav aria-label="Proyecto">
+              <h4 className="text-lg font-bold mb-2">Proyecto</h4>
+              <ul>
+                <li><a href="#proyecto" className="inline-block py-2 text-gray-400 hover:text-white transition">Sobre SimiAru</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Código en GitHub</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru/issues" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Reportar un problema</a></li>
+                <li><a href="https://github.com/FLOR345/simiaru/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="inline-block py-2 text-gray-400 hover:text-white transition">Licencia MIT</a></li>
               </ul>
-            </div>
-
-            {/* Columna 4 - Empresa */}
-            <div>
-              <h4 className="text-lg font-bold mb-4">Nosotros</h4>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Sobre SimiAru</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Contacto</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Privacidad</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition">Términos</a></li>
-              </ul>
-            </div>
+            </nav>
           </div>
 
           {/* Copyright */}
