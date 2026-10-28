@@ -139,7 +139,7 @@ const Home = ({ enableGuestMode }) => {
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex justify-between items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="" className="h-10 sm:h-12 w-auto" />
+              <img src={logo} alt="" width="253" height="299" className="h-10 sm:h-12 w-auto" />
               <span className="text-xl sm:text-2xl font-extrabold text-green-800">SimiAru</span>
             </Link>
 
@@ -283,7 +283,9 @@ const Home = ({ enableGuestMode }) => {
                   <img
                     src={logo}
                     alt="Mascota de SimiAru: una llama con chullo y chalina andina"
-                    className="w-full h-auto mx-auto"
+                    width="253"
+                    height="299"
+                    className="w-full max-w-sm h-auto mx-auto"
                   />
                 </div>
               </div>
@@ -542,7 +544,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <img src={logo} alt="" className="h-12 w-auto rounded-lg" />
+                <img src={logo} alt="" width="253" height="299" loading="lazy" decoding="async" className="h-12 w-auto rounded-lg" />
                 <span className="text-2xl font-extrabold">SimiAru</span>
               </div>
               <p className="text-stone-400 leading-relaxed">
@@ -560,7 +562,7 @@ const Home = ({ enableGuestMode }) => {
             </div>
 
             <nav aria-label="Aprende">
-              <h4 className="text-lg font-bold mb-2">Aprende</h4>
+              <h2 className="text-lg font-bold mb-2">Aprende</h2>
               <ul>
                 <li><a href="#languages" className={footerLink}>Quechua y aymara</a></li>
                 <li><a href="#how-it-works" className={footerLink}>Cómo funciona</a></li>
@@ -574,7 +576,7 @@ const Home = ({ enableGuestMode }) => {
             </nav>
 
             <nav aria-label="Proyecto">
-              <h4 className="text-lg font-bold mb-2">Proyecto</h4>
+              <h2 className="text-lg font-bold mb-2">Proyecto</h2>
               <ul>
                 <li><a href="#proyecto" className={footerLink}>Sobre SimiAru</a></li>
                 <li><a href={REPO} target="_blank" rel="noopener noreferrer" className={footerLink}>Código en GitHub</a></li>
