@@ -9,6 +9,7 @@ import {
   deleteAudio,
   getWordAudio
 } from '../controllers/dictionaryController.js';
+import { protect, isAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -35,8 +36,9 @@ router.get('/category', getWordsByCategory);
 router.get('/all', getAllWords);
 
 // ==================== NUEVAS RUTAS PARA AUDIO ====================
-router.post('/audio/:wordId', upload.single('audio'), uploadAudio);
-router.delete('/audio/:wordId', deleteAudio);
+// Subir o borrar audio modifica Cloudinary y la base: solo administradores
+router.post('/audio/:wordId', protect, isAdmin, upload.single('audio'), uploadAudio);
+router.delete('/audio/:wordId', protect, isAdmin, deleteAudio);
 router.get('/audio/:wordId', getWordAudio);
 
 // Ruta para stats

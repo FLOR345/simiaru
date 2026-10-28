@@ -140,6 +140,11 @@ export const sendManualReminder = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Solo puedes enviarte un recordatorio a ti mismo (o un administrador a cualquiera)
+    if (String(req.user?.id) !== String(userId) && req.user?.rol !== 'admin') {
+      return res.status(403).json({ error: 'No puedes enviar recordatorios a otros usuarios' });
+    }
+
     const userResult = await pool.query(
       'SELECT id, nombre, email, racha_actual FROM usuarios WHERE id = $1',
       [userId]
