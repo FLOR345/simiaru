@@ -85,3 +85,8 @@ Las contraseñas y claves **nunca** se escriben en el código: van en archivos `
 ## Autor
 
 Proyecto desarrollado por [FLOR345](https://github.com/FLOR345) para el curso de Desarrollo de Software II.
+
+## Licencia
+
+- **Código:** [MIT](LICENSE). Puedes usarlo, modificarlo y redistribuirlo, manteniendo el aviso de copyright.
+- **Contenido lingüístico** (vocabulario, ejercicios y textos culturales): no está cubierto por la licencia MIT. Parte del vocabulario proviene de diccionarios del Ministerio de Educación de Chile, y su licencia de redistribución está pendiente de confirmar.
