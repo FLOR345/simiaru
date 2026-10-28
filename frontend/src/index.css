@@ -35,8 +35,10 @@ button:focus-visible {
     border-color 150ms ease,
     color 150ms ease;
 }
+/* Respuesta al presionar: más rápida que la vuelta, para sentirse inmediata */
 .toque:active {
   transform: scale(0.97);
+  transition-duration: 100ms;
 }
 @media (prefers-reduced-motion: reduce) {
   .toque:active {

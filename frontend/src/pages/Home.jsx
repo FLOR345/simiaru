@@ -173,7 +173,7 @@ const PalabraViva = () => {
       } finally {
         clearTimeout(limite);
       }
-    }, 450);
+    }, 300);
 
     return () => {
       clearTimeout(espera);
@@ -290,6 +290,40 @@ const Home = ({ enableGuestMode }) => {
   const navigate = useNavigate();
 
   const headerRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+
+  // El borde del encabezado aparece solo cuando hay contenido pasando por debajo
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 8);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  // ¿Dónde estoy? El menú marca la sección que ocupa el centro de la pantalla
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (visible) setActiveSection(visible.target.id);
+      },
+      { rootMargin: '-45% 0px -50% 0px' }
+    );
+    document.querySelectorAll('main section[id]').forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   // El menú de celular se cierra con Escape, al tocar fuera del encabezado
   // y si la ventana crece hasta mostrar el menú de escritorio
@@ -348,7 +382,8 @@ const Home = ({ enableGuestMode }) => {
       </a>
 
       {/* ==================== ENCABEZADO ==================== */}
-      <header ref={headerRef} className="fixed top-0 w-full bg-white z-50 border-b border-stone-200">
+      {/* Material translúcido: el contenido pasa por debajo; el borde aparece solo cuando hay contenido detrás */}
+      <header ref={headerRef} data-scrolled={scrolled} className="material-cabecera fixed top-0 w-full z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex justify-between items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
@@ -357,11 +392,21 @@ const Home = ({ enableGuestMode }) => {
             </Link>
 
             <nav className="hidden xl:flex items-center gap-8 whitespace-nowrap">
-              {NAV_LINKS.map(([href, label]) => (
-                <a key={href} href={href} className="text-stone-700 hover:text-green-800 font-semibold transition-colors">
-                  {label}
-                </a>
-              ))}
+              {NAV_LINKS.map(([href, label]) => {
+                const current = activeSection === href.slice(1);
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    aria-current={current ? 'location' : undefined}
+                    className={`enlace-seccion font-semibold transition-colors ${
+                      current ? 'text-green-800' : 'text-stone-700 hover:text-green-800'
+                    }`}
+                  >
+                    {label}
+                  </a>
+                );
+              })}
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -407,14 +452,17 @@ const Home = ({ enableGuestMode }) => {
 
           {/* Menú de celular y tablet */}
           {menuOpen && (
-            <nav id="menu-movil" aria-label="Menú" className="menu-entrada xl:hidden mt-3 pt-2 pb-2 border-t border-stone-200">
+            <nav id="menu-movil" aria-label="Menú" className="menu-entrada xl:hidden mt-3 pt-2 pb-2 border-t border-stone-900/10">
               <ul>
                 {NAV_LINKS.map(([href, label]) => (
                   <li key={href}>
                     <a
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className="toque flex items-center min-h-12 px-2 text-stone-800 font-semibold rounded-lg hover:bg-stone-50"
+                      aria-current={activeSection === href.slice(1) ? 'location' : undefined}
+                      className={`toque flex items-center min-h-12 px-2 font-semibold rounded-lg ${
+                        activeSection === href.slice(1) ? 'text-green-800 bg-green-50' : 'text-stone-800 hover:bg-stone-50'
+                      }`}
                     >
                       {label}
                     </a>
@@ -526,7 +574,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="palabra" className="py-24 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Prueba una <span className="text-green-700">palabra</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
@@ -545,7 +593,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="how-it-works" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Aprende en <span className="text-green-700">3 pasos</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Tu viaje hacia las lenguas andinas comienza aquí</p>
@@ -581,7 +629,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="features" className="py-24 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Qué incluye <span className="text-green-700">SimiAru</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
@@ -629,7 +677,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="languages" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">Elige tu idioma</h2>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Elige tu idioma</h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones</p>
             </div>
 
@@ -744,7 +792,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="cultura" className="py-24 bg-white overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Cultura <span className="text-green-700">viva</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
@@ -771,7 +819,7 @@ const Home = ({ enableGuestMode }) => {
         <section id="proyecto" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-bold">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Una herramienta <span className="text-green-700">abierta</span> para lenguas originarias
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
@@ -794,7 +842,7 @@ const Home = ({ enableGuestMode }) => {
         <section className="py-24 bg-green-800">
           <div className="container mx-auto px-6 text-center">
             <div className="max-w-4xl mx-auto space-y-8">
-              <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
+              <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
                 Empieza con la <span className="text-green-200">Unidad 1</span>
               </h2>
               <p className="text-xl md:text-2xl text-green-50 leading-relaxed">
@@ -939,10 +987,65 @@ const Home = ({ enableGuestMode }) => {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        /* Menú del celular: baja desde el encabezado, rápido y con una curva firme */
+        /* Encabezado como material translúcido (Apple): el contenido se ve pasar por debajo */
+        .material-cabecera {
+          background: rgba(255, 255, 255, 0.72);
+          -webkit-backdrop-filter: saturate(180%) blur(20px);
+          backdrop-filter: saturate(180%) blur(20px);
+          box-shadow: 0 1px 0 rgba(28, 25, 23, 0);
+          transition: box-shadow 200ms ease, background-color 200ms ease;
+        }
+        /* Borde de desplazamiento: solo cuando hay contenido detrás */
+        .material-cabecera[data-scrolled='true'] {
+          box-shadow: 0 1px 0 rgba(28, 25, 23, 0.08), 0 10px 24px -18px rgba(28, 25, 23, 0.35);
+        }
+        /* Navegadores sin desenfoque: fondo casi sólido para que el texto siga legible */
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+          .material-cabecera {
+            background: rgba(255, 255, 255, 0.97);
+          }
+        }
+        @media (prefers-reduced-transparency: reduce) {
+          .material-cabecera {
+            background: #fff;
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+          }
+        }
+        @media (prefers-contrast: more) {
+          .material-cabecera {
+            background: #fff;
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            box-shadow: 0 1px 0 #44403c;
+          }
+        }
+        /* Dónde estoy: una línea corta bajo la sección actual del menú */
+        .enlace-seccion {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          min-height: 44px;
+        }
+        .enlace-seccion::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 6px;
+          height: 2px;
+          border-radius: 999px;
+          background: currentColor;
+          transform: scaleX(0);
+          transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .enlace-seccion[aria-current]::after {
+          transform: scaleX(1);
+        }
+        /* Menú del celular: baja desde el encabezado y se materializa (desenfoque + posición) */
         @keyframes menu-entrada {
-          from { opacity: 0; transform: translateY(-8px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-8px); filter: blur(4px); }
+          to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
         .menu-entrada {
           transform-origin: top;
@@ -988,6 +1091,12 @@ const Home = ({ enableGuestMode }) => {
           }
           .copia {
             transition: none;
+          }
+          .enlace-seccion::after {
+            transition: opacity 150ms ease;
+          }
+          .enlace-seccion:not([aria-current])::after {
+            opacity: 0;
           }
         }
         /* Ajuste para el encabezado fijo */
