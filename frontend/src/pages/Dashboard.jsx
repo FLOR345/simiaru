@@ -6,6 +6,7 @@ import logo from '../assets/logo.jpg';
 
 // URL del backend
 import { API_URL } from '../config.js';
+import { getLevel } from '../utils/levels.js';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 const LANGUAGE_STYLE = {
@@ -26,8 +27,6 @@ const LANGUAGE_STYLE = {
     bar: 'bg-blue-800',
   },
 };
-
-const LEVEL_NAMES = { 1: 'Principiante', 2: 'Intermedio' };
 
 const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [units, setUnits] = useState([]);
@@ -55,13 +54,26 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         const token = localStorage.getItem('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        const [unitsRes, progressRes] = await Promise.all([
+        const [unitsRes, progressRes, profileRes] = await Promise.all([
           axios.get(`${API_URL}/api/lessons/units?idioma=${selectedLanguage}`),
           axios.get(`${API_URL}/api/progress`),
+          // Racha, puntos y nivel actualizados (los guardados al iniciar sesión pueden estar viejos)
+          axios.get(`${API_URL}/api/auth/profile`).catch(() => null),
         ]);
 
         setUnits(unitsRes.data.units);
         setProgress(progressRes.data.progress);
+        const fresh = profileRes?.data?.user;
+        // Solo se avisa a App si algo cambió (evita volver a dibujar todo sin motivo)
+        if (fresh && setUser && JSON.stringify({ ...user, ...fresh }) !== JSON.stringify(user)) {
+          const merged = { ...user, ...fresh };
+          setUser(merged);
+          try {
+            localStorage.setItem('user', JSON.stringify(merged));
+          } catch {
+            // almacenamiento bloqueado: se usa solo en esta visita
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -95,7 +107,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const totalLessons = units.reduce((acc, unit) => acc + (unit.lecciones_count || 0), 0);
   const overallProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-  const displayUser = isGuest ? { nombre: 'Invitado', racha_actual: 0, puntos_totales: 0, nivel: 1 } : user;
+  const displayUser = isGuest ? { nombre: 'Invitado', racha_actual: 0, puntos_totales: 0, nivel_actual: 1 } : user;
   const lang = LANGUAGE_STYLE[selectedLanguage];
   const lockedUnits = Math.max(units.length - 1, 0);
 
@@ -125,8 +137,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       Icon: Award,
       iconClass: 'text-blue-800',
       label: 'Nivel',
-      value: displayUser?.nivel || 1,
-      detail: isGuest ? 'Modo invitado' : LEVEL_NAMES[displayUser?.nivel] || 'Avanzado',
+      value: getLevel(displayUser).number,
+      detail: isGuest ? 'Modo invitado' : `${getLevel(displayUser).name} (${getLevel(displayUser).subtitle.toLowerCase()})`,
     },
   ];
 

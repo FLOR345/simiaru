@@ -53,8 +53,16 @@ router.get('/facebook/callback',
 // ===== ACTUALIZAR PERFIL =====
 router.put('/profile', protect, async (req, res) => {
   try {
-    const { nombre, idioma_objetivo, notificaciones_email } = req.body;
-    
+    const nombre = String(req.body.nombre ?? '').trim();
+    const idioma_objetivo = req.body.idioma_objetivo;
+
+    if (nombre.length < 1 || nombre.length > 80) {
+      return res.status(400).json({ message: 'El nombre debe tener entre 1 y 80 caracteres' });
+    }
+    if (!['quechua', 'aymara'].includes(idioma_objetivo)) {
+      return res.status(400).json({ message: 'Elige quechua o aymara' });
+    }
+
     await pool.query(
       `UPDATE usuarios SET nombre = $1, idioma_objetivo = $2 WHERE id = $3`,
       [nombre, idioma_objetivo, req.user.id]

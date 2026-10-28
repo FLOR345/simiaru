@@ -234,12 +234,16 @@ export const getProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     
+    // Incluye el título de la lección para mostrar el historial con nombres
     const result = await pool.query(
-      'SELECT * FROM progreso_usuario WHERE usuario_id = $1 ORDER BY fecha_completado DESC',
+      `SELECT p.*, l.titulo AS leccion_titulo
+       FROM progreso_usuario p
+       LEFT JOIN lecciones l ON l.id = p.leccion_id
+       WHERE p.usuario_id = $1
+       ORDER BY p.fecha_completado DESC NULLS LAST`,
       [userId]
     );
-    
-    console.log(`Progreso encontrado: ${result.rows.length} lecciones`);
+
     res.json({ success: true, progress: result.rows });
   } catch (error) {
     console.error('Error en getProgress:', error);

@@ -1,981 +1,464 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Award, Flame, Star, TrendingUp, Mountain, ArrowLeft, Calendar, Target, Trophy, Crown, CheckCircle, Clock, Zap, BookOpen, Globe, Sparkles, Play, ArrowRight, Shield, Medal, Edit3, Camera, Bell, BellOff, Save, X, Lock } from 'lucide-react';
+import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
-// URL del backend
 import { API_URL } from '../config.js';
+import { getLevel } from '../utils/levels.js';
+
+const authHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+
+const formatDate = (value) =>
+  value ? new Date(value).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+
+// Ventana modal con el <dialog> nativo: encierra el foco y se cierra con Escape
+const Modal = ({ id, open, onClose, title, children }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={ref}
+      onClose={onClose}
+      aria-labelledby={`${id}-titulo`}
+      className="w-[calc(100%-2rem)] max-w-md rounded-3xl p-0 backdrop:bg-stone-900/60 text-stone-900"
+    >
+      <div className="p-6 sm:p-8">
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <h2 id={`${id}-titulo`} className="text-2xl font-bold">
+            {title}
+          </h2>
+          <button type="button" onClick={onClose} aria-label="Cerrar" className="w-11 h-11 -mt-2 -mr-2 flex items-center justify-center rounded-full hover:bg-stone-100">
+            <X className="w-6 h-6" aria-hidden="true" />
+          </button>
+        </div>
+        {children}
+      </div>
+    </dialog>
+  );
+};
+
+const Message = ({ message }) =>
+  message ? (
+    <p
+      role={message.type === 'error' ? 'alert' : 'status'}
+      className={`p-4 rounded-xl mb-5 font-semibold ${message.type === 'success' ? 'bg-green-50 text-green-900 border border-green-300' : 'bg-red-50 text-red-800 border border-red-300'}`}
+    >
+      {message.text}
+    </p>
+  ) : null;
+
+const fieldClass = 'w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none bg-white';
+const primaryButton = 'w-full min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60';
+
 const Profile = ({ user, setUser }) => {
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(user);
   const [progress, setProgress] = useState([]);
-  const [stats, setStats] = useState({
-    totalLessons: 0,
-    completedLessons: 0,
-    averageScore: 0
-  });
+  const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [editForm, setEditForm] = useState({
-    nombre: '',
-    idioma_objetivo: '',
-    notificaciones_email: true
-  });
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const [loadError, setLoadError] = useState(false);
+
+  const [modal, setModal] = useState(null); // 'edit' | 'password' | null
+  const [editForm, setEditForm] = useState({ nombre: '', idioma_objetivo: 'quechua' });
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
-  const [passwordInfo, setPasswordInfo] = useState({ hasPassword: true, isGoogleUser: false });
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    loadProgress();
-    if (user) {
-      setEditForm({
-        nombre: user.nombre || '',
-        idioma_objetivo: user.idioma_objetivo || 'quechua',
-        notificaciones_email: user.notificaciones_email !== false
-      });
-    }
-  }, [user]);
-
-  // Verificar si el usuario tiene contraseña
-  useEffect(() => {
-    const checkPassword = async () => {
+  const loadAll = async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const [profileRes, progressRes, badgesRes] = await Promise.all([
+        axios.get(`${API_URL}/api/auth/profile`, authHeaders()),
+        axios.get(`${API_URL}/api/progress`, authHeaders()),
+        axios.get(`${API_URL}/api/progress/badges/all`, authHeaders()).catch(() => ({ data: { badges: [] } })),
+      ]);
+      const fresh = { ...user, ...profileRes.data.user };
+      setProfile(fresh);
+      // Solo se avisa a App si algo cambió (evita volver a dibujar todo sin motivo)
+      if (setUser && JSON.stringify(fresh) !== JSON.stringify(user)) setUser(fresh);
       try {
-        const token = localStorage.getItem('token');
-        const { data } = await axios.get(`${API_URL}/api/auth/has-password`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setPasswordInfo({
-          hasPassword: data.hasPassword,
-          isGoogleUser: data.isGoogleUser
-        });
-      } catch (error) {
-        console.error('Error checking password:', error);
+        localStorage.setItem('user', JSON.stringify(fresh));
+      } catch {
+        // almacenamiento bloqueado: se usa solo en esta visita
       }
-    };
-    
-    if (user) {
-      checkPassword();
-    }
-  }, [user?.id]);
-
-// ==================== FUNCIÓN loadProgress CORREGIDA ====================
-const loadProgress = async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token');
-    
-    // Verificar que hay token
-    if (!token) {
-      console.error('No hay token de autenticación');
-      setProgress([]);
-      setStats({
-        totalLessons: 0,
-        completedLessons: 0,
-        averageScore: 0
-      });
-      setLoading(false);
-      return;
-    }
-
-    console.log('🔍 Solicitando progreso del usuario...');
-    
-    const { data } = await axios.get(`${API_URL}/api/progress`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    console.log('✅ Respuesta del backend:', data);
-    
-    // ✅ PROTECCIÓN: Manejar la estructura del backend
-    // El backend devuelve: { success: true, progress: [...] }
-    let progressArray = [];
-    
-    if (data.success && Array.isArray(data.progress)) {
-      progressArray = data.progress;
-    } else if (Array.isArray(data)) {
-      // Por si acaso el backend envía directamente el array
-      progressArray = data;
-    } else {
-      console.warn('⚠️ Estructura inesperada del backend:', data);
-      progressArray = [];
-    }
-    
-    console.log(`📊 Total de lecciones encontradas: ${progressArray.length}`);
-    
-    setProgress(progressArray);
-    
-    // ✅ PROTECCIÓN: Filtrar con validación
-    const completed = progressArray.filter(p => {
-      // En PostgreSQL, completado puede ser boolean (true/false) o integer (1/0)
-      return p?.completado === true || 
-             p?.completado === 1 || 
-             p?.completado === '1' ||
-             p?.completado === 't'; // PostgreSQL a veces devuelve 't' para true
-    });
-    
-    console.log(`✅ Lecciones completadas: ${completed.length}`);
-    
-    // ✅ PROTECCIÓN: Calcular promedio con seguridad
-    const avgScore = completed.length > 0
-      ? Math.round(
-          completed.reduce((sum, p) => {
-            const score = Number(p.porcentaje_aciertos) || 0;
-            return sum + score;
-          }, 0) / completed.length
-        )
-      : 0;
-    
-    console.log(`📈 Promedio de aciertos: ${avgScore}%`);
-    
-    setStats({
-      totalLessons: progressArray.length,
-      completedLessons: completed.length,
-      averageScore: avgScore
-    });
-    
-  } catch (error) {
-    console.error('❌ Error cargando progreso:', error);
-    
-    // Mostrar más detalles del error
-    if (error.response) {
-      // El servidor respondió con un error
-      console.error('📛 Error del servidor:', {
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers
-      });
-      
-      // Si es error 401, redirigir al login
-      if (error.response.status === 401) {
-        console.error('🔐 Token inválido o expirado. Redirigiendo al login...');
+      setProgress(Array.isArray(progressRes.data.progress) ? progressRes.data.progress : []);
+      setBadges(badgesRes.data.badges || []);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      if (error.response?.status === 401) {
         localStorage.removeItem('token');
         navigate('/login');
         return;
       }
-    } else if (error.request) {
-      // La petición se hizo pero no hubo respuesta
-      console.error('🌐 Sin respuesta del servidor:', error.request);
-      console.error('⚠️ Verifica que el backend esté corriendo en Railway');
-    } else {
-      // Algo pasó al configurar la petición
-      console.error('⚙️ Error de configuración:', error.message);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
     }
-    
-    // ✅ Establecer valores por defecto en caso de error
-    setProgress([]);
-    setStats({
-      totalLessons: 0,
-      completedLessons: 0,
-      averageScore: 0
-    });
-  } finally {
-    setLoading(false);
-    console.log('🏁 Carga de progreso finalizada');
-  }
-};
+  };
 
-// ==================== EXTRA: Función de inicialización mejorada ====================
-useEffect(() => {
-  // Solo cargar si hay usuario
-  if (user && user.id) {
-    console.log('👤 Usuario detectado:', user.email);
-    loadProgress();
-  } else {
-    console.warn('⚠️ No hay usuario autenticado');
-    setProgress([]);
-    setStats({
-      totalLessons: 0,
-      completedLessons: 0,
-      averageScore: 0
-    });
-    setLoading(false);
-  }
-  
-  // Configurar formulario de edición
-  if (user) {
-    setEditForm({
-      nombre: user.nombre || '',
-      idioma_objetivo: user.idioma_objetivo || 'quechua',
-      notificaciones_email: user.notificaciones_email !== false
-    });
-  }
-}, [user?.id]); // Dependencia específica para evitar re-renders innecesarios
+  useEffect(() => {
+    loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleSaveProfile = async () => {
+  const openEdit = () => {
+    setMessage(null);
+    setEditForm({ nombre: profile?.nombre || '', idioma_objetivo: profile?.idioma_objetivo === 'aymara' ? 'aymara' : 'quechua' });
+    setModal('edit');
+  };
+
+  const openPassword = () => {
+    setMessage(null);
+    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    setModal('password');
+  };
+
+  const closeModal = () => {
+    setModal(null);
+    setMessage(null);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
     setSaving(true);
     setMessage(null);
     try {
-      const token = localStorage.getItem('token');
-      const { data } = await axios.put(`${API_URL}/api/auth/profile`, editForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setUser({ ...user, ...editForm });
-      setMessage({ type: 'success', text: '¡Perfil actualizado correctamente!' });
-      
-      setTimeout(() => {
-        setShowEditModal(false);
-        setMessage(null);
-      }, 1500);
+      await axios.put(`${API_URL}/api/auth/profile`, editForm, authHeaders());
+      const updated = { ...profile, ...editForm, nombre: editForm.nombre.trim() };
+      setProfile(updated);
+      if (setUser) setUser(updated);
+      try {
+        localStorage.setItem('user', JSON.stringify(updated));
+      } catch {
+        // sin almacenamiento: se actualiza solo en esta visita
+      }
+      setMessage({ type: 'success', text: 'Perfil actualizado' });
     } catch (error) {
-      console.error('Error updating profile:', error);
-      setMessage({ type: 'error', text: error.response?.data?.message || 'Error al actualizar el perfil' });
+      setMessage({ type: 'error', text: error.response?.data?.message || 'No pudimos guardar los cambios. Inténtalo de nuevo.' });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleChangePassword = async () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setMessage({ type: 'error', text: 'Las contraseñas no coinciden' });
-      return;
-    }
+  const hasPassword = profile?.hasPassword !== false;
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
     if (passwordForm.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'La contraseña debe tener al menos 6 caracteres' });
+      setMessage({ type: 'error', text: 'La nueva contraseña debe tener al menos 6 caracteres.' });
       return;
     }
-
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setMessage({ type: 'error', text: 'Las contraseñas nuevas no coinciden.' });
+      return;
+    }
     setSaving(true);
     setMessage(null);
     try {
-      const token = localStorage.getItem('token');
-      const { data } = await axios.put(`${API_URL}/api/auth/change-password`, {
-        currentPassword: passwordForm.currentPassword,
-        newPassword: passwordForm.newPassword
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setMessage({ type: 'success', text: data.message || '¡Contraseña cambiada correctamente!' });
+      const { data } = await axios.put(
+        `${API_URL}/api/auth/change-password`,
+        { currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword },
+        authHeaders(),
+      );
+      setMessage({ type: 'success', text: data.message || 'Contraseña actualizada' });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setPasswordInfo({ ...passwordInfo, hasPassword: true });
-      
-      setTimeout(() => {
-        setShowPasswordModal(false);
-        setMessage(null);
-      }, 2000);
+      setProfile((p) => ({ ...p, hasPassword: true }));
     } catch (error) {
-      console.error('Error changing password:', error);
-      setMessage({ type: 'error', text: error.response?.data?.message || 'Error al cambiar la contraseña' });
+      setMessage({ type: 'error', text: error.response?.data?.message || 'No pudimos cambiar la contraseña. Inténtalo de nuevo.' });
     } finally {
       setSaving(false);
     }
   };
 
-  const getLevelName = (nivel) => {
-    const levels = {
-      1: { name: 'Ayllu', subtitle: 'Comunidad', color: 'from-green-400 to-emerald-500' },
-      2: { name: "Mark'a", subtitle: 'Pueblo', color: 'from-blue-400 to-cyan-500' },
-      3: { name: 'Llaqta', subtitle: 'Ciudad', color: 'from-purple-400 to-pink-500' },
-      4: { name: 'Suyu', subtitle: 'Región', color: 'from-orange-400 to-red-500' },
-      5: { name: 'Tawantinsuyu', subtitle: 'Imperio', color: 'from-yellow-400 to-orange-500' }
-    };
-    return levels[nivel] || { name: `Nivel ${nivel}`, subtitle: 'Aprendiz', color: 'from-gray-400 to-gray-500' };
-  };
+  // Cada lección cuenta una sola vez, aunque se haya repetido
+  const completedIds = new Set(progress.filter((p) => p?.completado === true || p?.completado === 't' || p?.completado === 1).map((p) => p.leccion_id));
+  const completedRows = progress.filter((p) => completedIds.has(p.leccion_id));
+  const averageScore =
+    completedRows.length > 0 ? Math.round(completedRows.reduce((sum, p) => sum + (Number(p.porcentaje_aciertos) || 0), 0) / completedRows.length) : 0;
+  const level = getLevel(profile);
+  const obtainedBadges = badges.filter((b) => b.obtenida).length;
 
-  const getAchievements = () => {
-    const achievements = [];
-    
-    if (user?.racha_actual >= 7) {
-      achievements.push({ icon: '🔥', name: 'Racha de Fuego', description: '7 días seguidos', color: 'from-orange-500 to-red-600' });
-    }
-    if (user?.racha_actual >= 30) {
-      achievements.push({ icon: '🌟', name: 'Maestro Constante', description: '30 días seguidos', color: 'from-yellow-400 to-orange-500' });
-    }
-    if (stats.completedLessons >= 10) {
-      achievements.push({ icon: '📚', name: 'Estudiante Dedicado', description: '10 lecciones', color: 'from-blue-500 to-purple-600' });
-    }
-    if (stats.completedLessons >= 50) {
-      achievements.push({ icon: '🏆', name: 'Experto', description: '50 lecciones', color: 'from-purple-500 to-pink-600' });
-    }
-    if (stats.averageScore >= 80) {
-      achievements.push({ icon: '⭐', name: 'Excelencia', description: 'Promedio 80%+', color: 'from-green-500 to-emerald-600' });
-    }
-    if (user?.puntos_totales >= 1000) {
-      achievements.push({ icon: '💎', name: 'Coleccionista', description: '1000 puntos', color: 'from-cyan-500 to-blue-600' });
-    }
-    
-    return achievements;
-  };
-
-  const level = getLevelName(user?.nivel_actual || 1);
-  const achievements = getAchievements();
-  const progressPercentage = stats.totalLessons > 0 
-    ? Math.round((stats.completedLessons / stats.totalLessons) * 100) 
-    : 0;
+  const stats = [
+    { Icon: Flame, iconClass: 'text-orange-700', label: 'Racha', value: profile?.racha_actual || 0, detail: 'días seguidos' },
+    { Icon: Star, iconClass: 'text-amber-600', label: 'Ayni Points', value: profile?.puntos_totales || 0, detail: 'puntos ganados' },
+    { Icon: BookOpen, iconClass: 'text-green-700', label: 'Lecciones', value: completedIds.size, detail: 'completadas' },
+    { Icon: Target, iconClass: 'text-blue-800', label: 'Precisión', value: `${averageScore}%`, detail: 'promedio de aciertos' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      
-      {/* ==================== MODAL EDITAR PERFIL ==================== */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
-            <button
-              onClick={() => setShowEditModal(false)}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition"
-            >
-              <X className="w-6 h-6 text-gray-500" />
-            </button>
-            
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Edit3 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">Editar Perfil</h2>
-                <p className="text-gray-600 text-sm">Actualiza tu información</p>
-              </div>
-            </div>
-
-            {message && (
-              <div className={`p-4 rounded-xl mb-6 ${
-                message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {message.text}
-              </div>
-            )}
-
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Nombre
-                </label>
-                <input
-                  type="text"
-                  value={editForm.nombre}
-                  onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition"
-                  placeholder="Tu nombre"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Idioma que estás aprendiendo
-                </label>
-                <select
-                  value={editForm.idioma_objetivo}
-                  onChange={(e) => setEditForm({ ...editForm, idioma_objetivo: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition"
-                >
-                  <option value="quechua">🏔️ Quechua</option>
-                  <option value="aymara">🌙 Aymara</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Notificaciones por Email
-                </label>
-                <button
-                  onClick={() => setEditForm({ ...editForm, notificaciones_email: !editForm.notificaciones_email })}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition ${
-                    editForm.notificaciones_email
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200 bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {editForm.notificaciones_email ? (
-                      <Bell className="w-5 h-5 text-green-600" />
-                    ) : (
-                      <BellOff className="w-5 h-5 text-gray-400" />
-                    )}
-                    <span className={editForm.notificaciones_email ? 'text-green-700' : 'text-gray-600'}>
-                      {editForm.notificaciones_email ? 'Activadas' : 'Desactivadas'}
-                    </span>
-                  </div>
-                  <div className={`w-12 h-6 rounded-full p-1 transition ${
-                    editForm.notificaciones_email ? 'bg-green-500' : 'bg-gray-300'
-                  }`}>
-                    <div className={`w-4 h-4 rounded-full bg-white transition transform ${
-                      editForm.notificaciones_email ? 'translate-x-6' : 'translate-x-0'
-                    }`} />
-                  </div>
-                </button>
-              </div>
-
-              <button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {saving ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    Guardar Cambios
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==================== MODAL CAMBIAR CONTRASEÑA ==================== */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
-            <button
-              onClick={() => {
-                setShowPasswordModal(false);
-                setMessage(null);
-                setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-              }}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition"
-            >
-              <X className="w-6 h-6 text-gray-500" />
-            </button>
-            
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                <Lock className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                  {!passwordInfo.hasPassword ? 'Crear Contraseña' : 'Cambiar Contraseña'}
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  {!passwordInfo.hasPassword 
-                    ? 'Crea una contraseña para iniciar con email' 
-                    : 'Actualiza tu contraseña'}
-                </p>
-              </div>
-            </div>
-
-            {/* Aviso para usuarios de Google */}
-            {passwordInfo.isGoogleUser && !passwordInfo.hasPassword && (
-              <div className="p-4 rounded-xl mb-6 bg-blue-50 text-blue-800 border border-blue-200">
-                <p className="text-sm">
-                  <strong>🔐 Cuenta de Google:</strong> Al crear una contraseña, podrás iniciar sesión con tu email y contraseña además de Google.
-                </p>
-              </div>
-            )}
-
-            {message && (
-              <div className={`p-4 rounded-xl mb-6 ${
-                message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {message.text}
-              </div>
-            )}
-
-            <div className="space-y-5">
-              {/* Solo mostrar si YA tiene contraseña */}
-              {passwordInfo.hasPassword && (
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Contraseña Actual
-                  </label>
-                  <input
-                    type="password"
-                    value={passwordForm.currentPassword}
-                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition"
-                    placeholder="••••••••"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Nueva Contraseña
-                </label>
-                <input
-                  type="password"
-                  value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Confirmar Nueva Contraseña
-                </label>
-                <input
-                  type="password"
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <button
-                onClick={handleChangePassword}
-                disabled={saving}
-                className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-xl hover:shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {saving ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Lock className="w-5 h-5" />
-                    {!passwordInfo.hasPassword ? 'Crear Contraseña' : 'Cambiar Contraseña'}
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==================== HEADER PREMIUM ==================== */}
-      <header className="bg-white/95 backdrop-blur-xl shadow-xl sticky top-0 z-40 border-b-2 border-gray-100">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="group p-3 hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 rounded-2xl transition-all duration-300"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600 group-hover:text-blue-600 transition-colors" />
-              </button>
-              
-              <div className="flex items-center gap-4">
-                <img 
-                  src={logo} 
-                  alt="SimiAru" 
-                  className="h-12 w-auto rounded-xl shadow-md"
-                />
-                <div>
-                  <h1 className="text-2xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                    Mi Perfil
-                  </h1>
-                  <p className="text-sm text-gray-600 font-semibold">Tu Trayectoria de Aprendizaje</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowEditModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl shadow-md hover:shadow-xl transform hover:scale-105 transition-all"
-              >
-                <Edit3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Editar Perfil</span>
-              </button>
-              
-              <Link
-                to="/dashboard"
-                className="hidden md:flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-              >
-                <Mountain className="w-5 h-5" />
-                Continuar
-              </Link>
-            </div>
-          </div>
+    <div className="min-h-screen bg-stone-50 text-stone-900">
+      {/* ==================== ENCABEZADO ==================== */}
+      <header className="bg-white sticky top-0 z-40 border-b border-stone-200">
+        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 transition-colors">
+            <ArrowLeft className="w-6 h-6" aria-hidden="true" />
+          </Link>
+          <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
+          <h1 className="text-xl sm:text-2xl font-bold">Tu perfil</h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-10 max-w-7xl">
-        
+      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="relative w-24 h-24 mb-8">
-              <div className="absolute inset-0 border-4 border-purple-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-purple-600 rounded-full border-t-transparent animate-spin"></div>
-              <img src={logo} alt="SimiAru" className="absolute inset-2 w-20 h-20 rounded-full object-cover" />
-            </div>
-            <p className="text-2xl font-bold text-gray-700">Cargando tu perfil...</p>
+          <p className="text-center py-20 text-lg font-semibold text-stone-700" role="status">
+            Cargando tu perfil…
+          </p>
+        ) : loadError ? (
+          <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center" role="alert">
+            <AlertCircle className="w-10 h-10 text-red-700 mx-auto mb-3" aria-hidden="true" />
+            <p className="text-lg font-semibold mb-1">No pudimos cargar tu perfil</p>
+            <p className="text-stone-600 mb-5">Revisa tu conexión. Si es tu primera visita del día, el servidor puede tardar hasta un minuto.</p>
+            <button type="button" onClick={loadAll} className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg transition-colors">
+              <RefreshCw className="w-5 h-5" aria-hidden="true" />
+              Reintentar
+            </button>
           </div>
         ) : (
           <>
-            {/* ==================== HERO BANNER CON AVATAR ==================== */}
-            <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-[2.5rem] shadow-2xl p-10 md:p-12 mb-10 overflow-hidden">
-              
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
-              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-3xl -ml-32 -mb-32"></div>
-              
-              <div className="relative z-10">
-                <div className="grid md:grid-cols-[auto_1fr] gap-8 items-center">
-                  
-                  <div className="flex justify-center md:justify-start">
-                    <div className="relative group">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 rounded-[2rem] blur-xl opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                      
-                      <div className="relative w-36 h-36 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-[2rem] flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-all duration-500 border-4 border-white/30">
-                        <User className="w-20 h-20 text-white drop-shadow-lg" />
-                      </div>
-                      
-                      <div className={`absolute -bottom-3 -right-3 w-16 h-16 bg-gradient-to-br ${level.color} rounded-2xl flex items-center justify-center border-4 border-white shadow-xl`}>
-                        <div className="text-center">
-                          <Crown className="w-7 h-7 text-white mx-auto" />
-                          <p className="text-xs font-black text-white">{user?.nivel_actual || 1}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-center md:text-left text-white">
-                    <h2 className="text-5xl font-black mb-4 drop-shadow-lg">{user?.nombre || 'Usuario'}</h2>
-                    
-                    <div className="flex flex-col md:flex-row items-center gap-3 mb-5">
-                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/30">
-                        <Mail className="w-5 h-5" />
-                        <span className="font-semibold">{user?.email}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/30">
-                        <Globe className="w-5 h-5" />
-                        <span className="font-semibold capitalize">{user?.idioma_objetivo || 'Quechua'}</span>
-                      </div>
-
-                      {/* Badge de Google */}
-                      {passwordInfo.isGoogleUser && (
-                        <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/30">
-                          <span className="text-lg">🔗</span>
-                          <span className="font-semibold">Google</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className={`inline-flex items-center gap-4 bg-gradient-to-r ${level.color} px-8 py-4 rounded-2xl shadow-2xl border-2 border-white/50`}>
-                      <Trophy className="w-10 h-10 text-white" />
-                      <div className="text-left">
-                        <p className="text-sm font-bold text-white/90">Tu Nivel Actual</p>
-                        <p className="text-2xl font-black">{level.name}</p>
-                        <p className="text-sm font-semibold text-white/90">{level.subtitle}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
-                      <button
-                        onClick={() => setShowEditModal(true)}
-                        className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl hover:bg-white/30 transition"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                        <span className="text-sm font-semibold">Editar Perfil</span>
-                      </button>
-                      <button
-                        onClick={() => setShowPasswordModal(true)}
-                        className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl hover:bg-white/30 transition"
-                      >
-                        <Lock className="w-4 h-4" />
-                        <span className="text-sm font-semibold">
-                          {!passwordInfo.hasPassword ? 'Crear Contraseña' : 'Cambiar Contraseña'}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
+            {/* ==================== DATOS DE LA CUENTA ==================== */}
+            <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="nombre-usuario">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <span className="w-20 h-20 rounded-2xl bg-green-700 text-white text-4xl font-bold flex items-center justify-center shrink-0" aria-hidden="true">
+                  {profile?.nombre?.charAt(0).toUpperCase() || '?'}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h2 id="nombre-usuario" className="text-3xl font-bold break-words">
+                    {profile?.nombre || 'Usuario'}
+                  </h2>
+                  <p className="text-stone-600 break-all">{profile?.email}</p>
+                  <ul className="flex flex-wrap gap-2 mt-3 text-sm font-semibold">
+                    <li className={`px-3 py-1 rounded-full ${profile?.idioma_objetivo === 'aymara' ? 'bg-blue-50 text-blue-900' : 'bg-green-50 text-green-900'}`}>
+                      Aprende {profile?.idioma_objetivo === 'aymara' ? 'aymara' : 'quechua'}
+                    </li>
+                    <li className="px-3 py-1 rounded-full bg-stone-100 text-stone-800">
+                      Nivel {level.number}: {level.name} ({level.subtitle.toLowerCase()})
+                    </li>
+                    {profile?.isGoogleUser && <li className="px-3 py-1 rounded-full bg-stone-100 text-stone-800">Cuenta de Google</li>}
+                  </ul>
                 </div>
               </div>
-            </div>
-
-            {/* ==================== ESTADÍSTICAS EN GRID ==================== */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-              
-              <div className="group relative bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10 text-white">
-                  <Flame className="w-14 h-14 mb-4 animate-pulse drop-shadow-lg" />
-                  <p className="text-6xl font-black mb-2">{user?.racha_actual || 0}</p>
-                  <p className="text-lg font-bold opacity-90">Días Consecutivos</p>
-                </div>
-              </div>
-
-              <div className="group relative bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10 text-white">
-                  <Star className="w-14 h-14 mb-4 fill-white drop-shadow-lg" />
-                  <p className="text-6xl font-black mb-2">{user?.puntos_totales || 0}</p>
-                  <p className="text-lg font-bold opacity-90">Ayni Points</p>
-                </div>
-              </div>
-
-              <div className="group relative bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10 text-white">
-                  <BookOpen className="w-14 h-14 mb-4 drop-shadow-lg" />
-                  <p className="text-6xl font-black mb-2">{stats.completedLessons}</p>
-                  <p className="text-lg font-bold opacity-90">Lecciones</p>
-                </div>
-              </div>
-
-              <div className="group relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10 text-white">
-                  <Target className="w-14 h-14 mb-4 drop-shadow-lg" />
-                  <p className="text-6xl font-black mb-2">{stats.averageScore}%</p>
-                  <p className="text-lg font-bold opacity-90">Precisión</p>
-                </div>
-              </div>
-            </div>
-
-            {/* ==================== CONFIGURACIÓN RÁPIDA ==================== */}
-            <div className="bg-white rounded-[2rem] shadow-xl p-8 md:p-10 mb-10">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-900 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Shield className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black text-gray-800">Configuración</h2>
-                  <p className="text-gray-600 font-semibold">Administra tu cuenta</p>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all group"
-                >
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition">
-                    <Edit3 className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-gray-800">Editar Perfil</p>
-                    <p className="text-sm text-gray-600">Nombre, idioma, notificaciones</p>
-                  </div>
+              <div className="flex flex-wrap gap-3 mt-6">
+                <button type="button" onClick={openEdit} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors">
+                  <Edit3 className="w-4 h-4" aria-hidden="true" />
+                  Editar perfil
                 </button>
-
-                <button
-                  onClick={() => setShowPasswordModal(true)}
-                  className="flex items-center gap-4 p-6 bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl border-2 border-orange-100 hover:border-orange-300 hover:shadow-lg transition-all group"
-                >
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition">
-                    <Lock className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-gray-800">
-                      {!passwordInfo.hasPassword ? 'Crear Contraseña' : 'Cambiar Contraseña'}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {!passwordInfo.hasPassword ? 'Añade acceso con email' : 'Actualiza tu contraseña'}
-                    </p>
-                  </div>
+                <button type="button" onClick={openPassword} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors">
+                  <Lock className="w-4 h-4" aria-hidden="true" />
+                  {hasPassword ? 'Cambiar contraseña' : 'Crear contraseña'}
                 </button>
-
-                <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-100">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                    {user?.notificaciones_email !== false ? (
-                      <Bell className="w-7 h-7 text-white" />
-                    ) : (
-                      <BellOff className="w-7 h-7 text-white" />
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-gray-800">Notificaciones</p>
-                    <p className="text-sm text-gray-600">
-                      {user?.notificaciones_email !== false ? '✓ Activadas' : '✗ Desactivadas'}
-                    </p>
-                  </div>
-                </div>
               </div>
-            </div>
+            </section>
 
-            {/* ==================== PROGRESO GENERAL ==================== */}
-            <div className="bg-white rounded-[2rem] shadow-xl p-8 md:p-10 mb-10">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <TrendingUp className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black text-gray-800">Progreso General</h2>
-                  <p className="text-gray-600 font-semibold">Tu camino hacia la maestría</p>
-                </div>
-              </div>
+            {/* ==================== ESTADÍSTICAS ==================== */}
+            <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+              {stats.map(({ Icon, iconClass, label, value, detail }) => (
+                <li key={label} className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Icon className={`w-6 h-6 ${iconClass}`} aria-hidden="true" />
+                    <span className="text-sm font-bold text-stone-600">{label}</span>
+                  </div>
+                  <p className="text-3xl sm:text-4xl font-extrabold mb-1">{value}</p>
+                  <p className="text-sm text-stone-600">{detail}</p>
+                </li>
+              ))}
+            </ul>
 
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xl font-bold text-gray-700">
-                    {stats.completedLessons} de {stats.totalLessons} lecciones completadas
-                  </span>
-                  <span className="text-4xl font-black bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {progressPercentage}%
-                  </span>
-                </div>
-                
-                <div className="relative w-full bg-gradient-to-r from-gray-100 to-gray-200 rounded-full h-8 overflow-hidden shadow-inner">
-                  <div
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 rounded-full transition-all duration-1000 flex items-center justify-end pr-3 shadow-lg"
-                    style={{ width: `${progressPercentage}%` }}
-                  >
-                    {progressPercentage > 15 && (
-                      <Zap className="w-5 h-5 text-white animate-pulse" />
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-6">
-                <div className="flex items-center gap-4 p-5 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border-2 border-blue-100">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md">
-                    <CheckCircle className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-black text-gray-800">{stats.completedLessons}</p>
-                    <p className="text-sm text-gray-600 font-semibold">Completadas</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-5 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl border-2 border-yellow-100">
-                  <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-                    <Clock className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-black text-gray-800">{stats.totalLessons - stats.completedLessons}</p>
-                    <p className="text-sm text-gray-600 font-semibold">Pendientes</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border-2 border-purple-100">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
-                    <Award className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-black text-gray-800">{stats.averageScore}%</p>
-                    <p className="text-sm text-gray-600 font-semibold">Precisión</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ==================== LOGROS ==================== */}
-            {achievements.length > 0 && (
-              <div className="bg-white rounded-[2rem] shadow-xl p-8 md:p-10 mb-10">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Trophy className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-black text-gray-800">Logros Desbloqueados</h2>
-                    <p className="text-gray-600 font-semibold">{achievements.length} insignias ganadas</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-                  {achievements.map((achievement, index) => (
-                    <div
-                      key={index}
-                      className="group relative bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 text-center border-2 border-gray-200 hover:border-yellow-400 hover:shadow-2xl transition-all duration-300 hover:-translate-y-3"
+            {/* ==================== INSIGNIAS ==================== */}
+            {badges.length > 0 && (
+              <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="insignias-titulo">
+                <h2 id="insignias-titulo" className="text-2xl font-bold">
+                  Insignias
+                </h2>
+                <p className="text-stone-600 mb-5">
+                  {obtainedBadges} de {badges.length} obtenidas
+                </p>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {badges.map((badge) => (
+                    <li
+                      key={badge.id}
+                      className={`flex items-start gap-3 p-4 rounded-2xl border-2 ${badge.obtenida ? 'border-amber-500 bg-amber-50' : 'border-stone-200 bg-stone-50'}`}
                     >
-                      <div className="text-6xl mb-3 transform group-hover:scale-125 transition-transform duration-300">
-                        {achievement.icon}
+                      {badge.obtenida ? (
+                        <Award className="w-8 h-8 text-amber-700 shrink-0" aria-hidden="true" />
+                      ) : (
+                        <Lock className="w-8 h-8 text-stone-400 shrink-0" aria-hidden="true" />
+                      )}
+                      <div>
+                        <p className="font-bold">
+                          {badge.nombre}
+                          <span className="sr-only">{badge.obtenida ? ' (obtenida)' : ' (pendiente)'}</span>
+                        </p>
+                        {badge.descripcion && <p className="text-sm text-stone-600">{badge.descripcion}</p>}
+                        {badge.obtenida && badge.fecha_obtencion && <p className="text-sm text-amber-900 mt-1">Obtenida el {formatDate(badge.fecha_obtencion)}</p>}
                       </div>
-                      <p className="font-black text-gray-800 text-sm mb-1">{achievement.name}</p>
-                      <p className="text-xs text-gray-600 font-semibold">{achievement.description}</p>
-                    </div>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </section>
             )}
 
             {/* ==================== HISTORIAL ==================== */}
-            <div className="bg-white rounded-[2rem] shadow-xl p-8 md:p-10 mb-10">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <BookOpen className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black text-gray-800">Historial de Lecciones</h2>
-                  <p className="text-gray-600 font-semibold">Últimas 10 lecciones completadas</p>
-                </div>
-              </div>
+            <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="historial-titulo">
+              <h2 id="historial-titulo" className="text-2xl font-bold">
+                Historial de lecciones
+              </h2>
+              <p className="text-stone-600 mb-5">Tus últimos 10 intentos</p>
 
               {progress.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-28 h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                    <BookOpen className="w-14 h-14 text-gray-400" />
-                  </div>
-                  <h3 className="text-2xl font-black text-gray-700 mb-3">
-                    Aún no has completado ninguna lección
-                  </h3>
-                  <p className="text-gray-500 mb-8 text-lg">¡Es hora de comenzar tu aventura!</p>
-                  <Link
-                    to="/dashboard"
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white font-black text-lg rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all"
-                  >
-                    <Play className="w-6 h-6" />
-                    Comenzar Ahora
+                <div className="text-center py-10">
+                  <BookOpen className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
+                  <p className="text-lg font-semibold mb-4">Todavía no completaste ninguna lección</p>
+                  <Link to="/dashboard" className="inline-flex items-center px-6 min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl transition-colors">
+                    Empezar la primera lección
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {progress
-                    .sort((a, b) => new Date(b.fecha_completado) - new Date(a.fecha_completado))
-                    .slice(0, 10)
-                    .map((p, index) => (
-                      <div
-                        key={index}
-                        className="group flex items-center justify-between p-6 bg-gradient-to-r from-gray-50 to-white rounded-2xl border-2 border-gray-100 hover:border-blue-300 hover:shadow-xl transition-all duration-300"
-                      >
-                        <div className="flex items-center gap-5">
-                          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${
-                            p.completado
-                              ? 'bg-gradient-to-br from-green-500 to-emerald-600'
-                              : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                          }`}>
-                            {p.completado ? (
-                              <CheckCircle className="w-8 h-8 text-white" />
-                            ) : (
-                              <Clock className="w-8 h-8 text-white" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-black text-xl text-gray-800 mb-1">
-                              Lección #{p.leccion_id}
+                <ol className="space-y-3">
+                  {progress.slice(0, 10).map((p, index) => {
+                    const score = Number(p.porcentaje_aciertos) || 0;
+                    const passed = score >= 80;
+                    return (
+                      <li key={`${p.id || p.leccion_id}-${index}`} className="flex items-center gap-4 p-4 rounded-2xl border border-stone-200">
+                        <span
+                          className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${p.completado ? 'bg-green-700 text-white' : 'bg-stone-200 text-stone-600'}`}
+                          aria-hidden="true"
+                        >
+                          <CheckCircle className="w-6 h-6" />
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-lg">{p.leccion_titulo || `Lección ${p.leccion_id}`}</p>
+                          {formatDate(p.fecha_completado) && (
+                            <p className="flex items-center gap-1.5 text-sm text-stone-600">
+                              <Calendar className="w-4 h-4" aria-hidden="true" />
+                              {formatDate(p.fecha_completado)}
                             </p>
-                            <div className="flex items-center gap-3 text-sm">
-                              <div className="flex items-center gap-1.5 text-gray-600">
-                                <Calendar className="w-4 h-4" />
-                                <span className="font-semibold">
-                                  {new Date(p.fecha_completado).toLocaleDateString('es-ES', {
-                                    day: 'numeric',
-                                    month: 'short'
-                                  })}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                          )}
                         </div>
-                        <div className={`text-4xl font-black ${
-                          p.porcentaje_aciertos >= 80
-                            ? 'text-green-600'
-                            : p.porcentaje_aciertos >= 60
-                            ? 'text-yellow-600'
-                            : 'text-red-600'
-                        }`}>
-                          {p.porcentaje_aciertos}%
-                        </div>
-                      </div>
-                    ))}
-                </div>
+                        <p className={`text-2xl font-extrabold ${passed ? 'text-green-800' : 'text-orange-800'}`}>
+                          {score}%<span className="sr-only"> de aciertos</span>
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ol>
               )}
-            </div>
-
-            {/* ==================== CTA FINAL ==================== */}
-            <div className="relative bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-600 rounded-[2rem] shadow-2xl p-12 text-white text-center overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
-              <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -ml-48 -mb-48"></div>
-              
-              <div className="relative z-10">
-                <Sparkles className="w-20 h-20 mx-auto mb-6 animate-pulse drop-shadow-lg" />
-                <h3 className="text-4xl font-black mb-4">¡Sigue Aprendiendo!</h3>
-                <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
-                  Cada día de práctica te acerca más a dominar las lenguas andinas. ¡Tú puedes!
-                </p>
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-3 px-10 py-5 bg-white text-purple-600 font-black text-xl rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300"
-                >
-                  Continuar Mi Viaje
-                  <ArrowRight className="w-6 h-6" />
-                </Link>
-              </div>
-            </div>
+            </section>
           </>
         )}
       </main>
+
+      {/* ==================== EDITAR PERFIL ==================== */}
+      <Modal id="editar" open={modal === 'edit'} onClose={closeModal} title="Editar perfil">
+        <Message message={message} />
+        <form onSubmit={handleSaveProfile} className="space-y-5">
+          <div>
+            <label htmlFor="perfil-nombre" className="block font-bold mb-2">
+              Nombre
+            </label>
+            <input
+              id="perfil-nombre"
+              type="text"
+              autoComplete="name"
+              required
+              maxLength={80}
+              value={editForm.nombre}
+              onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })}
+              className={fieldClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="perfil-idioma" className="block font-bold mb-2">
+              Lengua que estás aprendiendo
+            </label>
+            <select
+              id="perfil-idioma"
+              value={editForm.idioma_objetivo}
+              onChange={(e) => setEditForm({ ...editForm, idioma_objetivo: e.target.value })}
+              className={fieldClass}
+            >
+              <option value="quechua">Quechua</option>
+              <option value="aymara">Aymara</option>
+            </select>
+          </div>
+          <button type="submit" disabled={saving} className={primaryButton}>
+            {saving ? 'Guardando…' : 'Guardar cambios'}
+          </button>
+        </form>
+      </Modal>
+
+      {/* ==================== CONTRASEÑA ==================== */}
+      <Modal id="contrasena" open={modal === 'password'} onClose={closeModal} title={hasPassword ? 'Cambiar contraseña' : 'Crear contraseña'}>
+        {!hasPassword && (
+          <p className="p-4 rounded-xl mb-5 bg-stone-50 border border-stone-200 text-stone-800">
+            Entraste con Google. Si creas una contraseña, también podrás iniciar sesión con tu correo.
+          </p>
+        )}
+        <Message message={message} />
+        <form onSubmit={handleChangePassword} className="space-y-5">
+          {/* Campo oculto para que el gestor de contraseñas asocie la cuenta */}
+          <input type="email" autoComplete="username" value={profile?.email || ''} readOnly hidden />
+          {hasPassword && (
+            <div>
+              <label htmlFor="pass-actual" className="block font-bold mb-2">
+                Contraseña actual
+              </label>
+              <input
+                id="pass-actual"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                className={fieldClass}
+              />
+            </div>
+          )}
+          <div>
+            <label htmlFor="pass-nueva" className="block font-bold mb-2">
+              Nueva contraseña
+            </label>
+            <input
+              id="pass-nueva"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={6}
+              aria-describedby="pass-nueva-ayuda"
+              value={passwordForm.newPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              className={fieldClass}
+            />
+            <p id="pass-nueva-ayuda" className="text-sm text-stone-600 mt-1.5">
+              Al menos 6 caracteres
+            </p>
+          </div>
+          <div>
+            <label htmlFor="pass-confirmar" className="block font-bold mb-2">
+              Confirmar nueva contraseña
+            </label>
+            <input
+              id="pass-confirmar"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={passwordForm.confirmPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              className={fieldClass}
+            />
+          </div>
+          <button type="submit" disabled={saving} className={primaryButton}>
+            <Lock className="w-5 h-5" aria-hidden="true" />
+            {saving ? 'Guardando…' : hasPassword ? 'Cambiar contraseña' : 'Crear contraseña'}
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };

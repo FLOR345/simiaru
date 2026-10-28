@@ -12,6 +12,22 @@ import CultureModule from './pages/CultureModule';
 // URL del backend
 import { API_URL } from './config.js';
 
+// Ruta protegida que permite usuarios Y invitados.
+// Va fuera de App: si se define dentro, cada cambio de estado de App la crea de nuevo
+// y React vuelve a montar la pantalla entera (eso provocaba un bucle de peticiones).
+const ProtectedRoute = ({ children, auth, guestAllowed = true }) => {
+  if (auth.loading) {
+    return <div className="min-h-screen flex items-center justify-center text-white">Cargando...</div>;
+  }
+
+  // Si hay usuario O es invitado (y está permitido), dar acceso
+  if (auth.user || (auth.isGuest && guestAllowed)) {
+    return children;
+  }
+
+  return <Navigate to="/login" />;
+};
+
 function App() {
   const [user, setUser] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
@@ -63,19 +79,7 @@ function App() {
     }
   }, []);
 
-  // Ruta protegida que permite usuarios Y invitados
-  const ProtectedRoute = ({ children, guestAllowed = true }) => {
-    if (loading) {
-      return <div className="min-h-screen flex items-center justify-center text-white">Cargando...</div>;
-    }
-    
-    // Si hay usuario O es invitado (y está permitido), dar acceso
-    if (user || (isGuest && guestAllowed)) {
-      return children;
-    }
-    
-    return <Navigate to="/login" />;
-  };
+  const auth = { loading, user, isGuest };
 
   return (
     <BrowserRouter>
@@ -86,7 +90,7 @@ function App() {
         <Route 
           path="/dashboard" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute auth={auth}>
               <Dashboard user={user} setUser={setUser} isGuest={isGuest} setIsGuest={setIsGuest} />
             </ProtectedRoute>
           } 
@@ -94,7 +98,7 @@ function App() {
         <Route 
           path="/lesson/:lessonId" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute auth={auth}>
               <LessonView user={user} isGuest={isGuest} />
             </ProtectedRoute>
           } 
@@ -102,7 +106,7 @@ function App() {
         <Route 
           path="/profile" 
           element={
-            <ProtectedRoute guestAllowed={false}>
+            <ProtectedRoute auth={auth} guestAllowed={false}>
               <Profile user={user} setUser={setUser} />
             </ProtectedRoute>
           } 
@@ -111,7 +115,7 @@ function App() {
         <Route 
           path="/culture" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute auth={auth}>
               <CultureModule user={user} setUser={setUser} isGuest={isGuest} />
             </ProtectedRoute>
           } 
