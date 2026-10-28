@@ -27,6 +27,54 @@ const readFavorites = () => {
   }
 };
 
+// Fuera del componente principal para que no se vuelvan a crear en cada cambio
+// (si no, el botón pierde el foco del teclado al marcar un favorito)
+const FavoriteButton = ({ isFavorite, onToggle, name }) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    aria-pressed={isFavorite}
+    aria-label={`${isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}: ${name}`}
+    className="w-11 h-11 flex items-center justify-center rounded-full transition-colors shrink-0 text-stone-600 hover:bg-stone-100"
+  >
+    <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-600 text-red-600' : ''}`} aria-hidden="true" />
+  </button>
+);
+
+// Texto original, traducción y explicación: igual en cuentos y en el resto
+const ContentBody = ({ item, lang }) => (
+  <div className="space-y-4">
+    <div className={`${lang.soft} p-5 rounded-xl border-l-4 ${lang.bar}`}>
+      <p className={`text-sm font-bold ${lang.accent} mb-2`}>{lang.label}</p>
+      <p className="text-lg leading-relaxed whitespace-pre-line font-medium" lang={lang.lang}>
+        {item.contenido_original}
+      </p>
+    </div>
+    {item.traduccion && (
+      <div className="bg-stone-50 p-5 rounded-xl border-l-4 border-stone-300">
+        <p className="text-sm font-bold text-stone-600 mb-2">Traducción al español</p>
+        <p className="text-stone-800 italic leading-relaxed whitespace-pre-line">{item.traduccion}</p>
+      </div>
+    )}
+    {item.explicacion && (
+      <div className="bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500">
+        <p className="text-sm font-bold text-amber-900 mb-2">Significado cultural</p>
+        <p className="text-stone-800 leading-relaxed">{item.explicacion}</p>
+      </div>
+    )}
+    {item.audio_url && (
+      <button
+        type="button"
+        onClick={() => new Audio(item.audio_url).play().catch((err) => console.error('Error playing audio:', err))}
+        className={`w-full flex items-center justify-center gap-2 px-5 min-h-12 ${lang.solid} text-white rounded-xl font-bold transition-colors`}
+      >
+        <Volume2 className="w-5 h-5" aria-hidden="true" />
+        Escuchar
+      </button>
+    )}
+  </div>
+);
+
 const CultureModule = ({ user }) => {
   const [content, setContent] = useState([]);
   const [selectedType, setSelectedType] = useState('adivinanza');
@@ -79,9 +127,6 @@ const CultureModule = ({ user }) => {
     }
   };
 
-  const playAudio = (url) => {
-    if (url) new Audio(url).play().catch((err) => console.error('Error playing audio:', err));
-  };
 
   const search = searchTerm.trim().toLowerCase();
   const filteredContent = content.filter((item) => {
@@ -95,54 +140,11 @@ const CultureModule = ({ user }) => {
     setShowFavorites(false);
   };
 
-  const FavoriteButton = ({ item, className = '' }) => {
-    const isFavorite = favorites.includes(item.id);
-    return (
-      <button
-        type="button"
-        onClick={() => toggleFavorite(item.id)}
-        aria-pressed={isFavorite}
-        aria-label={`${isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}: ${item.titulo || type.singular}`}
-        className={`w-11 h-11 flex items-center justify-center rounded-full transition-colors shrink-0 ${className}`}
-      >
-        <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-600 text-red-600' : ''}`} aria-hidden="true" />
-      </button>
-    );
-  };
-
-  // Texto original, traducción y explicación: igual en cuentos y en el resto
-  const ContentBody = ({ item }) => (
-    <div className="space-y-4">
-      <div className={`${lang.soft} p-5 rounded-xl border-l-4 ${lang.bar}`}>
-        <p className={`text-sm font-bold ${lang.accent} mb-2`}>{lang.label}</p>
-        <p className="text-lg leading-relaxed whitespace-pre-line font-medium" lang={lang.lang}>
-          {item.contenido_original}
-        </p>
-      </div>
-      {item.traduccion && (
-        <div className="bg-stone-50 p-5 rounded-xl border-l-4 border-stone-300">
-          <p className="text-sm font-bold text-stone-600 mb-2">Traducción al español</p>
-          <p className="text-stone-800 italic leading-relaxed whitespace-pre-line">{item.traduccion}</p>
-        </div>
-      )}
-      {item.explicacion && (
-        <div className="bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500">
-          <p className="text-sm font-bold text-amber-900 mb-2">Significado cultural</p>
-          <p className="text-stone-800 leading-relaxed">{item.explicacion}</p>
-        </div>
-      )}
-      {item.audio_url && (
-        <button
-          type="button"
-          onClick={() => playAudio(item.audio_url)}
-          className={`w-full flex items-center justify-center gap-2 px-5 min-h-12 ${lang.solid} text-white rounded-xl font-bold transition-colors`}
-        >
-          <Volume2 className="w-5 h-5" aria-hidden="true" />
-          Escuchar
-        </button>
-      )}
-    </div>
-  );
+  const favoriteProps = (item) => ({
+    isFavorite: favorites.includes(item.id),
+    onToggle: () => toggleFavorite(item.id),
+    name: item.titulo || type.singular,
+  });
 
   const renderResults = () => {
     if (loading) {
@@ -211,11 +213,11 @@ const CultureModule = ({ user }) => {
                 </h2>
                 <p className={`${lang.accent} font-semibold mt-1`}>Cuento en {lang.label.toLowerCase()}</p>
               </div>
-              <FavoriteButton item={selectedStory} className="text-stone-600 hover:bg-stone-100" />
+              <FavoriteButton {...favoriteProps(selectedStory)} />
             </div>
           </div>
           <div className="p-6">
-            <ContentBody item={selectedStory} />
+            <ContentBody item={selectedStory} lang={lang} />
           </div>
         </article>
       );
@@ -256,9 +258,9 @@ const CultureModule = ({ user }) => {
           <li key={item.id} className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6">
             <div className="flex items-start justify-between gap-3 mb-4">
               <h2 className="text-2xl font-bold">{item.titulo || type.label}</h2>
-              <FavoriteButton item={item} className="text-stone-600 hover:bg-stone-100" />
+              <FavoriteButton {...favoriteProps(item)} />
             </div>
-            <ContentBody item={item} />
+            <ContentBody item={item} lang={lang} />
           </li>
         ))}
       </ul>
