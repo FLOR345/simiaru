@@ -114,7 +114,7 @@ export const api = {
 
   // ===== CULTURE =====
   getCulturalContent: (tipo, idioma) => 
-    axiosInstance.get(`/api/culture?tipo=${tipo}&idioma=${idioma}`)
+    axiosInstance.get(`/api/culture?tipo=${encodeURIComponent(tipo)}&idioma=${encodeURIComponent(idioma)}`)
 };
 
 // ==================== EXPORT DEFAULT ====================

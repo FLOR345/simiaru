@@ -1,636 +1,377 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { Volume2, Heart, Search, ArrowLeft, CheckCircle, AlertCircle, RefreshCw, BookOpen } from 'lucide-react';
 import { api } from '../services/api';
-import Header from '../components/shared/Header';
-import { Volume2, BookOpen, Sparkles, Heart, Search, Globe, ArrowLeft, Image } from 'lucide-react';
+import logo from '../assets/logo.jpg';
 
-const CultureModule = ({ user, setUser }) => {
+// Misma paleta que el resto de la app: verde = quechua, azul lago = aymara
+const LANGUAGES = {
+  quechua: { label: 'Quechua', lang: 'qu', detail: 'Variedad Cusco-Collao', accent: 'text-green-800', selected: 'border-green-700 bg-green-50', solid: 'bg-green-700 hover:bg-green-800', bar: 'border-green-700', soft: 'bg-green-50' },
+  aymara: { label: 'Aymara', lang: 'ay', detail: 'Aymara central', accent: 'text-blue-900', selected: 'border-blue-800 bg-blue-50', solid: 'bg-blue-800 hover:bg-blue-900', bar: 'border-blue-800', soft: 'bg-blue-50' },
+};
+
+const TYPES = [
+  { value: 'adivinanza', label: 'Adivinanzas', singular: 'adivinanza' },
+  { value: 'proverbio', label: 'Proverbios', singular: 'proverbio' },
+  { value: 'cancion', label: 'Canciones', singular: 'canción' },
+  { value: 'cuento', label: 'Cuentos', singular: 'cuento' },
+];
+
+const FAVORITES_KEY = 'cultureFavorites';
+
+const readFavorites = () => {
+  try {
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const CultureModule = ({ user }) => {
   const [content, setContent] = useState([]);
   const [selectedType, setSelectedType] = useState('adivinanza');
-  const [selectedLanguage, setSelectedLanguage] = useState(user?.idioma_objetivo || 'quechua');
+  const [selectedLanguage, setSelectedLanguage] = useState(user?.idioma_objetivo === 'aymara' ? 'aymara' : 'quechua');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(readFavorites);
   const [showFavorites, setShowFavorites] = useState(false);
-  
-  // Estado para manejar la vista de detalle de cuentos
   const [selectedStory, setSelectedStory] = useState(null);
+  const storyHeadingRef = useRef(null);
 
-  const types = [
-    { value: 'adivinanza', label: 'Adivinanzas', icon: '❓' },
-    { value: 'proverbio', label: 'Proverbios', icon: '💭' },
-    { value: 'cancion', label: 'Canciones', icon: '🎵' },
-    { value: 'cuento', label: 'Cuentos', icon: '📖' }
-  ];
-
-  const languages = [
-    { 
-      value: 'quechua', 
-      name: 'Quechua',
-      flag: '☀️',
-      region: 'Andes Centrales',
-      color: 'orange',
-      gradient: 'from-orange-500 to-red-500',
-      emoji: '🏔️'
-    },
-    { 
-      value: 'aymara', 
-      name: 'Aymara',
-      flag: '🌙',
-      region: 'Altiplano',
-      color: 'blue',
-      gradient: 'from-blue-500 to-indigo-600',
-      emoji: '⛰️'
-    }
-  ];
+  const lang = LANGUAGES[selectedLanguage];
+  const type = TYPES.find((t) => t.value === selectedType);
 
   useEffect(() => {
     loadContent();
-    loadFavorites();
-    // Resetear el cuento seleccionado al cambiar tipo o idioma
     setSelectedStory(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedType, selectedLanguage]);
 
-  const loadFavorites = async () => {
-    try {
-      const stored = localStorage.getItem('cultureFavorites');
-      if (stored) {
-        setFavorites(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-    }
-  };
-
-  const toggleFavorite = (itemId) => {
-    const newFavorites = favorites.includes(itemId)
-      ? favorites.filter(id => id !== itemId)
-      : [...favorites, itemId];
-    
-    setFavorites(newFavorites);
-    localStorage.setItem('cultureFavorites', JSON.stringify(newFavorites));
-  };
+  // Al abrir un cuento, el foco va a su título
+  useEffect(() => {
+    if (selectedStory) storyHeadingRef.current?.focus();
+  }, [selectedStory]);
 
   const loadContent = async () => {
     setLoading(true);
+    setLoadError(false);
     try {
-      console.log('🔍 Cargando contenido:', { tipo: selectedType, idioma: selectedLanguage });
-      
       const response = await api.getCulturalContent(selectedType, selectedLanguage);
-      console.log('📦 Respuesta completa:', response);
-      
-      const contentData = response?.data?.content || response?.content || [];
-      console.log('✅ Contenido recibido:', contentData);
-      
-      setContent(contentData);
+      setContent(response?.data?.content || []);
     } catch (error) {
-      console.error('❌ Error loading cultural content:', error);
-      console.error('Error completo:', error.response || error);
+      console.error('Error loading cultural content:', error);
       setContent([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const playAudio = (url) => {
-    if (url) {
-      const audio = new Audio(url);
-      audio.play().catch(err => console.error('Error playing audio:', err));
+  // Los favoritos se guardan en este dispositivo (sirve también en modo invitado)
+  const toggleFavorite = (itemId) => {
+    const next = favorites.includes(itemId) ? favorites.filter((id) => id !== itemId) : [...favorites, itemId];
+    setFavorites(next);
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+    } catch {
+      // almacenamiento bloqueado: los favoritos duran solo esta visita
     }
   };
 
-  const getLanguageInfo = () => {
-    return languages.find(lang => lang.value === selectedLanguage) || languages[0];
+  const playAudio = (url) => {
+    if (url) new Audio(url).play().catch((err) => console.error('Error playing audio:', err));
   };
 
-  const filteredContent = content.filter(item => {
+  const search = searchTerm.trim().toLowerCase();
+  const filteredContent = content.filter((item) => {
     if (showFavorites && !favorites.includes(item.id)) return false;
-    if (!searchTerm) return true;
-    
-    const search = searchTerm.toLowerCase();
-    return (
-      item.titulo?.toLowerCase().includes(search) ||
-      item.contenido_original?.toLowerCase().includes(search) ||
-      item.traduccion?.toLowerCase().includes(search)
-    );
+    if (!search) return true;
+    return [item.titulo, item.contenido_original, item.traduccion].some((field) => field?.toLowerCase().includes(search));
   });
 
-  const langInfo = getLanguageInfo();
-
-  // Función para abrir un cuento
-  const openStory = (story) => {
-    setSelectedStory(story);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const resetFilters = () => {
+    setSearchTerm('');
+    setShowFavorites(false);
   };
 
-  // Función para volver a la lista de cuentos
-  const backToStoryList = () => {
-    setSelectedStory(null);
-  };
-
-  // Renderizar vista de detalle de cuento
-  const renderStoryDetail = () => {
-    if (!selectedStory) return null;
-
+  const FavoriteButton = ({ item, className = '' }) => {
+    const isFavorite = favorites.includes(item.id);
     return (
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-fadeIn">
-        {/* Header del cuento */}
-        <div className={`bg-gradient-to-r ${langInfo.gradient} p-6 text-white`}>
-          <button
-            onClick={backToStoryList}
-            className="flex items-center gap-2 mb-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all backdrop-blur-sm"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Volver a Cuentos</span>
+      <button
+        type="button"
+        onClick={() => toggleFavorite(item.id)}
+        aria-pressed={isFavorite}
+        aria-label={`${isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}: ${item.titulo || type.singular}`}
+        className={`w-11 h-11 flex items-center justify-center rounded-full transition-colors shrink-0 ${className}`}
+      >
+        <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-600 text-red-600' : ''}`} aria-hidden="true" />
+      </button>
+    );
+  };
+
+  // Texto original, traducción y explicación: igual en cuentos y en el resto
+  const ContentBody = ({ item }) => (
+    <div className="space-y-4">
+      <div className={`${lang.soft} p-5 rounded-xl border-l-4 ${lang.bar}`}>
+        <p className={`text-sm font-bold ${lang.accent} mb-2`}>{lang.label}</p>
+        <p className="text-lg leading-relaxed whitespace-pre-line font-medium" lang={lang.lang}>
+          {item.contenido_original}
+        </p>
+      </div>
+      {item.traduccion && (
+        <div className="bg-stone-50 p-5 rounded-xl border-l-4 border-stone-300">
+          <p className="text-sm font-bold text-stone-600 mb-2">Traducción al español</p>
+          <p className="text-stone-800 italic leading-relaxed whitespace-pre-line">{item.traduccion}</p>
+        </div>
+      )}
+      {item.explicacion && (
+        <div className="bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500">
+          <p className="text-sm font-bold text-amber-900 mb-2">Significado cultural</p>
+          <p className="text-stone-800 leading-relaxed">{item.explicacion}</p>
+        </div>
+      )}
+      {item.audio_url && (
+        <button
+          type="button"
+          onClick={() => playAudio(item.audio_url)}
+          className={`w-full flex items-center justify-center gap-2 px-5 min-h-12 ${lang.solid} text-white rounded-xl font-bold transition-colors`}
+        >
+          <Volume2 className="w-5 h-5" aria-hidden="true" />
+          Escuchar
+        </button>
+      )}
+    </div>
+  );
+
+  const renderResults = () => {
+    if (loading) {
+      return (
+        <p className="bg-white rounded-3xl border border-stone-200 p-12 text-center text-lg font-semibold text-stone-700" role="status">
+          Cargando contenido cultural…
+        </p>
+      );
+    }
+
+    if (loadError) {
+      return (
+        <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center" role="alert">
+          <AlertCircle className="w-10 h-10 text-red-700 mx-auto mb-3" aria-hidden="true" />
+          <p className="text-lg font-semibold mb-1">No pudimos cargar el contenido cultural</p>
+          <p className="text-stone-600 mb-5">Revisa tu conexión. Si es tu primera visita del día, el servidor puede tardar hasta un minuto.</p>
+          <button type="button" onClick={loadContent} className={`inline-flex items-center gap-2 px-6 min-h-11 ${lang.solid} text-white font-bold rounded-lg transition-colors`}>
+            <RefreshCw className="w-5 h-5" aria-hidden="true" />
+            Reintentar
           </button>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">📖</span>
+        </div>
+      );
+    }
+
+    if (content.length === 0) {
+      return (
+        <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
+          <BookOpen className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
+          <h2 className="text-xl font-bold mb-2">
+            Todavía no hay {type.label.toLowerCase()} en {lang.label.toLowerCase()}
+          </h2>
+          <p className="text-stone-600">Prueba con otro tipo de contenido o con la otra lengua.</p>
+        </div>
+      );
+    }
+
+    if (filteredContent.length === 0) {
+      return (
+        <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
+          <Search className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
+          <h2 className="text-xl font-bold mb-2">{showFavorites ? 'Aún no guardaste favoritos aquí' : `Sin resultados para “${searchTerm.trim()}”`}</h2>
+          <button type="button" onClick={resetFilters} className="mt-3 px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 transition-colors">
+            Ver todo el contenido
+          </button>
+        </div>
+      );
+    }
+
+    // ----- Cuento abierto -----
+    if (selectedType === 'cuento' && selectedStory) {
+      return (
+        <article className="bg-white rounded-3xl border border-stone-200 overflow-hidden" aria-labelledby="cuento-titulo">
+          <div className="p-6 border-b border-stone-200">
+            <button
+              type="button"
+              onClick={() => setSelectedStory(null)}
+              className="inline-flex items-center gap-2 min-h-11 mb-3 text-stone-700 hover:text-stone-900 font-semibold transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+              Volver a los cuentos
+            </button>
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-3xl font-bold">{selectedStory.titulo}</h2>
-                <p className="text-white/80 mt-1 flex items-center gap-2">
-                  <span>{langInfo.flag}</span>
-                  <span>Cuento en {langInfo.name}</span>
-                </p>
+                <h2 id="cuento-titulo" ref={storyHeadingRef} tabIndex={-1} className="text-3xl font-bold focus:outline-none">
+                  {selectedStory.titulo}
+                </h2>
+                <p className={`${lang.accent} font-semibold mt-1`}>Cuento en {lang.label.toLowerCase()}</p>
               </div>
+              <FavoriteButton item={selectedStory} className="text-stone-600 hover:bg-stone-100" />
             </div>
-            <button
-              onClick={() => toggleFavorite(selectedStory.id)}
-              className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all"
-              title={favorites.includes(selectedStory.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-            >
-              <Heart 
-                className={`w-7 h-7 transition-colors ${
-                  favorites.includes(selectedStory.id) 
-                    ? 'fill-red-400 text-red-400' 
-                    : 'text-white'
-                }`}
-              />
-            </button>
           </div>
-        </div>
-
-        {/* Contenido del cuento */}
-        <div className="p-6 space-y-6">
-          {/* Contenido Original */}
-          <div className={`bg-gradient-to-br from-${langInfo.color}-50 to-yellow-50 p-6 rounded-xl border-l-4 border-${langInfo.color}-500`}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm font-bold text-gray-600 uppercase flex items-center gap-2 bg-white/80 px-3 py-1.5 rounded-lg shadow-sm">
-                {langInfo.flag} {langInfo.name}
-              </span>
-            </div>
-            <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line font-medium">
-              {selectedStory.contenido_original}
-            </p>
+          <div className="p-6">
+            <ContentBody item={selectedStory} />
           </div>
-
-          {/* Traducción */}
-          {selectedStory.traduccion && (
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-gray-300">
-              <p className="text-sm font-semibold text-gray-500 mb-3 flex items-center gap-2">
-                📝 <span>Traducción al Español</span>
-              </p>
-              <p className="text-gray-700 italic leading-relaxed whitespace-pre-line text-lg">
-                {selectedStory.traduccion}
-              </p>
-            </div>
-          )}
-
-          {/* Explicación / Significado Cultural */}
-          {selectedStory.explicacion && (
-            <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-400">
-              <p className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-2">
-                📚 <span>Significado Cultural</span>
-              </p>
-              <p className="text-gray-700 leading-relaxed">
-                {selectedStory.explicacion}
-              </p>
-            </div>
-          )}
-
-          {/* Imagen del cuento */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-xl border border-orange-200">
-            <div className="flex items-center gap-2 mb-4">
-              <Image className="w-5 h-5 text-orange-600" />
-              <span className="font-semibold text-gray-800">Ilustración del Cuento</span>
-            </div>
-            <div className="flex justify-center">
-              <img 
-                src="/logo.jpg" 
-                alt={`Ilustración: ${selectedStory.titulo}`}
-                className="max-w-full h-auto rounded-xl shadow-lg border-4 border-white"
-                style={{ maxHeight: '400px' }}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/frontend/src/assets/culture-bg.jpg'; // Ruta alternativa
-                }}
-              />
-            </div>
-            <p className="text-center text-sm text-gray-500 mt-3 italic">
-              Ilustración representativa del cuento "{selectedStory.titulo}"
-            </p>
-          </div>
-
-          {/* Botón de audio si existe */}
-          {selectedStory.audio_url && (
-            <button
-              onClick={() => playAudio(selectedStory.audio_url)}
-              className={`w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r ${langInfo.gradient} text-white rounded-xl hover:shadow-lg transition-all shadow-md text-lg font-semibold`}
-            >
-              <Volume2 className="w-6 h-6" />
-              🎧 Escuchar el cuento narrado
-            </button>
-          )}
-
-          {/* Botón para volver */}
-          <button
-            onClick={backToStoryList}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-medium"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Volver a la lista de cuentos
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Renderizar lista de cuentos como botones
-  const renderStoryList = () => {
-    if (filteredContent.length === 0) {
-      return (
-        <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-          <div className="text-6xl mb-4">📚</div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">
-            No hay cuentos disponibles
-          </h3>
-          <p className="text-gray-600">
-            Aún no hay cuentos en {langInfo.name}
-          </p>
-        </div>
+        </article>
       );
     }
 
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-3xl">📖</span>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Cuentos Ancestrales</h2>
-            <p className="text-gray-600">Selecciona un cuento para leer</p>
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    // ----- Lista de cuentos -----
+    if (selectedType === 'cuento') {
+      return (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredContent.map((story) => (
-            <button
-              key={story.id}
-              onClick={() => openStory(story)}
-              className={`group relative p-5 rounded-xl text-left transition-all duration-300 border-2 border-gray-200 hover:border-transparent hover:shadow-xl bg-gradient-to-br from-white to-gray-50 hover:from-${langInfo.color}-50 hover:to-yellow-50 transform hover:scale-105`}
-            >
-              {/* Indicador de favorito */}
-              {favorites.includes(story.id) && (
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
-                  <Heart className="w-4 h-4 fill-white" />
-                </div>
-              )}
-
-              {/* Icono y título */}
-              <div className="flex items-start gap-3">
-                <div className={`p-3 rounded-lg bg-gradient-to-br ${langInfo.gradient} text-white text-xl shadow-md group-hover:scale-110 transition-transform`}>
-                  📖
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-800 text-lg truncate group-hover:text-orange-700 transition-colors">
-                    {story.titulo || 'Sin título'}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                    {langInfo.flag} {langInfo.name}
-                  </p>
-                </div>
-              </div>
-
-              {/* Preview del contenido */}
-              <p className="mt-3 text-sm text-gray-600 line-clamp-2">
-                {story.contenido_original?.substring(0, 100)}...
-              </p>
-
-              {/* Indicador visual de "click para leer" */}
-              <div className={`mt-4 text-sm font-medium text-${langInfo.color}-600 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity`}>
-                <span>Leer cuento</span>
-                <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </button>
+            <li key={story.id}>
+              <button
+                type="button"
+                onClick={() => setSelectedStory(story)}
+                className="w-full h-full text-left p-5 rounded-2xl bg-white border-2 border-stone-200 hover:border-stone-400 transition-colors"
+              >
+                <span className="flex items-start justify-between gap-2">
+                  <span className="font-bold text-lg">{story.titulo || 'Sin título'}</span>
+                  {favorites.includes(story.id) && <Heart className="w-5 h-5 fill-red-600 text-red-600 shrink-0" aria-label="En favoritos" />}
+                </span>
+                <span className="block mt-2 text-sm text-stone-600 line-clamp-2" lang={lang.lang}>
+                  {story.contenido_original}
+                </span>
+                <span className={`block mt-3 text-sm font-bold ${lang.accent}`}>
+                  Leer cuento <span aria-hidden="true">→</span>
+                </span>
+              </button>
+            </li>
           ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Renderizar contenido normal (para otros tipos que no son cuentos)
-  const renderNormalContent = () => {
-    if (filteredContent.length === 0) {
-      return (
-        <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">
-            No se encontraron resultados
-          </h3>
-          <p className="text-gray-600 mb-4">
-            {showFavorites 
-              ? 'No tienes favoritos guardados aún'
-              : 'Intenta con otros términos de búsqueda'
-            }
-          </p>
-          {(showFavorites || searchTerm) && (
-            <button
-              onClick={() => {
-                setShowFavorites(false);
-                setSearchTerm('');
-              }}
-              className={`px-6 py-2 bg-gradient-to-r ${langInfo.gradient} text-white rounded-lg hover:shadow-lg transition-all`}
-            >
-              Ver todo el contenido
-            </button>
-          )}
-        </div>
+        </ul>
       );
     }
 
+    // ----- Adivinanzas, proverbios y canciones -----
     return (
-      <div className="grid gap-6">
+      <ul className="grid gap-5">
         {filteredContent.map((item) => (
-          <div 
-            key={item.id} 
-            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-100"
-          >
-            <div className="p-6">
-              {item.titulo && (
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-start gap-3 flex-1">
-                    <span className="text-2xl">{types.find(t => t.value === selectedType)?.icon}</span>
-                    <h3 className="text-2xl font-bold text-gray-800">{item.titulo}</h3>
-                  </div>
-                  <button
-                    onClick={() => toggleFavorite(item.id)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title={favorites.includes(item.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                  >
-                    <Heart 
-                      className={`w-6 h-6 transition-colors ${
-                        favorites.includes(item.id) 
-                          ? 'fill-red-500 text-red-500' 
-                          : 'text-gray-400'
-                      }`}
-                    />
-                  </button>
-                </div>
-              )}
-              
-              {/* Contenido Original en idioma nativo */}
-              <div className={`bg-gradient-to-br from-${langInfo.color}-50 to-yellow-50 p-5 rounded-xl mb-4 border-l-4 border-${langInfo.color}-500`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1 bg-white/80 px-2 py-1 rounded">
-                    {langInfo.flag} {langInfo.name}
-                  </span>
-                </div>
-                <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line font-medium">
-                  {item.contenido_original}
-                </p>
-              </div>
-
-              {/* Traducción */}
-              {item.traduccion && (
-                <div className="bg-gray-50 p-5 rounded-xl mb-4 border-l-4 border-gray-300">
-                  <p className="text-sm font-semibold text-gray-500 mb-2">📝 Traducción al Español:</p>
-                  <p className="text-gray-700 italic leading-relaxed whitespace-pre-line">
-                    {item.traduccion}
-                  </p>
-                </div>
-              )}
-
-              {/* Explicación */}
-              {item.explicacion && (
-                <div className="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-400 mb-4">
-                  <p className="text-sm font-semibold text-blue-700 mb-1">📚 Significado Cultural:</p>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {item.explicacion}
-                  </p>
-                </div>
-              )}
-
-              {/* Buttons */}
-              <div className="flex gap-3">
-                {/* Audio Button */}
-                {item.audio_url && (
-                  <button
-                    onClick={() => playAudio(item.audio_url)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r ${langInfo.gradient} text-white rounded-xl hover:shadow-lg transition-all shadow-md`}
-                  >
-                    <Volume2 className="w-5 h-5" />
-                    Escuchar pronunciación
-                  </button>
-                )}
-              </div>
+          <li key={item.id} className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <h2 className="text-2xl font-bold">{item.titulo || type.label}</h2>
+              <FavoriteButton item={item} className="text-stone-600 hover:bg-stone-100" />
             </div>
-          </div>
+            <ContentBody item={item} />
+          </li>
         ))}
-      </div>
+      </ul>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-yellow-50">
-      <Header user={user} setUser={setUser} />
-      
-      <main className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-t-4 border-orange-500 relative overflow-hidden">
-          {/* Decorative pattern */}
-          <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
-            <div className="text-9xl transform rotate-12">🏔️⛰️☀️🌙</div>
-          </div>
-          
-          <div className="flex items-center justify-between mb-4 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className={`p-3 bg-gradient-to-br ${langInfo.gradient} rounded-xl shadow-lg transform hover:scale-105 transition-transform`}>
-                <BookOpen className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                  Cultura Viva
-                  <span className="text-2xl">{langInfo.emoji}</span>
-                </h1>
-                <p className="text-gray-600">Explora la sabiduría ancestral andina</p>
-              </div>
-            </div>
-            <div className="text-6xl animate-pulse">{langInfo.flag}</div>
-          </div>
-
-          {/* Selector de Idioma */}
-          <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 rounded-xl p-5 mb-4 relative z-10 border border-orange-100">
-            <div className="flex items-center gap-2 mb-3">
-              <Globe className="w-5 h-5 text-orange-600" />
-              <span className="font-semibold text-gray-800">Selecciona el idioma ancestral:</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {languages.map((lang) => (
-                <button
-                  key={lang.value}
-                  onClick={() => {
-                    setSelectedLanguage(lang.value);
-                    setSearchTerm('');
-                    setShowFavorites(false);
-                    setSelectedStory(null);
-                  }}
-                  className={`relative px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
-                    selectedLanguage === lang.value
-                      ? `bg-gradient-to-r ${lang.gradient} text-white shadow-xl scale-105 border-2 border-white`
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 hover:border-orange-300 hover:shadow-lg'
-                  }`}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <span className="text-4xl">{lang.flag}</span>
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{lang.name}</div>
-                      <div className={`text-sm ${selectedLanguage === lang.value ? 'text-white/90' : 'text-gray-500'}`}>
-                        {lang.region}
-                      </div>
-                    </div>
-                  </div>
-                  {selectedLanguage === lang.value && (
-                    <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
-                      ✓
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Info del idioma actual */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 relative z-10">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
-              <span>Explorando: <strong className={`text-${langInfo.color}-600 capitalize`}>{langInfo.name}</strong></span>
-              <span className="text-gray-400">•</span>
-              <span className="text-gray-600">{langInfo.region}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="px-3 py-1 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-700 rounded-full font-semibold">
-                {content.length} {content.length === 1 ? 'elemento' : 'elementos'}
-              </span>
-            </div>
+    <div className="min-h-screen bg-stone-50 text-stone-900">
+      {/* ==================== ENCABEZADO ==================== */}
+      <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
+        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 transition-colors">
+            <ArrowLeft className="w-6 h-6" aria-hidden="true" />
+          </Link>
+          <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold">Cultura viva</h1>
+            <p className="text-sm text-stone-600">Adivinanzas, proverbios, canciones y cuentos andinos</p>
           </div>
         </div>
+      </header>
 
-        {/* Tabs de Tipo de Contenido - Solo mostrar si no estamos viendo un cuento */}
-        {!selectedStory && (
-          <>
-            <div className="flex justify-center gap-3 mb-6 overflow-x-auto pb-2">
-              {types.map((type) => (
+      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
+        {/* ==================== IDIOMA ==================== */}
+        <section className="mb-6" aria-label="Idioma">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {Object.entries(LANGUAGES).map(([key, style]) => {
+              const selected = selectedLanguage === key;
+              return (
                 <button
-                  key={type.value}
+                  key={key}
+                  type="button"
+                  aria-pressed={selected}
                   onClick={() => {
-                    setSelectedType(type.value);
-                    setShowFavorites(false);
-                    setSelectedStory(null);
+                    setSelectedLanguage(key);
+                    resetFilters();
                   }}
-                  className={`px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all shadow-md ${
-                    selectedType === type.value && !showFavorites
-                      ? `bg-gradient-to-r ${langInfo.gradient} text-white scale-105 shadow-lg`
-                      : 'bg-white text-gray-700 hover:bg-gray-50 hover:shadow-lg'
-                  }`}
+                  className={`text-left p-4 sm:p-6 rounded-2xl border-2 transition-colors ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
                 >
-                  <span className="mr-2">{type.icon}</span>
-                  {type.label}
+                  <span className="flex items-center justify-between">
+                    <span className={`text-xl sm:text-2xl font-bold ${style.accent}`}>{style.label}</span>
+                    {selected && <CheckCircle className={`w-6 h-6 ${style.accent}`} aria-hidden="true" />}
+                  </span>
+                  <span className="block text-sm sm:text-base text-stone-600">{style.detail}</span>
                 </button>
-              ))}
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ==================== TIPO, BÚSQUEDA Y FAVORITOS ==================== */}
+        {!selectedStory && (
+          <section className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 mb-6" aria-label="Filtros">
+            <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Tipo de contenido">
+              {TYPES.map((t) => {
+                const selected = selectedType === t.value;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setSelectedType(t.value);
+                      resetFilters();
+                    }}
+                    className={`px-5 min-h-11 rounded-full border-2 font-semibold transition-colors ${selected ? `${lang.selected} ${lang.accent}` : 'border-stone-200 bg-white hover:border-stone-400'}`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Search and Filters */}
-            <div className="bg-white rounded-xl shadow-md p-4 mb-6">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 relative">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <label htmlFor="buscar-cultura" className="sr-only">
+                  Buscar en {type.label.toLowerCase()}
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 w-5 h-5" aria-hidden="true" />
                   <input
-                    type="text"
-                    placeholder={`Buscar ${selectedType === 'cuento' ? 'cuentos' : 'contenido cultural'}...`}
+                    id="buscar-cultura"
+                    type="search"
+                    autoComplete="off"
+                    placeholder={`Buscar en ${type.label.toLowerCase()}`}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full min-h-12 pl-12 pr-4 rounded-xl border-2 border-stone-300 focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-green-700"
                   />
-                  <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
                 </div>
-                <button
-                  onClick={() => setShowFavorites(!showFavorites)}
-                  className={`px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
-                    showFavorites
-                      ? 'bg-red-500 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Heart className={`w-5 h-5 ${showFavorites ? 'fill-white' : ''}`} />
-                  Favoritos ({favorites.length})
-                </button>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowFavorites(!showFavorites)}
+                aria-pressed={showFavorites}
+                className={`px-5 min-h-12 rounded-xl font-semibold whitespace-nowrap transition-colors flex items-center justify-center gap-2 border-2 ${
+                  showFavorites ? 'border-red-700 bg-red-50 text-red-800' : 'border-stone-200 bg-white hover:border-stone-400'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${showFavorites ? 'fill-red-600 text-red-600' : ''}`} aria-hidden="true" />
+                Solo favoritos ({favorites.length})
+              </button>
             </div>
-          </>
+            {!loading && !loadError && content.length > 0 && (
+              <p className="text-sm text-stone-600 mt-3" aria-live="polite">
+                {filteredContent.length} de {content.length} {type.label.toLowerCase()}
+              </p>
+            )}
+          </section>
         )}
 
-        {/* Content */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
-            <p className="text-gray-600 mt-4">Cargando contenido cultural...</p>
-          </div>
-        ) : content.length > 0 ? (
-          // Si es tipo cuento, mostrar vista especial
-          selectedType === 'cuento' ? (
-            selectedStory ? renderStoryDetail() : renderStoryList()
-          ) : (
-            // Para otros tipos, mostrar contenido normal
-            renderNormalContent()
-          )
-        ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              No hay contenido disponible
-            </h3>
-            <p className="text-gray-600">
-              Aún no hay {types.find(t => t.value === selectedType)?.label.toLowerCase()} en {langInfo.name}
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Prueba seleccionando otro tipo de contenido o idioma
-            </p>
-          </div>
-        )}
+        {renderResults()}
       </main>
-
-      {/* Estilos CSS adicionales para animaciones */}
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.4s ease-out;
-        }
-        
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </div>
   );
 };
