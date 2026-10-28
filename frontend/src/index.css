@@ -26,6 +26,24 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* Botones que se sienten presionados: se hunden un poco al tocarlos.
+   Va fuera de @layer para ganarle a transition-colors de Tailwind. */
+.toque {
+  transition:
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+.toque:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .toque:active {
+    transform: none;
+  }
+}
+
 @layer components {
   .btn-primary {
     @apply bg-wiphala-green hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl;

@@ -15,5 +15,9 @@ export default {
       }
     }
   },
+  future: {
+    // hover: solo en dispositivos con mouse; en pantallas táctiles no queda "pegado" tras tocar
+    hoverOnlyWhenSupported: true
+  },
   plugins: []
 };
