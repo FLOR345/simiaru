@@ -119,6 +119,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     {
       Icon: Flame,
       iconClass: 'text-orange-700',
+      card: 'from-orange-50 to-amber-100/70',
+      icon: 'from-orange-500 to-orange-700',
       label: 'Racha',
       value: formatNumber(displayUser?.racha_actual),
       detail: isGuest ? 'Regístrate para guardar tu racha' : 'días seguidos',
@@ -126,6 +128,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     {
       Icon: Star,
       iconClass: 'text-amber-600',
+      card: 'from-amber-50 to-yellow-100/70',
+      icon: 'from-amber-500 to-amber-700',
       label: 'Ayni Points',
       value: formatNumber(displayUser?.puntos_totales),
       detail: isGuest ? 'Regístrate para ganar puntos' : 'puntos ganados',
@@ -133,6 +137,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     {
       Icon: TrendingUp,
       iconClass: 'text-green-700',
+      card: 'from-green-50 to-green-100/70',
+      icon: 'from-green-600 to-green-800',
       label: 'Progreso',
       value: isGuest ? '—' : `${overallProgress}%`,
       detail: isGuest ? 'Regístrate para guardarlo' : `${completedLessons} de ${totalLessons} lecciones`,
@@ -140,6 +146,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     {
       Icon: Award,
       iconClass: 'text-blue-800',
+      card: 'from-blue-50 to-purple-100/70',
+      icon: 'from-blue-600 to-purple-700',
       label: 'Nivel',
       value: getLevel(displayUser).number,
       detail: isGuest ? 'Modo invitado' : `${getLevel(displayUser).name} (${getLevel(displayUser).subtitle.toLowerCase()})`,
@@ -149,7 +157,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const navLink = 'flex items-center gap-2 min-h-11 px-2 text-stone-700 hover:text-green-800 font-semibold rounded-lg toque';
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900">
+    <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
       {/* ==================== AVISO MODO INVITADO ==================== */}
       {isGuest && (
         <div className="bg-orange-800 text-white py-3 px-4 sm:px-6">
@@ -222,8 +230,14 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
         {/* ==================== SALUDO ==================== */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-            {isGuest ? '¡Bienvenido!' : `¡Rimaykullayki, ${firstName(displayUser?.nombre)}!`}
+          <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">
+            {isGuest ? (
+              <span className="texto-degradado">¡Bienvenido!</span>
+            ) : (
+              <>
+                ¡Rimaykullayki, <span className="texto-degradado texto-vivo">{firstName(displayUser?.nombre)}</span>!
+              </>
+            )}
           </h1>
           <p className="text-lg sm:text-xl text-stone-600">
             {isGuest
@@ -274,10 +288,12 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
         {/* ==================== ESTADÍSTICAS ==================== */}
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {stats.map(({ Icon, iconClass, label, value, detail }) => (
-            <li key={label} className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6">
+          {stats.map(({ Icon, iconClass, card, icon, label, value, detail }, i) => (
+            <li key={label} className={`tarjeta-viva anim-entra bg-gradient-to-br ${isGuest ? "from-white to-stone-100" : card} rounded-3xl border border-white shadow-sm p-5 sm:p-6`} style={{ "--i": i }}>
               <div className="flex items-center gap-2 mb-3">
-                <Icon className={`w-6 h-6 ${isGuest ? 'text-stone-400' : iconClass}`} aria-hidden="true" />
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${isGuest ? "from-stone-300 to-stone-400" : icon}`} aria-hidden="true">
+                  <Icon className="w-5 h-5 text-white" />
+                </span>
                 <span className="text-sm font-bold text-stone-600">{label}</span>
               </div>
               <p className="text-[clamp(1.25rem,6vw,1.875rem)] sm:text-4xl font-extrabold mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">{value}</p>

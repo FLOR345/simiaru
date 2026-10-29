@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Mountain, Heart, BookOpen, Globe, Trophy, Zap, Target, CheckCircle, ArrowRight, Play, Shield, UserX, Github, Menu, X } from 'lucide-react';
+import { Mountain, Heart, BookOpen, Globe, Trophy, Zap, Target, CheckCircle, ArrowRight, Play, Shield, UserX, Github, Menu, X, Sparkles } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../config';
 import { preloadOn, Register, Login, Dashboard, Dictionary } from '../routes';
@@ -31,8 +31,8 @@ const LANGUAGES = {
       ['Números del 1 al 20', 'Huk, Iskay, Kimsa...'],
       ['Colores, animales y comidas', 'Puka, Kuntur, Sara'],
     ],
-    tabOn: 'bg-green-700 border-green-700 text-white',
-    panel: 'bg-green-800',
+    tabOn: 'bg-gradient-to-r from-green-600 to-green-800 border-transparent text-white shadow-xl shadow-green-600/40',
+    panel: 'bg-gradient-to-br from-green-700 to-green-900',
     soft: 'text-green-100',
     secondaryBtn: 'bg-green-700 hover:bg-green-600',
     primaryText: 'text-green-800',
@@ -51,14 +51,28 @@ const LANGUAGES = {
       ['Números del 1 al 10', 'Maya, Paya, Kimsa...'],
       ['Colores, animales y comidas', "Qarwa, Kunturi, Ch'uqi"],
     ],
-    tabOn: 'bg-blue-800 border-blue-800 text-white',
-    panel: 'bg-blue-900',
+    tabOn: 'bg-gradient-to-r from-blue-600 to-blue-800 border-transparent text-white shadow-xl shadow-blue-600/40',
+    panel: 'bg-gradient-to-br from-blue-800 to-indigo-950',
     soft: 'text-blue-100',
     secondaryBtn: 'bg-blue-800 hover:bg-blue-700',
     primaryText: 'text-blue-900',
     dot: 'bg-blue-100 text-blue-900',
   },
 };
+
+// Colores de la primera versión: verde, azul y morado, en tonos que mantienen el contraste
+const STEP_COLORS = [
+  { circle: 'from-green-600 to-green-800', glow: 'bg-green-200' },
+  { circle: 'from-blue-600 to-blue-800', glow: 'bg-blue-200' },
+  { circle: 'from-purple-600 to-purple-800', glow: 'bg-purple-200' },
+];
+const CARD_COLORS = [
+  { card: 'from-blue-50 to-blue-100/60', deco: 'bg-blue-600/10', icon: 'from-blue-600 to-blue-800', tag: 'text-blue-800' },
+  { card: 'from-green-50 to-green-100/60', deco: 'bg-green-600/10', icon: 'from-green-600 to-green-800', tag: 'text-green-800' },
+  { card: 'from-purple-50 to-purple-100/60', deco: 'bg-purple-600/10', icon: 'from-purple-600 to-purple-800', tag: 'text-purple-800' },
+  { card: 'from-amber-50 to-orange-100/60', deco: 'bg-orange-600/10', icon: 'from-orange-600 to-orange-800', tag: 'text-orange-800' },
+  { card: 'from-pink-50 to-rose-100/60', deco: 'bg-rose-600/10', icon: 'from-rose-600 to-pink-700', tag: 'text-rose-800' },
+];
 
 const STEPS = [
   ['Elige tu idioma', 'Comienza con Quechua o Aymara, con vocabulario y contenido cultural de fuentes documentadas'],
@@ -186,7 +200,7 @@ const PalabraViva = () => {
   const sinDato = <span className="text-stone-500 font-semibold">(aún no está)</span>;
 
   return (
-    <div className="max-w-4xl mx-auto bg-stone-50 border border-stone-200 rounded-3xl p-6 sm:p-12 text-center">
+    <div className="max-w-4xl mx-auto bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 border-2 border-white rounded-3xl p-6 sm:p-12 text-center shadow-xl">
       <p className="text-2xl sm:text-4xl font-bold leading-snug">
         <label htmlFor="palabra-viva" className="sr-only">
           Escribe una palabra en castellano
@@ -389,7 +403,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="flex justify-between items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
               <img src={logo} alt="" width="253" height="299" className="h-10 sm:h-12 w-auto" />
-              <span className="text-xl sm:text-2xl font-extrabold text-green-800">SimiAru</span>
+              <span className="text-xl sm:text-2xl font-black texto-degradado">SimiAru</span>
             </Link>
 
             <nav className="hidden xl:flex items-center gap-8 whitespace-nowrap">
@@ -428,7 +442,7 @@ const Home = ({ enableGuestMode }) => {
               </Link>
               <Link
                 to="/register" {...preloadOn(Register)}
-                className="min-h-11 px-4 py-2.5 text-sm sm:px-7 sm:py-3 sm:text-base whitespace-nowrap bg-green-700 hover:bg-green-800 text-white font-bold rounded-full toque flex items-center gap-2"
+                className="min-h-11 px-4 py-2.5 text-sm sm:px-7 sm:py-3 sm:text-base whitespace-nowrap boton-degradado font-bold rounded-full shadow-md flex items-center gap-2"
               >
                 Empezar gratis
                 <ArrowRight className="hidden sm:block w-5 h-5" />
@@ -493,19 +507,24 @@ const Home = ({ enableGuestMode }) => {
 
       <main id="contenido">
         {/* ==================== INICIO ==================== */}
-        <section className="relative pt-32 pb-24 bg-stone-50">
+        {/* Fondo de la primera versión: degradado suave con burbujas de color difuminadas que flotan */}
+        <section className="fondo-burbujas pt-32 pb-32">
+          <span className="burbuja burbuja-verde" aria-hidden="true" />
+          <span className="burbuja burbuja-azul" aria-hidden="true" />
+          <span className="burbuja burbuja-morada" aria-hidden="true" />
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-8">
-                <p className="inline-flex items-center px-4 py-2 border border-stone-300 rounded-full text-sm font-semibold text-stone-700">
-                  Gratis • Sin publicidad • Código abierto
+                <p className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-green-700/20 rounded-full text-sm font-bold">
+                  <Sparkles className="w-4 h-4 text-green-700" aria-hidden="true" />
+                  <span className="texto-degradado-corto">Gratis • Sin publicidad • Código abierto</span>
                 </p>
 
                 <div className="space-y-5">
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
-                    Aprende
+                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
+                    <span className="text-stone-900">Aprende</span>
                     <br />
-                    <span className="lengua-subrayado text-green-700">Quechua</span> y <span className="lengua-subrayado lengua-segunda text-blue-800">Aymara</span>
+                    <span className="texto-degradado texto-vivo">Quechua y Aymara</span>
                   </h1>
                   <p className="text-xl sm:text-2xl text-stone-600 leading-relaxed max-w-xl">
                     Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
@@ -515,7 +534,7 @@ const Home = ({ enableGuestMode }) => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     to="/register" {...preloadOn(Register)}
-                    className="group px-9 py-4 bg-green-700 hover:bg-green-800 text-white font-bold rounded-2xl toque text-center text-lg flex items-center justify-center gap-3"
+                    className="group px-9 py-4 boton-degradado font-bold rounded-2xl shadow-lg text-center text-lg flex items-center justify-center gap-3"
                   >
                     Empezar gratis
                     <ArrowRight className="w-6 h-6 motion-safe:group-hover:translate-x-1 transition-transform duration-200 ease-out" />
@@ -535,10 +554,10 @@ const Home = ({ enableGuestMode }) => {
                   El modo invitado te permite explorar la Unidad 1 sin crear una cuenta
                 </p>
 
-                <div className="grid grid-cols-3 gap-6 pt-8 border-t border-stone-200">
+                <div className="grid grid-cols-3 gap-6 pt-8 border-t-2 border-stone-200/70">
                   {[['100%', 'Gratis'], ['2', 'Idiomas'], ['26', 'Lecciones']].map(([value, label]) => (
                     <div key={label}>
-                      <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-extrabold text-stone-900 mb-1">{value}</div>
+                      <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black texto-degradado-corto mb-1">{value}</div>
                       <div className="text-sm text-stone-600 font-semibold">{label}</div>
                     </div>
                   ))}
@@ -547,7 +566,10 @@ const Home = ({ enableGuestMode }) => {
 
               {/* Foto del Titicaca con la mascota encima */}
               <div className="relative pb-10 lg:pb-0">
-                <figure className="foto-entrada rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
+                {/* Resplandores de color detrás de la foto, como en la primera versión */}
+                <span className="absolute -z-10 -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-25" aria-hidden="true" />
+                <span className="absolute -z-10 -bottom-10 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-20" aria-hidden="true" />
+                <figure className="foto-entrada rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
                   <img
                     src={fotoTiticaca}
                     alt="Amanecer sobre el lago Titicaca, con los totorales de Puno en sombra"
@@ -566,9 +588,31 @@ const Home = ({ enableGuestMode }) => {
                     className="w-24 sm:w-32 h-auto"
                   />
                 </div>
+
+                {/* Etiquetas flotantes de la primera versión, con lo que SimiAru sí tiene */}
+                <div className="etiqueta-flotante absolute -top-4 -right-2 sm:-right-5 rotate-3 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true">
+                  <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
+                    <Trophy className="w-5 h-5" />
+                    Ayni Points
+                  </span>
+                </div>
+                <div className="etiqueta-flotante absolute bottom-16 -right-2 sm:-right-5 lg:bottom-24 -rotate-3 bg-gradient-to-br from-blue-700 to-purple-700 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true">
+                  <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
+                    <Zap className="w-5 h-5" />
+                    Racha diaria
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Ola que separa el inicio de la sección siguiente (primera versión) */}
+          <svg className="absolute bottom-0 left-0 w-full h-auto" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+            <path
+              fill="#ffffff"
+              d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L0,120Z"
+            />
+          </svg>
         </section>
 
         {/* ==================== LA PALABRA VIVA ==================== */}
@@ -576,7 +620,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Prueba una <span className="text-green-700">palabra</span>
+                Prueba una <span className="texto-degradado-corto">palabra</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
                 Aprende las palabras del{' '}
@@ -595,16 +639,22 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Aprende en <span className="text-green-700">3 pasos</span>
+                Aprende en <span className="texto-degradado-corto">3 pasos</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Tu viaje hacia las lenguas andinas comienza aquí</p>
             </div>
 
             <ol className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
               {STEPS.map(([title, text], i) => (
-                <li key={title} className="text-center">
-                  <div className="w-14 h-14 bg-green-700 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
-                    {i + 1}
+                <li key={title} className="text-center group">
+                  {/* Círculo en degradado con un resplandor detrás (primera versión) */}
+                  <div className="relative mb-8">
+                    <div
+                      className={`relative z-10 w-20 h-20 bg-gradient-to-br ${STEP_COLORS[i].circle} rounded-full flex items-center justify-center mx-auto text-white text-3xl font-black shadow-xl transition-transform duration-300 ease-out motion-safe:group-hover:scale-110`}
+                    >
+                      {i + 1}
+                    </div>
+                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 ${STEP_COLORS[i].glow} rounded-full blur-2xl opacity-60`} aria-hidden="true" />
                   </div>
                   <h3 className="text-2xl font-bold mb-3">{title}</h3>
                   <p className="text-stone-600 leading-relaxed">{text}</p>
@@ -631,7 +681,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Qué incluye <span className="text-green-700">SimiAru</span>
+                Qué incluye <span className="texto-degradado-corto">SimiAru</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 Vocabulario, ejercicios y cultura del altiplano en un solo lugar, gratis y sin publicidad
@@ -639,25 +689,30 @@ const Home = ({ enableGuestMode }) => {
             </div>
 
             <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {FEATURES.map(([Icon, title, text, tag]) => (
-                <li key={title} className="bg-stone-50 rounded-2xl p-7 border border-stone-200">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Icon className="w-6 h-6 text-green-700 shrink-0" aria-hidden="true" />
-                    <h3 className="text-xl font-bold">{title}</h3>
+              {FEATURES.map(([Icon, title, text, tag], i) => {
+                const color = CARD_COLORS[i % CARD_COLORS.length];
+                return (
+                <li key={title} className={`tarjeta-viva group relative overflow-hidden bg-gradient-to-br ${color.card} rounded-3xl p-7 sm:p-8`}>
+                  {/* Cuadro decorativo inclinado que se endereza al pasar el mouse */}
+                  <span className={`absolute top-6 right-6 w-16 h-16 ${color.deco} rounded-2xl rotate-12 transition-transform duration-300 ease-out motion-safe:group-hover:rotate-0`} aria-hidden="true" />
+                  <div className={`relative w-14 h-14 bg-gradient-to-br ${color.icon} rounded-2xl flex items-center justify-center mb-5 shadow-lg`}>
+                    <Icon className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
-                  <p className="text-stone-700 leading-relaxed mb-4">{text}</p>
-                  <p className="flex items-center gap-2 text-green-800 font-semibold text-sm">
+                  <h3 className="relative text-2xl font-black mb-3">{title}</h3>
+                  <p className="relative text-stone-700 leading-relaxed mb-4">{text}</p>
+                  <p className={`relative flex items-center gap-2 ${color.tag} font-bold text-sm`}>
                     <CheckCircle className="w-4 h-4" aria-hidden="true" />
                     {tag}
                   </p>
                 </li>
-              ))}
+                );
+              })}
 
-              <li className="bg-stone-50 rounded-2xl p-7 border-2 border-orange-700">
-                <div className="flex items-center gap-3 mb-3">
-                  <UserX className="w-6 h-6 text-orange-700 shrink-0" aria-hidden="true" />
-                  <h3 className="text-xl font-bold">Prueba sin cuenta</h3>
+              <li className="tarjeta-viva relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100/60 rounded-3xl p-7 sm:p-8 border-2 border-orange-700">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-600 to-orange-800 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
+                  <UserX className="w-7 h-7 text-white" aria-hidden="true" />
                 </div>
+                <h3 className="text-2xl font-black mb-3">Prueba sin cuenta</h3>
                 <p className="text-stone-700 leading-relaxed mb-4">
                   Explora la Unidad 1 sin crear una cuenta. Para guardar tu progreso, regístrate gratis
                 </p>
@@ -794,7 +849,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Cultura <span className="text-green-700">viva</span>
+                Cultura <span className="texto-degradado-corto">viva</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 69 cuentos, proverbios, adivinanzas y canciones, en quechua y en aymara, cada uno con su traducción
@@ -821,7 +876,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Una herramienta <span className="text-green-700">abierta</span> para lenguas originarias
+                Una herramienta <span className="texto-degradado-corto">abierta</span> para lenguas originarias
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 SimiAru es un proyecto gratuito y de código abierto para aprender quechua y aymara. Su contenido sigue creciendo y cualquier persona puede revisar y mejorar el código.
@@ -831,7 +886,7 @@ const Home = ({ enableGuestMode }) => {
             <ul className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
               {PROJECT_STATS.map(([value, label]) => (
                 <li key={label}>
-                  <div className="text-4xl sm:text-5xl font-extrabold text-stone-900 mb-2">{value}</div>
+                  <div className="text-4xl sm:text-5xl font-black texto-degradado mb-2">{value}</div>
                   <div className="text-stone-600 font-semibold">{label}</div>
                 </li>
               ))}
@@ -840,11 +895,14 @@ const Home = ({ enableGuestMode }) => {
         </section>
 
         {/* ==================== LLAMADA FINAL ==================== */}
-        <section className="py-24 bg-green-800">
+        {/* Degradado completo con burbujas blancas difuminadas, como el cierre de la primera versión */}
+        <section className="relative isolate overflow-hidden py-24 bg-gradient-to-br from-green-700 via-blue-700 to-purple-700">
+          <span className="burbuja -z-10 bg-white opacity-15 top-[-6rem] left-[-6rem]" aria-hidden="true" />
+          <span className="burbuja -z-10 bg-white opacity-10 bottom-[-8rem] right-[-6rem] [animation-delay:-6s]" aria-hidden="true" />
           <div className="container mx-auto px-6 text-center">
             <div className="max-w-4xl mx-auto space-y-8">
               <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
-                Empieza con la <span className="text-green-200">Unidad 1</span>
+                Empieza con la <span className="text-yellow-300">Unidad 1</span>
               </h2>
               <p className="text-xl md:text-2xl text-green-50 leading-relaxed">
                 Crea tu cuenta para guardar tu progreso, o pruébala sin registrarte

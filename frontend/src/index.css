@@ -219,6 +219,108 @@ dialog.modal {
   animation-delay: calc(var(--i, 0) * 12ms + 180ms);
 }
 
+/* ==================== Estilo de la primera versión de SimiAru ====================
+   Degradado verde (quechua) → azul (aymara) → morado, burbujas difuminadas y tarjetas que se elevan.
+   Tonos 700 para que el texto blanco encima se lea bien (contraste AA). */
+
+/* Texto en degradado; .texto-vivo además se desplaza lentamente */
+.texto-degradado {
+  background-image: linear-gradient(90deg, #15803d, #1d4ed8, #7e22ce);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.texto-degradado-corto {
+  background-image: linear-gradient(90deg, #15803d, #1d4ed8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes degradado {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+.texto-vivo {
+  background-size: 200% 200%;
+  animation: degradado 6s ease infinite;
+}
+
+/* Fondo suave con burbujas de color difuminadas que flotan */
+.fondo-burbujas {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-image: linear-gradient(135deg, #f0fdf4, #eff6ff 50%, #faf5ff);
+}
+.burbuja {
+  position: absolute;
+  z-index: -1;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 999px;
+  filter: blur(64px);
+  opacity: 0.28;
+  pointer-events: none;
+  animation: burbuja 14s ease-in-out infinite;
+}
+.burbuja-verde { background: #4ade80; top: -6rem; left: -6rem; }
+.burbuja-azul { background: #60a5fa; top: -4rem; right: -6rem; animation-delay: -4s; }
+.burbuja-morada { background: #c084fc; bottom: -8rem; left: 40%; animation-delay: -8s; }
+@keyframes burbuja {
+  0%,
+  100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(24px, -36px) scale(1.08); }
+  66% { transform: translate(-20px, 20px) scale(0.94); }
+}
+
+/* Botón principal en degradado, con un resplandor al pasar el mouse */
+.boton-degradado {
+  background-image: linear-gradient(90deg, #15803d, #1d4ed8, #7e22ce);
+  background-size: 150% 100%;
+  background-position: 0% 50%;
+  color: #fff;
+  transition:
+    transform 160ms var(--ease-out),
+    background-position 400ms var(--ease-out),
+    box-shadow 200ms ease;
+}
+.boton-degradado:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+/* Tarjeta que se eleva un poco al pasar el mouse */
+.tarjeta-viva {
+  transition:
+    transform 250ms var(--ease-out),
+    box-shadow 250ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .boton-degradado:hover {
+    background-position: 100% 50%;
+    box-shadow: 0 12px 28px -10px rgba(29, 78, 216, 0.55);
+  }
+  .tarjeta-viva:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 40px -18px rgba(28, 25, 23, 0.35);
+  }
+}
+
+/* Etiquetas flotantes inclinadas (sobre la foto de inicio) */
+.etiqueta-flotante {
+  transition: transform 250ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .etiqueta-flotante:hover {
+    transform: rotate(0deg) scale(1.04);
+  }
+}
+
 /* ==================== Espera ==================== */
 /* Aparece tras 300ms: si la pantalla llega antes, nunca se ve */
 .espera {
@@ -262,6 +364,15 @@ dialog.modal {
   .anim-latido,
   .anim-sacude {
     animation: none;
+  }
+  /* Sin flotar ni desplazar el degradado: los colores se quedan, quietos */
+  .burbuja,
+  .texto-vivo {
+    animation: none;
+  }
+  .tarjeta-viva:hover,
+  .etiqueta-flotante:hover {
+    transform: none;
   }
   .papelito {
     display: none;

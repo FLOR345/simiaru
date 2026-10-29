@@ -4,14 +4,18 @@ import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.jpg';
 
 export const AuthLayout = ({ title, subtitle, children, footer }) => (
-  <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-50 text-stone-900">
-    <main className="w-full max-w-md">
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8">
+  // Mismo fondo de la portada: degradado suave con burbujas de color difuminadas
+  <div className="fondo-burbujas min-h-screen flex items-center justify-center px-4 py-12 text-stone-900">
+    <span className="burbuja burbuja-verde" aria-hidden="true" />
+    <span className="burbuja burbuja-azul" aria-hidden="true" />
+    <span className="burbuja burbuja-morada" aria-hidden="true" />
+    <main className="w-full max-w-md anim-entra">
+      <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8">
         <div className="text-center mb-8">
           <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-5">
             <img src={logo} alt="" width="253" height="299" className="h-20 w-auto" />
           </Link>
-          <h1 className="text-3xl font-bold">{title}</h1>
+          <h1 className="text-3xl font-black texto-degradado">{title}</h1>
           <p className="text-stone-600 mt-2">{subtitle}</p>
         </div>
         {children}
@@ -79,7 +83,7 @@ export const SubmitButton = ({ loading, loadingText, children }) => (
   <button
     type="submit"
     disabled={loading}
-    className="w-full min-h-12 py-3 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+    className="w-full min-h-12 py-3 boton-degradado font-bold rounded-xl shadow-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
   >
     {loading ? (
       <>

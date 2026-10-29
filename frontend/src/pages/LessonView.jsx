@@ -53,7 +53,7 @@ const useCountUp = (target, duration = 900) => {
 const ResultsScore = ({ percentage, passed, theme }) => {
   const shown = useCountUp(percentage);
   return (
-    <p className={`text-6xl font-extrabold mb-2 tabular-nums ${passed ? theme.text : 'text-orange-800'}`}>
+    <p className={`text-6xl font-black mb-2 tabular-nums ${passed ? 'texto-degradado' : 'text-orange-800'}`}>
       <span aria-hidden="true">{shown}%</span>
       <span className="sr-only">{percentage}%</span>
     </p>
@@ -233,9 +233,12 @@ const LessonView = ({ user, isGuest }) => {
   if (showResults) {
     const passed = percentage >= PASS_PERCENT;
     return (
-      <div className="min-h-screen bg-stone-50 text-stone-900 py-8">
+      <div className="fondo-burbujas min-h-screen text-stone-900 py-8">
+        <span className="burbuja burbuja-verde" aria-hidden="true" />
+        <span className="burbuja burbuja-azul" aria-hidden="true" />
+        <span className="burbuja burbuja-morada" aria-hidden="true" />
         <main className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 text-center anim-entra">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8 text-center anim-entra">
             {/* Pop in del trofeo; si aprobó, papelitos que salen de él */}
             <div className="relative w-24 h-24 mx-auto mb-6" aria-hidden="true">
               {passed &&
@@ -254,7 +257,9 @@ const LessonView = ({ user, isGuest }) => {
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold mb-2 anim-entra" style={{ '--i': 3 }}>{passed ? '¡Felicitaciones!' : '¡Buen intento!'}</h1>
+            <h1 className="text-3xl font-black mb-2 anim-entra" style={{ '--i': 3 }}>
+              {passed ? <span className="texto-degradado texto-vivo">¡Felicitaciones!</span> : '¡Buen intento!'}
+            </h1>
             <p className="text-stone-600 mb-6 anim-entra" style={{ '--i': 4 }}>
               {passed
                 ? lesson.idioma === 'aymara'
