@@ -11,7 +11,8 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 // responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
 const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
 import Home from './pages/Home';
-import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule } from './routes';
+import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher } from './routes';
+import { startTelemetry } from './services/telemetry';
 
 // Pantalla de espera: mismo fondo claro que la app y solo visible si la carga pasa de 0,3 s
 // (las cargas rápidas no muestran un destello de "Cargando")
@@ -95,6 +96,11 @@ function App() {
   }, []);
 
   const auth = { loading, user, isGuest };
+
+  // Envío diferido de eventos de aprendizaje (solo con consentimiento; ver services/telemetry.js)
+  useEffect(() => {
+    startTelemetry();
+  }, []);
   const hasSession = Boolean(user) || isGuest;
 
   // Con sesión, lo más probable es ir al panel y a una lección:
@@ -154,6 +160,15 @@ function App() {
           } 
         />
         <Route path="/dictionary" element={<Dictionary />} />
+        <Route path="/aula" element={<Classroom setUser={setUser} setIsGuest={setIsGuest} />} />
+        <Route
+          path="/docente"
+          element={
+            <ProtectedRoute auth={auth} guestAllowed={false}>
+              <Teacher />
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/culture" 
           element={

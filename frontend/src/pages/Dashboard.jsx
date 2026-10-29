@@ -12,6 +12,8 @@ import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import MantineShell from '../ui/MantineShell';
 import { CountUp } from '../ui/lazyBits';
+import ConsentDialog from '../components/ConsentDialog';
+import LearningPath from '../components/LearningPath';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 const LANGUAGE_STYLE = {
@@ -166,6 +168,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   return (
     <MantineShell>
     <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
+      {/* Pregunta única de consentimiento para los datos de aprendizaje */}
+      {!isGuest && <ConsentDialog user={user} setUser={setUser} />}
       {/* ==================== AVISO MODO INVITADO ==================== */}
       {isGuest && (
         <div className="bg-orange-800 text-white py-3 px-4 sm:px-6">
@@ -398,18 +402,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
               <p className="text-lg font-semibold">Todavía no hay unidades de {lang.label.toLowerCase()}</p>
             </div>
           ) : (
-            <ol className="space-y-4">
-              {units.map((unit, index) => (
-                <UnitCard
-                  key={unit.id}
-                  unit={unit}
-                  index={index}
-                  isLessonCompleted={isLessonCompleted}
-                  style={lang}
-                  isGuest={isGuest}
-                />
-              ))}
-            </ol>
+            // Camino de aprendizaje al estilo Duolingo (components/LearningPath.jsx)
+            <LearningPath units={units} langId={selectedLanguage} isGuest={isGuest} isLessonCompleted={isLessonCompleted} />
           )}
         </section>
 
@@ -445,217 +439,5 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   );
 };
 
-// ==================== TARJETA DE UNIDAD ====================
-const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
-  const [expanded, setExpanded] = useState(false);
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const requested = useRef(false);
-  const [opened, setOpened] = useState(false);
-
-  // Los invitados solo pueden acceder a la Unidad 1 (index === 0)
-  const isLockedForGuest = isGuest && index > 0;
-  const panelId = `unidad-${unit.id}-lecciones`;
-
-  // Se piden una sola vez: al acercar el mouse o enfocar (precarga) o al abrir la unidad
-  const loadLessons = async () => {
-    if (requested.current || isLockedForGuest) return;
-    requested.current = true;
-    setLoading(true);
-    setError(false);
-    try {
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const { data } = await axios.get(`${API_URL}/api/lessons/units/${unit.id}/lessons`, { headers });
-      setLessons(data.lessons);
-    } catch (err) {
-      console.error('Error loading lessons:', err);
-      requested.current = false; // permite reintentar
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleToggle = () => {
-    if (isLockedForGuest) return;
-    if (!expanded) loadLessons();
-    setOpened(true);
-    setExpanded(!expanded);
-  };
-
-  const completedCount = lessons.filter((l) => isLessonCompleted(l.id)).length;
-  const progress = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
-
-  const header = (
-    <>
-      <span
-        className={`w-14 h-14 ${isLockedForGuest ? 'bg-stone-300 text-stone-600' : `${style.badge} text-white`} rounded-2xl flex items-center justify-center font-extrabold text-2xl shrink-0`}
-        aria-hidden="true"
-      >
-        {isLockedForGuest ? <Lock className="w-7 h-7" /> : index + 1}
-      </span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-xl font-bold">
-          <span className="sr-only">Unidad {index + 1}: </span>
-          {unit.nombre}
-        </span>
-        <span className="block text-stone-600">{unit.descripcion}</span>
-        {isLockedForGuest && (
-          <span className="flex items-center gap-1.5 text-orange-800 text-sm font-semibold mt-2">
-            <Lock className="w-4 h-4" aria-hidden="true" />
-            Regístrate gratis para acceder a esta unidad
-          </span>
-        )}
-        {/* El avance aparece tras abrir la unidad, no con la precarga: así la tarjeta no crece bajo el mouse */}
-        {!isLockedForGuest && opened && lessons.length > 0 && (
-          <span className="block mt-3">
-            <span className="flex items-center justify-between text-sm font-semibold text-stone-600 mb-1.5">
-              <span>
-                {completedCount} de {lessons.length} completadas
-              </span>
-              <span>{progress}%</span>
-            </span>
-            <span className="block w-full bg-stone-200 rounded-full h-2 overflow-hidden" aria-hidden="true">
-              <Barra value={progress} className={style.bar} />
-            </span>
-          </span>
-        )}
-      </span>
-      {!isLockedForGuest && (
-        <ChevronDown
-          className={`w-6 h-6 text-stone-500 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? 'rotate-180' : ''}`}
-          aria-hidden="true"
-        />
-      )}
-    </>
-  );
-
-  return (
-    <li className={`border-2 rounded-2xl overflow-hidden bg-white ${isLockedForGuest ? 'border-stone-200 bg-stone-50' : 'border-stone-200 hover:border-stone-300'} transition-colors`}>
-      {isLockedForGuest ? (
-        <div className="flex items-center gap-4 sm:gap-6 p-5 sm:p-6">{header}</div>
-      ) : (
-        <button
-          type="button"
-          onClick={handleToggle}
-          onPointerEnter={loadLessons}
-          onFocus={loadLessons}
-          aria-expanded={expanded}
-          aria-controls={panelId}
-          className="w-full text-left flex items-center gap-4 sm:gap-6 p-5 sm:p-6"
-        >
-          {header}
-        </button>
-      )}
-
-      {/* Motion: la unidad se despliega con su altura real (auto) y se pliega igual al cerrarla */}
-      <AnimatePresence initial={false}>
-      {expanded && !isLockedForGuest && (
-        <m.div
-          key="panel"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-          className="overflow-hidden"
-        >
-        <div id={panelId} className="border-t-2 border-stone-100 bg-stone-50 p-4 sm:p-6">
-          {loading ? (
-            <p className="text-center py-8 text-stone-600" role="status">
-              Cargando lecciones…
-            </p>
-          ) : error ? (
-            <div className="text-center py-6" role="alert">
-              <p className="font-semibold mb-3">No pudimos cargar las lecciones.</p>
-              <button
-                type="button"
-                onClick={loadLessons}
-                className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 font-bold rounded-lg hover:bg-white toque"
-              >
-                <RefreshCw className="w-4 h-4" aria-hidden="true" />
-                Reintentar
-              </button>
-            </div>
-          ) : lessons.length === 0 ? (
-            <p className="text-center text-stone-600 py-8">Esta unidad todavía no tiene lecciones</p>
-          ) : (
-            <ol className="space-y-3">
-              {lessons.map((lesson, lessonIndex) => {
-                const completed = isLessonCompleted(lesson.id);
-                // Los invitados pueden hacer cualquier lección de la Unidad 1; los registrados, en orden
-                const locked = !isGuest && lessonIndex > 0 && !isLessonCompleted(lessons[lessonIndex - 1].id);
-                const status = locked ? 'Completa la lección anterior' : completed ? 'Completada' : isGuest ? 'Probar lección' : 'Comenzar lección';
-                const StatusIcon = locked ? Lock : completed ? CheckCircle : Play;
-
-                const content = (
-                  <>
-                    <span
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                        locked ? 'bg-stone-200 text-stone-500' : completed ? `${style.badge} text-white` : 'bg-stone-100 text-stone-700'
-                      }`}
-                      aria-hidden="true"
-                    >
-                      <StatusIcon className="w-6 h-6" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block font-bold text-lg">{lesson.titulo}</span>
-                      <span className="block text-sm text-stone-600">{status}</span>
-                    </span>
-                    {!locked && !isGuest && (
-                      <span className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 font-bold text-sm shrink-0">
-                        <Star className="w-4 h-4 fill-amber-500 text-amber-500" aria-hidden="true" />+{lesson.puntos_recompensa || 100}
-                      </span>
-                    )}
-                  </>
-                );
-
-                return (
-                  <li key={lesson.id} className="anim-despliega" style={{ "--i": lessonIndex }}>
-                    {locked ? (
-                      <div className="flex items-center gap-4 p-4 rounded-xl bg-stone-100 text-stone-500" aria-disabled="true">
-                        {content}
-                      </div>
-                    ) : (
-                      <Link
-                        to={`/lesson/${lesson.id}`}
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 toque ${
-                          completed ? 'bg-white border-stone-200 hover:border-stone-400' : 'bg-white border-stone-200 hover:border-green-700'
-                        }`}
-                      >
-                        {content}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </div>
-        </m.div>
-      )}
-      </AnimatePresence>
-    </li>
-  );
-};
-
 export default Dashboard;
 
-// Barra de avance: se llena desde cero al aparecer, con transform (sin recalcular el diseño).
-// Con movimiento reducido, .barra no tiene transición y muestra el valor directamente.
-function Barra({ value, className }) {
-  const [shown, setShown] = useState(0);
-  useEffect(() => {
-    // Dos cuadros: el primero pinta la barra vacía, el segundo dispara la transición
-    let second;
-    const first = requestAnimationFrame(() => {
-      second = requestAnimationFrame(() => setShown(value));
-    });
-    return () => {
-      cancelAnimationFrame(first);
-      cancelAnimationFrame(second);
-    };
-  }, [value]);
-  return <span className={`barra block h-full w-full ${className}`} style={{ transform: `scaleX(${shown / 100})` }} />;
-}

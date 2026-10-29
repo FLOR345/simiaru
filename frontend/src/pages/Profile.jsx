@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar } from 'lucide-react';
+import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar, ShieldCheck, Download, Trash2, School, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 import { API_URL } from '../config.js';
@@ -9,6 +9,9 @@ import { getLevel } from '../utils/levels.js';
 import { RingProgress } from '@mantine/core';
 import MantineShell from '../ui/MantineShell';
 import Reveal from '../ui/Reveal';
+import { api } from '../services/api';
+import { clearQueue, flush } from '../services/telemetry';
+import { saveConsentLocally } from '../components/ConsentDialog';
 
 const authHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -59,6 +62,94 @@ const Message = ({ message }) =>
 
 const fieldClass = 'w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none bg-white';
 const primaryButton = 'w-full min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque flex items-center justify-center gap-2 disabled:opacity-60';
+
+// Datos de aprendizaje: ver el permiso, cambiarlo, descargar y borrar (soberanía de los datos)
+const LearningData = ({ profile, onConsentChange }) => {
+  const [busy, setBusy] = useState(false);
+  const consent = profile?.consentimiento_datos;
+
+  const change = async (value) => {
+    setBusy(true);
+    try {
+      await api.setConsent(value);
+      onConsentChange(value);
+      if (!value) clearQueue();
+      toast.success(value ? 'Gracias: tus datos ayudarán a investigar' : 'Ya no se registran tus datos de aprendizaje');
+    } catch {
+      toast.error('No pudimos guardar el cambio');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const download = async (format) => {
+    try {
+      await flush();
+      await api.download(`/api/research/export/me?format=${format}`, `simiaru-mis-eventos.${format}`);
+    } catch {
+      toast.error('No pudimos descargar tus datos');
+    }
+  };
+
+  const remove = async () => {
+    if (!window.confirm('¿Borrar todos tus datos de aprendizaje? No se puede deshacer. Tu avance en las lecciones se conserva.')) return;
+    setBusy(true);
+    try {
+      clearQueue();
+      const { data } = await api.deleteMyEvents();
+      toast.success(`Se borraron ${data.borrados} registros`);
+    } catch {
+      toast.error('No pudimos borrar tus datos');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="datos-titulo">
+      <div className="flex items-start gap-4 mb-5">
+        <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center shadow-md shrink-0" aria-hidden="true">
+          <ShieldCheck className="w-6 h-6 text-white" />
+        </span>
+        <div>
+          <h2 id="datos-titulo" className="text-2xl font-bold">
+            Mis datos de aprendizaje
+          </h2>
+          <p className="text-stone-600">
+            {consent === true
+              ? 'Aceptaste que se registre cómo practicas, con un seudónimo, para investigar estas lenguas.'
+              : consent === false
+                ? 'No se registra cómo practicas. Puedes cambiarlo cuando quieras.'
+                : 'Todavía no elegiste. Mientras tanto no se registra nada.'}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {consent === true ? (
+          <button type="button" disabled={busy} onClick={() => change(false)} className="min-h-11 px-4 rounded-xl border-2 border-stone-300 font-bold hover:bg-stone-50 toque disabled:opacity-60">
+            Dejar de compartir
+          </button>
+        ) : (
+          <button type="button" disabled={busy} onClick={() => change(true)} className="min-h-11 px-4 rounded-xl boton-degradado font-bold shadow disabled:opacity-60">
+            Acepto contribuir
+          </button>
+        )}
+        <button type="button" onClick={() => download('csv')} className="inline-flex items-center gap-2 min-h-11 px-4 rounded-xl border-2 border-stone-300 font-bold hover:bg-stone-50 toque">
+          <Download className="w-4 h-4" aria-hidden="true" />
+          Descargar CSV
+        </button>
+        <button type="button" onClick={() => download('json')} className="inline-flex items-center gap-2 min-h-11 px-4 rounded-xl border-2 border-stone-300 font-bold hover:bg-stone-50 toque">
+          <Download className="w-4 h-4" aria-hidden="true" />
+          Descargar JSON
+        </button>
+        <button type="button" disabled={busy} onClick={remove} className="inline-flex items-center gap-2 min-h-11 px-4 rounded-xl text-red-800 font-bold hover:bg-red-50 toque disabled:opacity-60">
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
+          Borrar mis datos
+        </button>
+      </div>
+    </section>
+  );
+};
 
 const Profile = ({ user, setUser }) => {
   const navigate = useNavigate();
@@ -375,6 +466,33 @@ const Profile = ({ user, setUser }) => {
                 </ol>
               )}
             </section>
+
+            {/* ==================== MIS DATOS DE APRENDIZAJE ==================== */}
+            <LearningData
+              profile={profile}
+              onConsentChange={(consiente) => {
+                const updated = saveConsentLocally(profile, consiente);
+                setProfile(updated);
+                if (setUser) setUser(updated);
+              }}
+            />
+
+            {/* ==================== MODO AULA (DOCENTES) ==================== */}
+            {!profile?.es_cuenta_aula && (
+              <Link
+                to="/docente"
+                className="tarjeta-viva mt-6 flex items-center gap-4 p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-blue-50 to-purple-100/60 border border-white shadow-sm"
+              >
+                <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center shadow-md shrink-0" aria-hidden="true">
+                  <School className="w-6 h-6 text-white" />
+                </span>
+                <span className="flex-1">
+                  <span className="block text-lg font-black">¿Enseñas quechua o aymara?</span>
+                  <span className="block text-stone-700">Crea un aula: tus estudiantes entran con un código, sin correo ni datos personales.</span>
+                </span>
+                <ArrowRight className="w-5 h-5 text-stone-600" aria-hidden="true" />
+              </Link>
+            )}
           </>
         )}
       </main>

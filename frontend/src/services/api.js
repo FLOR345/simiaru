@@ -114,7 +114,29 @@ export const api = {
 
   // ===== CULTURE =====
   getCulturalContent: (tipo, idioma) => 
-    axiosInstance.get(`/api/culture?tipo=${encodeURIComponent(tipo)}&idioma=${encodeURIComponent(idioma)}`)
+    axiosInstance.get(`/api/culture?tipo=${encodeURIComponent(tipo)}&idioma=${encodeURIComponent(idioma)}`),
+
+  // ===== DATOS DE APRENDIZAJE (consentimiento y exportación) =====
+  getConsent: () => axiosInstance.get('/api/research/consent'),
+  setConsent: (consiente) => axiosInstance.put('/api/research/consent', { consiente }),
+  deleteMyEvents: () => axiosInstance.delete('/api/research/events/me'),
+  // Descarga un archivo autenticado (CSV o JSON) y lo guarda con su nombre
+  download: async (path, filename) => {
+    const res = await axiosInstance.get(path, { responseType: 'blob' });
+    const url = URL.createObjectURL(res.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  },
+
+  // ===== MODO AULA =====
+  createClassroom: (data) => axiosInstance.post('/api/classroom', data),
+  getMyClassrooms: () => axiosInstance.get('/api/classroom/mine'),
+  getClassroomProgress: (id) => axiosInstance.get(`/api/classroom/${id}/progress`),
+  joinClassroom: (data) => axiosInstance.post('/api/classroom/join', data),
+  studentLogin: (codigoEstudiante) => axiosInstance.post('/api/classroom/login', { codigoEstudiante }),
 };
 
 // ==================== EXPORT DEFAULT ====================

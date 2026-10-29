@@ -23,3 +23,5 @@ export const preloadOn = (Screen) => ({
   onFocus: () => Screen.preload(),
   onTouchStart: () => Screen.preload(),
 });
+export const Classroom = lazyWithPreload(() => import('./pages/Classroom'));
+export const Teacher = lazyWithPreload(() => import('./pages/Teacher'));

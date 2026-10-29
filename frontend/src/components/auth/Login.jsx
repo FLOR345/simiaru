@@ -112,6 +112,12 @@ const Login = ({ setUser, setIsGuest }) => {
           Regístrate gratis
         </Link>
       </p>
+      <p className="mt-3 text-center text-stone-600">
+        ¿Eres estudiante de un curso?{' '}
+        <Link to="/aula" className="text-blue-800 font-bold underline-offset-4 hover:underline">
+          Entra con el código de tu aula
+        </Link>
+      </p>
     </AuthLayout>
   );
 };
