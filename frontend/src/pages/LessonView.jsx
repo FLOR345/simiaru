@@ -9,6 +9,7 @@ import { Volume2, VolumeX, X, Check, ArrowRight, Star, Trophy, AlertCircle, Refr
 import { getLanguage, languageStyle } from '../languages';
 import { PHENOMENON_LABELS } from '../utils/normalizer';
 import { track, flush } from '../services/telemetry';
+import { queueProgress } from '../services/offlineSync';
 import { playCorrect, playWrong, playComplete, soundEnabled, setSoundEnabled } from '../utils/sounds';
 
 const PASS_PERCENT = 80;
@@ -170,7 +171,13 @@ const LessonView = ({ user, isGuest }) => {
       });
     } catch (error) {
       console.error('Error saving progress:', error);
-      setSaveState('error');
+      // Sin conexión (o servidor dormido): el resultado queda en este dispositivo y se envía después
+      if (!error.response) {
+        queueProgress({ leccionId: parseInt(lessonId, 10), porcentajeAciertos: percentage });
+        setSaveState('queued');
+      } else {
+        setSaveState('error');
+      }
     }
   };
 
@@ -422,6 +429,9 @@ const LessonView = ({ user, isGuest }) => {
                   <span className="text-green-800">
                     Progreso guardado{serverResult?.racha ? ` · Racha de ${serverResult.racha} ${serverResult.racha === 1 ? 'día' : 'días'} 🔥` : ''}
                   </span>
+                )}
+                {saveState === 'queued' && (
+                  <span className="text-stone-700">Sin conexión: tu resultado quedó guardado en este dispositivo y se enviará al volver internet.</span>
                 )}
                 {saveState === 'error' && (
                   <span className="text-red-800">

@@ -13,6 +13,7 @@ const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })
 import Home from './pages/Home';
 import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher } from './routes';
 import { startTelemetry } from './services/telemetry';
+import OfflineBanner from './components/OfflineBanner';
 
 // Pantalla de espera: mismo fondo claro que la app y solo visible si la carga pasa de 0,3 s
 // (las cargas rápidas no muestran un destello de "Cargando")
@@ -126,6 +127,7 @@ function App() {
     <BrowserRouter>
       {/* Avisos de toda la app (progreso guardado, insignias, favoritos, perfil).
           Arriba al centro: nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
+      <OfflineBanner />
       <Suspense fallback={null}>
         <Toaster position="top-center" richColors closeButton duration={4000} toastOptions={{ style: { fontFamily: 'inherit' } }} />
       </Suspense>
