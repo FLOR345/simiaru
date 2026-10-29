@@ -339,6 +339,7 @@ const Profile = ({ user, setUser }) => {
                       Nivel {level.number}: {level.name} ({level.subtitle.toLowerCase()})
                     </li>
                     {profile?.isGoogleUser && <li className="px-3 py-1 rounded-full bg-stone-100 text-stone-800">Cuenta de Google</li>}
+                    {profile?.es_cuenta_aula && <li className="px-3 py-1 rounded-full bg-amber-50 text-amber-900">Cuenta de aula</li>}
                   </ul>
                 </div>
               </div>
@@ -347,10 +348,12 @@ const Profile = ({ user, setUser }) => {
                   <Edit3 className="w-4 h-4" aria-hidden="true" />
                   Editar perfil
                 </button>
+                {!profile?.es_cuenta_aula && (
                 <button type="button" onClick={openPassword} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque">
                   <Lock className="w-4 h-4" aria-hidden="true" />
                   {hasPassword ? 'Cambiar contraseña' : 'Crear contraseña'}
                 </button>
+                )}
               </div>
             </section>
 
