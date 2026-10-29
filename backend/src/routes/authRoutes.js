@@ -29,33 +29,31 @@ router.get('/profile', protect, getProfile);
 const requireProvider = (enabled, name) => (req, res, next) =>
   enabled ? next() : res.status(503).json({ message: 'El inicio de sesión con ' + name + ' no está configurado en este servidor' });
 
+// Si algo falla en Google/Facebook, se vuelve a la pantalla de inicio de sesión con un aviso legible
+const FRONTEND = () => process.env.FRONTEND_URL || 'https://simiaru-3j6b.vercel.app';
+const oauthCallback = (provider) => (req, res, next) => {
+  passport.authenticate(provider, { session: false }, (error, user) => {
+    if (error || !user) {
+      console.error(`Error en el inicio de sesión con ${provider}:`, error?.message || 'sin usuario');
+      return res.redirect(`${FRONTEND()}/login?error=${provider}`);
+    }
+    return res.redirect(`${FRONTEND()}/dashboard?token=${generateToken(user)}`);
+  })(req, res, next);
+};
+
 // ===== GOOGLE OAUTH =====
 router.get('/google', requireProvider(googleEnabled, 'Google'), passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 
-router.get('/google/callback', requireProvider(googleEnabled, 'Google'),
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  (req, res) => {
-    const token = generateToken(req.user);
-    // Redirige al frontend con el token
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
-  }
-);
+router.get('/google/callback', requireProvider(googleEnabled, 'Google'), oauthCallback('google'));
 
 // ===== FACEBOOK OAUTH =====
 router.get('/facebook', requireProvider(facebookEnabled, 'Facebook'), passport.authenticate('facebook', {
   scope: ['email']
 }));
 
-router.get('/facebook/callback', requireProvider(facebookEnabled, 'Facebook'),
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  (req, res) => {
-    const token = generateToken(req.user);
-    // Redirige al frontend con el token
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${token}`);
-  }
-);
+router.get('/facebook/callback', requireProvider(facebookEnabled, 'Facebook'), oauthCallback('facebook'));
 
 // ===== ACTUALIZAR PERFIL =====
 router.put('/profile', protect, async (req, res) => {

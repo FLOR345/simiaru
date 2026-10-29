@@ -124,3 +124,23 @@ test('modo aula: crear, unirse sin correo, volver a entrar con el código y ver 
   assert.deepEqual(progress.body.estudiantes.map((s) => s.alias), ['Ana']);
   await request(app).get(`/api/classroom/${id}/progress`).set({ Authorization: `Bearer ${joined.body.token}` }).expect(404);
 });
+
+test('Google con un correo ya registrado: se vincula a esa cuenta (no se crea otra ni falla)', { skip }, async () => {
+  const email = `google${unique}@ejemplo.test`;
+  await request(app).post('/api/auth/register').send({ nombre: 'Con clave', email, password: 'clave-segura-123' }).expect(201);
+  // Mismo correo con otra capitalización: debe avisar, no fallar
+  const again = await request(app).post('/api/auth/register').send({ nombre: 'Otra vez', email: email.toUpperCase(), password: 'clave-segura-123' });
+  assert.equal(again.status, 409);
+  assert.match(again.body.message, /ya tiene una cuenta/);
+
+  const { findOrLinkUser } = await import('../src/config/passport.js');
+  const profile = { id: `g-${unique}`, displayName: 'Persona Google', emails: [{ value: email.toUpperCase() }], photos: [] };
+  const linked = await findOrLinkUser('google', profile);
+  const { rows } = await pool.query('SELECT id, google_id FROM usuarios WHERE LOWER(email) = $1', [email]);
+  assert.equal(rows.length, 1);
+  assert.equal(linked.id, rows[0].id);
+  assert.equal(rows[0].google_id, profile.id);
+  // La segunda vez se encuentra por el id de Google
+  const again2 = await findOrLinkUser('google', profile);
+  assert.equal(again2.id, linked.id);
+});

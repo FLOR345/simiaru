@@ -13,6 +13,7 @@ import Counter from '../components/reactbits/Counter';
 import GlareHover from '../components/reactbits/GlareHover';
 import ShinyText from '../components/reactbits/ShinyText';
 import Decor from '../components/Decor';
+import SplitText from '../components/reactbits/SplitText';
 
 // ==================== Juegos de práctica ====================
 // Repasan las palabras de las lecciones que la persona ya completó (o de la Unidad 1 si aún no hay).
@@ -1158,6 +1159,10 @@ const Practice = ({ user, isGuest }) => {
               </section>
             </aside>
 
+            <div className="min-w-0">
+            <h2 className="mb-5 text-3xl sm:text-4xl font-black">
+              <SplitText text="¡Elige tu juego!" tag="span" effect="wave" delay={45} duration={0.8} textAlign="left" rootMargin="0px" hoverEffect="wave" />
+            </h2>
             <ul className="grid gap-5 sm:grid-cols-2">
               {GAMES.map(({ id, Icon, pose, title, text, color, shadow, best }, i) => {
                 const value = best ? readBest(bestKey(id, idioma)) : 0;
@@ -1205,6 +1210,7 @@ const Practice = ({ user, isGuest }) => {
                 );
               })}
             </ul>
+            </div>
           </div>
         )}
       </main>

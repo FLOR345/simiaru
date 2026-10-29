@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage } from '../languages';
 import { LlamaImage } from '../components/Mascot';
+import Decor from '../components/Decor';
 
 const formatDate = (value) => (value ? new Date(value).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) : '—');
 
@@ -171,7 +172,8 @@ const Teacher = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
-      <main className="container mx-auto py-8 max-w-4xl">
+      <main className="relative isolate container mx-auto py-8 max-w-4xl">
+        <Decor palette="frio" />
         <Link to="/profile" className="inline-flex items-center gap-2 min-h-11 font-semibold text-stone-700 hover:text-stone-900">
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
           Volver al perfil

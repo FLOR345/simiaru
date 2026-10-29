@@ -379,7 +379,7 @@ const LearningPath = ({ units, langId, isGuest, isLessonCompleted }) => {
                     <Lock className="w-4 h-4" aria-hidden="true" /> Regístrate gratis para desbloquearla
                   </p>
                 )}
-                <span className="pointer-events-none absolute right-1 sm:right-4 -bottom-1 w-24 sm:w-40 aspect-square" aria-hidden="true">
+                <span className="pointer-events-none absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-24 sm:w-36 aspect-square llama llama-reposo" aria-hidden="true">
                   <LlamaImage pose={lockedUnit ? 'descansando' : UNIT_POSES[unitIndex % UNIT_POSES.length]} sticker sizes="10rem" />
                 </span>
               </m.div>

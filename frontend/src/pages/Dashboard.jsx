@@ -19,6 +19,7 @@ import { Practice, preloadOn } from '../routes';
 import { LANGUAGES, languageStyle } from '../languages';
 import GradientText from '../components/reactbits/GradientText';
 import Decor from '../components/Decor';
+import SplitText from '../components/reactbits/SplitText';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 // Idiomas desde los paquetes de src/languages: una lengua nueva con contenido aparece sola en el selector
@@ -377,7 +378,9 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="ruta-titulo" aria-busy={loading}>
           <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
             <div>
-              <h2 id="ruta-titulo" className="text-2xl font-bold">Tu ruta de aprendizaje</h2>
+              <h2 id="ruta-titulo" className="text-2xl sm:text-3xl font-black">
+                <SplitText text="Tu ruta de aprendizaje" tag="span" effect="pop" delay={30} duration={0.6} textAlign="left" rootMargin="0px" />
+              </h2>
               <p className="text-stone-600">Aprende {lang.label.toLowerCase()} paso a paso</p>
             </div>
 

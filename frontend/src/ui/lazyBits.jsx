@@ -49,3 +49,19 @@ export const TiltedCard = (props) => (
     <TiltedCardLazy {...props} />
   </Suspense>
 );
+
+// GSAP (Animated Content) y Rotating Text también se descargan aparte: la portada carga primero
+const AnimatedContentLazy = lazy(() => import('../components/reactbits/AnimatedContent'));
+const RotatingTextLazy = lazy(() => import('../components/reactbits/RotatingText'));
+
+export const AnimatedContent = ({ children, ...props }) => (
+  <Suspense fallback={<div>{children}</div>}>
+    <AnimatedContentLazy {...props}>{children}</AnimatedContentLazy>
+  </Suspense>
+);
+
+export const RotatingText = (props) => (
+  <Suspense fallback={<span className={`flex ${props.mainClassName ?? ''}`}>{props.texts?.[0]}</span>}>
+    <RotatingTextLazy {...props} />
+  </Suspense>
+);

@@ -10,7 +10,13 @@ import { API_URL } from '../../config.js';
 const Login = ({ setUser, setIsGuest }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  // Si Google o Facebook fallaron, el servidor vuelve aquí con ?error=google
+  const [error, setError] = useState(() => {
+    const provider = new URLSearchParams(window.location.search).get('error');
+    if (!provider) return '';
+    const name = provider === 'facebook' ? 'Facebook' : 'Google';
+    return `No pudimos iniciar sesión con ${name}. Inténtalo otra vez o entra con tu correo y contraseña.`;
+  });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

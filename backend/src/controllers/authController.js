@@ -5,16 +5,19 @@ import * as emailService from '../utils/emailService.js';
 
 export const register = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre, password } = req.body;
+    const email = String(req.body.email ?? '').trim().toLowerCase();
 
-    // Verificar si existe
-    const userExists = await pool.query(
-      'SELECT * FROM usuarios WHERE email = $1',
-      [email]
-    );
+    // Verificar si existe (sin importar mayúsculas)
+    const userExists = await pool.query('SELECT id, password_hash FROM usuarios WHERE LOWER(email) = $1', [email]);
 
     if (userExists.rows.length > 0) {
-      return res.status(400).json({ message: 'El usuario ya existe' });
+      const sinClave = !userExists.rows[0].password_hash;
+      return res.status(409).json({
+        message: sinClave
+          ? 'Ese correo ya está registrado con Google o Facebook. Entra con ese botón (luego puedes crear una contraseña desde tu perfil).'
+          : 'Ese correo ya tiene una cuenta. Inicia sesión o recupera tu contraseña.',
+      });
     }
 
     // Hash password
@@ -60,10 +63,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Buscar usuario
-    const result = await pool.query(
-      'SELECT * FROM usuarios WHERE email = $1',
-      [email]
-    );
+    const result = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = LOWER($1)', [String(email ?? '').trim()]);
 
     if (result.rows.length === 0) {
       return res.status(401).json({ message: 'Credenciales inválidas' });

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import * as m from 'motion/react-m';
 import { Volume2, Check, X, Snail, Delete } from 'lucide-react';
@@ -115,6 +115,68 @@ const KeyHint = ({ n, state }) => (
   </span>
 );
 
+// Colores de las parejas: cada pareja unida tiene su línea y su borde del mismo color
+const PAIR_COLORS = ['#16a34a', '#2563eb', '#db2777', '#ea580c', '#7c3aed', '#0891b2', '#ca8a04', '#dc2626'];
+
+// Dibuja una curva entre las fichas de cada pareja (mide su posición dentro del contenedor)
+const MatchingLines = ({ containerRef, pairs, pairsKey }) => {
+  const [lines, setLines] = useState([]);
+  const measure = useCallback(() => {
+    const box = containerRef.current;
+    if (!box) return;
+    const c = box.getBoundingClientRect();
+    setLines(
+      pairs
+        .map((p) => {
+          const a = box.querySelector(`[data-tile="L-${p.l}"]`);
+          const b = box.querySelector(`[data-tile="R-${p.r}"]`);
+          if (!a || !b) return null;
+          const ar = a.getBoundingClientRect();
+          const br = b.getBoundingClientRect();
+          return { key: `${p.l}-${p.r}`, x1: ar.right - c.left, y1: ar.top + ar.height / 2 - c.top, x2: br.left - c.left, y2: br.top + br.height / 2 - c.top, color: p.color };
+        })
+        .filter(Boolean)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pairsKey]);
+  useLayoutEffect(() => {
+    measure();
+    const box = containerRef.current;
+    if (!box || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(box);
+    // Las fichas entran con una animación: se mide otra vez cuando terminan
+    const t = setTimeout(measure, 700);
+    return () => {
+      ro.disconnect();
+      clearTimeout(t);
+    };
+  }, [measure, containerRef]);
+  return (
+    <svg className="pointer-events-none absolute inset-0 w-full h-full overflow-visible z-10" aria-hidden="true">
+      {lines.map((l) => {
+        const mx = (l.x1 + l.x2) / 2;
+        return (
+          <g key={l.key}>
+            <m.path
+              d={`M ${l.x1} ${l.y1} C ${mx} ${l.y1}, ${mx} ${l.y2}, ${l.x2} ${l.y2}`}
+              stroke={l.color}
+              strokeWidth="5"
+              strokeLinecap="round"
+              fill="none"
+              initial={{ pathLength: 0, opacity: 0.4 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+            />
+            <m.circle cx={l.x1} cy={l.y1} r="7" fill={l.color} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }} />
+            <m.circle cx={l.x2} cy={l.y2} r="7" fill={l.color} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6, delay: 0.3 }} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
 // Barra fija de abajo con "Verificar" (y "Saltar" cuando aplica), como en Duolingo.
 // Va directo al <body>: dentro de la pregunta que se desliza, "fixed" se movería con ella.
 const CheckBar = (props) => createPortal(<CheckBarInner {...props} />, document.body);
@@ -181,6 +243,7 @@ const ExerciseTypes = ({
   languageId = 'quechua',
   mood = 'idle',
   beat = 0,
+  vocabulary = [],
 }) => {
   const [selected, setSelected] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
@@ -190,6 +253,11 @@ const ExerciseTypes = ({
   const [matched, setMatched] = useState({}); // emparejar: izquierda → derecha
   const [wrongPair, setWrongPair] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [fillMode, setFillMode] = useState('fichas'); // completar: 'fichas' (arrastrar) o 'escribir'
+  const [placed, setPlaced] = useState({}); // completar: espacio → índice de la ficha
+  const [hoverSlot, setHoverSlot] = useState(null);
+  const matchBoxRef = useRef(null);
+  const draggingRef = useRef(false);
 
   const inputRef = useRef(null);
   const blankRefs = useRef([]);
@@ -222,6 +290,15 @@ const ExerciseTypes = ({
     if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
       const words = opciones.palabras || (Array.isArray(opciones) ? opciones : []);
       return { words: shuffle(words) };
+    }
+    if (exercise.tipo === 'fill_blanks') {
+      const answers = safeJsonParse(exercise.respuesta_correcta, []);
+      const list = Array.isArray(answers) ? answers.map(String) : [String(answers)];
+      const taken = new Set(list.map((w) => w.toLowerCase()));
+      const distractors = shuffle(
+        [...new Set(vocabulary.map((w) => String(w).trim()))].filter((w) => w && !w.includes(' ') && w.length <= 16 && !taken.has(w.toLowerCase()))
+      ).slice(0, Math.max(2, 4 - list.length));
+      return { chips: shuffle([...list, ...distractors]) };
     }
     return {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -531,56 +608,186 @@ const ExerciseTypes = ({
   }
 
   // ==================== 5. COMPLETAR ESPACIOS ====================
+  // Se arrastra una ficha hasta el espacio (o se toca y cae en el primer espacio libre).
+  // Tocar una ficha ya puesta la devuelve. También se puede escribir la palabra.
   if (exercise.tipo === 'fill_blanks') {
     const parts = exercise.pregunta.split('___');
     const blanks = parts.length - 1;
     const incomplete = Array.from({ length: blanks }, (_, i) => fillBlanks[i] || '').some((v) => !v.trim());
     const setBlank = (i) => (value) => setFillBlanks((prev) => ({ ...prev, [i]: typeof value === 'function' ? value(prev[i] || '') : value }));
+    const chips = shuffled.chips || [];
+    const useChips = fillMode === 'fichas' && chips.length > 0;
+    const usedChips = new Set(Object.values(placed));
+
+    const place = (chipIndex, slot) => {
+      if (answered) return;
+      const target = slot ?? Array.from({ length: blanks }, (_, i) => i).find((i) => placed[i] === undefined);
+      if (target === undefined) return;
+      playTap();
+      setPlaced((prev) => {
+        const next = { ...prev };
+        Object.keys(next).forEach((k) => next[k] === chipIndex && delete next[k]);
+        next[target] = chipIndex;
+        return next;
+      });
+      setFillBlanks((prev) => ({ ...prev, [target]: chips[chipIndex] }));
+    };
+    const unplace = (slot) => {
+      if (answered || placed[slot] === undefined) return;
+      playTap();
+      setPlaced((prev) => {
+        const next = { ...prev };
+        delete next[slot];
+        return next;
+      });
+      setFillBlanks((prev) => ({ ...prev, [slot]: '' }));
+    };
+    // ¿Sobre qué espacio se soltó la ficha?
+    const slotAt = (event, info) => {
+      const x = event?.clientX ?? (info ? info.point.x - window.scrollX : 0);
+      const y = event?.clientY ?? (info ? info.point.y - window.scrollY : 0);
+      const el = document.elementsFromPoint(x, y).find((n) => n.dataset?.slot !== undefined);
+      return el ? Number(el.dataset.slot) : null;
+    };
+    if (useChips) {
+      numberRef.current = (i) => i < chips.length && !usedChips.has(i) && place(i);
+      backRef.current = () => {
+        const filled = Object.keys(placed).map(Number);
+        if (filled.length) unplace(Math.max(...filled));
+      };
+    }
+
     return (
       <div className="max-w-2xl mx-auto py-2">
-        {prompt(<p className="text-lg sm:text-xl font-bold">Escribe la palabra que falta</p>)}
-        <p className="rounded-2xl border-2 border-stone-200 bg-white p-5 sm:p-6 mb-4 text-xl leading-[2.6] font-semibold">
+        {prompt(<p className="text-lg sm:text-xl font-bold">{useChips ? 'Arrastra la palabra que falta' : 'Escribe la palabra que falta'}</p>)}
+        <p className="relative rounded-3xl border-2 border-stone-200 bg-white p-5 sm:p-7 mb-5 text-xl sm:text-2xl leading-[2.8] font-semibold shadow-sm">
           {parts.map((part, index) => (
             <span key={index}>
               {part}
-              {index < blanks && (
-                <input
-                  ref={(el) => {
-                    blankRefs.current[index] = el;
-                  }}
-                  type="text"
-                  aria-label={`Espacio ${index + 1} de ${blanks}`}
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  value={fillBlanks[index] || ''}
-                  disabled={answered}
-                  onFocus={() => {
-                    lastBlank.current = index;
-                  }}
-                  onChange={(e) => setBlank(index)(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (index < blanks - 1) blankRefs.current[index + 1]?.focus();
-                      else handleSubmit();
-                    }
-                  }}
-                  size={Math.max(6, (fillBlanks[index] || '').length + 2)}
-                  className={`inline-block mx-1.5 px-3 py-0.5 rounded-xl border-2 border-b-4 bg-stone-50 text-center font-bold focus:outline-none focus:bg-white ${theme.text} border-stone-300 focus:border-stone-500`}
-                />
-              )}
+              {index < blanks &&
+                (useChips ? (
+                  <span
+                    data-slot={index}
+                    className={`inline-flex align-middle mx-1.5 min-w-[7rem] min-h-12 items-center justify-center rounded-2xl border-2 border-dashed px-2 transition-all duration-150 ${
+                      hoverSlot === index ? `${theme.border} ${theme.soft} scale-105` : placed[index] !== undefined ? 'border-transparent' : 'border-stone-300 bg-stone-50'
+                    }`}
+                  >
+                    {placed[index] !== undefined ? (
+                      <m.button
+                        type="button"
+                        layoutId={answered ? undefined : `chip-${exercise.id}-${placed[index]}`}
+                        transition={{ type: 'spring', bounce: 0.3, duration: 0.4 }}
+                        onClick={() => unplace(index)}
+                        disabled={answered}
+                        aria-label={`Quitar ${chips[placed[index]]} del espacio ${index + 1}`}
+                        className={`ficha min-h-11 px-4 rounded-xl text-lg font-black ${theme.border} ${theme.soft} ${theme.text}`}
+                        lang={language?.lang}
+                      >
+                        {chips[placed[index]]}
+                      </m.button>
+                    ) : (
+                      <span className="text-base text-stone-400" aria-label={`Espacio ${index + 1} vacío`}>
+                        &nbsp;
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  <input
+                    ref={(el) => {
+                      blankRefs.current[index] = el;
+                    }}
+                    type="text"
+                    aria-label={`Espacio ${index + 1} de ${blanks}`}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    value={fillBlanks[index] || ''}
+                    disabled={answered}
+                    onFocus={() => {
+                      lastBlank.current = index;
+                    }}
+                    onChange={(e) => setBlank(index)(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (index < blanks - 1) blankRefs.current[index + 1]?.focus();
+                        else handleSubmit();
+                      }
+                    }}
+                    size={Math.max(6, (fillBlanks[index] || '').length + 2)}
+                    className={`inline-block mx-1.5 px-3 py-0.5 rounded-xl border-2 border-b-4 bg-stone-50 text-center font-bold focus:outline-none focus:bg-white ${theme.text} border-stone-300 focus:border-stone-500`}
+                  />
+                ))}
             </span>
           ))}
         </p>
-        {!answered && (
-          <LetterKeys
-            keys={letterKeys}
-            onKey={(k) => {
-              const i = lastBlank.current;
-              insertAtCursor(blankRefs.current[i], fillBlanks[i] || '', setBlank(i), k);
-            }}
-          />
+
+        {useChips ? (
+          <div className="flex flex-wrap justify-center gap-3" lang={language?.lang} role="group" aria-label="Palabras para completar">
+            {chips.map((word, i) =>
+              usedChips.has(i) ? (
+                <span key={i} className="ficha min-h-12 px-4 rounded-xl border-stone-200 bg-stone-200 text-transparent text-lg font-black select-none" aria-hidden="true">
+                  {word}
+                </span>
+              ) : (
+                <m.button
+                  key={i}
+                  type="button"
+                  data-opcion
+                  layoutId={answered ? undefined : `chip-${exercise.id}-${i}`}
+                  drag={!answered}
+                  dragSnapToOrigin
+                  dragElastic={0.9}
+                  whileDrag={{ scale: 1.12, rotate: -3, zIndex: 50, boxShadow: '0 16px 30px rgba(28,25,23,0.25)' }}
+                  whileHover={{ y: -3 }}
+                  onDragStart={() => {
+                    draggingRef.current = true;
+                  }}
+                  onDrag={(e, info) => setHoverSlot(slotAt(e, info))}
+                  onDragEnd={(e, info) => {
+                    const slot = slotAt(e, info);
+                    setHoverSlot(null);
+                    if (slot !== null) place(i, slot);
+                    setTimeout(() => {
+                      draggingRef.current = false;
+                    }, 0);
+                  }}
+                  onClick={() => !draggingRef.current && place(i)}
+                  disabled={answered}
+                  transition={{ type: 'spring', bounce: 0.3, duration: 0.4 }}
+                  className="ficha relative z-20 min-h-12 px-4 rounded-xl border-stone-300 bg-white text-lg font-black text-stone-800 hover:bg-stone-50 cursor-grab active:cursor-grabbing touch-none"
+                >
+                  {word}
+                </m.button>
+              )
+            )}
+          </div>
+        ) : (
+          !answered && (
+            <LetterKeys
+              keys={letterKeys}
+              onKey={(k) => {
+                const i = lastBlank.current;
+                insertAtCursor(blankRefs.current[i], fillBlanks[i] || '', setBlank(i), k);
+              }}
+            />
+          )
+        )}
+
+        {!answered && chips.length > 0 && (
+          <div className="mt-5 flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                setFillMode((m0) => (m0 === 'fichas' ? 'escribir' : 'fichas'));
+                setPlaced({});
+                setFillBlanks({});
+              }}
+              className="inline-flex items-center gap-2 min-h-11 px-4 rounded-xl text-stone-600 hover:bg-stone-100 font-bold toque"
+            >
+              {useChips ? 'Prefiero escribir' : 'Usar fichas'}
+            </button>
+          </div>
         )}
         {!answered && <CheckBar onCheck={handleSubmit} disabled={incomplete} />}
       </div>
@@ -633,9 +840,18 @@ const ExerciseTypes = ({
       else if (rightItems[i - leftItems.length] !== undefined) tap('R', rightItems[i - leftItems.length]);
     };
 
+    // Orden en que se unieron las parejas → color de cada una
+    const order = Object.keys(matched);
+    const colorOf = (side, value) => {
+      const left = side === 'L' ? value : order.find((k) => matched[k] === value);
+      const idx = order.indexOf(left);
+      return idx >= 0 ? PAIR_COLORS[idx % PAIR_COLORS.length] : null;
+    };
+    const linePairs = order.map((L, idx) => ({ l: leftItems.indexOf(L), r: rightItems.indexOf(matched[L]), color: PAIR_COLORS[idx % PAIR_COLORS.length] }));
+
     const stateOf = (side, value) => {
       const done = side === 'L' ? !!matched[value] : usedRight.includes(value);
-      if (done) return answered ? 'right' : 'done';
+      if (done) return 'done';
       if (wrongPair && wrongPair[side] === value) return 'wrong';
       if (pick?.side === side && pick.value === value) return 'selected';
       return 'idle';
@@ -646,21 +862,23 @@ const ExerciseTypes = ({
         <h3 className="text-center text-sm font-black uppercase tracking-wider text-stone-500">{title}</h3>
         {items.map((item, index) => {
           const state = stateOf(side, item);
+          const color = state === 'done' ? colorOf(side, item) : null;
           return (
             <button
               key={item}
               data-opcion
+              data-tile={`${side}-${index}`}
               type="button"
               onClick={() => tap(side, item)}
               aria-pressed={state === 'selected'}
               disabled={answered || state === 'done'}
               lang={side === 'L' ? language?.lang : undefined}
-              className={`${tileClass(state, theme)} justify-center !text-center anim-entra`}
-              style={{ '--i': index + (side === 'R' ? 2 : 0) }}
+              className={`${tileClass(state === 'done' ? 'idle' : state, theme)} justify-center !text-center anim-entra ${state === 'done' ? 'anim-pop' : ''}`}
+              style={{ '--i': index + (side === 'R' ? 2 : 0), ...(color ? { borderColor: color, backgroundColor: `${color}14`, color } : {}) }}
             >
               <KeyHint n={(offset + index + 1) % 10} state={state} />
               <span className="flex-1 text-base sm:text-lg">{item}</span>
-              {state === 'done' && <Check className="w-5 h-5 text-green-600" strokeWidth={3} aria-hidden="true" />}
+              {state === 'done' && <Check className="w-5 h-5" strokeWidth={3} aria-hidden="true" />}
             </button>
           );
         })}
@@ -670,9 +888,11 @@ const ExerciseTypes = ({
     return (
       <div className="max-w-3xl mx-auto py-2">
         {prompt(<p className="text-lg sm:text-xl font-bold">{exercise.pregunta || 'Toca las parejas'}</p>)}
-        <div className="grid grid-cols-2 gap-3 sm:gap-6">
+        {/* Las parejas unidas se conectan con una línea de su color */}
+        <div ref={matchBoxRef} className="relative grid grid-cols-2 gap-x-10 sm:gap-x-24 gap-y-3">
           {column('L', leftItems, languageLabel, 0)}
           {column('R', rightItems, 'Español', leftItems.length)}
+          <MatchingLines containerRef={matchBoxRef} pairs={linePairs} pairsKey={linePairs.map((p) => `${p.l}-${p.r}`).join('|')} />
         </div>
         <div className="mt-6 flex items-center gap-3" aria-live="polite">
           <div className="flex-1 h-3 rounded-full bg-stone-200 overflow-hidden" aria-hidden="true">

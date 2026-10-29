@@ -12,20 +12,38 @@ const BACKEND_URL = process.env.BACKEND_URL || process.env.RENDER_EXTERNAL_URL |
 // 🔵 FUNCIONES PARA BUSCAR Y CREAR USUARIOS EN POSTGRESQL
 // ========================================
 
-async function findUserByGoogleId(googleId) {
-  const result = await pool.query(
-    "SELECT * FROM usuarios WHERE google_id = $1 LIMIT 1",
-    [googleId]
-  );
+// Cuenta ya creada con ese correo (por ejemplo, registrada con contraseña)
+async function findUserByEmail(email) {
+  if (!email) return null;
+  const result = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = LOWER($1) LIMIT 1', [email]);
   return result.rows[0] || null;
 }
 
-async function findUserByFacebookId(facebookId) {
-  const result = await pool.query(
-    "SELECT * FROM usuarios WHERE facebook_id = $1 LIMIT 1",
-    [facebookId]
-  );
-  return result.rows[0] || null;
+// Busca por el id del proveedor; si no, por correo (y vincula el proveedor a esa cuenta); si no, la crea.
+// Antes se intentaba crear siempre una cuenta nueva y fallaba con "Ya existe un registro con estos datos".
+export async function findOrLinkUser(provider, profile) {
+  const column = provider === 'google' ? 'google_id' : 'facebook_id';
+  const byProvider = await pool.query(`SELECT * FROM usuarios WHERE ${column} = $1 LIMIT 1`, [profile.id]);
+  if (byProvider.rows[0]) return byProvider.rows[0];
+
+  const email = profile.emails?.[0]?.value?.trim().toLowerCase() || null;
+  const avatar = profile.photos?.[0]?.value || null;
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    const linked = await pool.query(
+      `UPDATE usuarios SET ${column} = $1, avatar = COALESCE(avatar, $2) WHERE id = $3 RETURNING *`,
+      [profile.id, avatar, existing.id]
+    );
+    return linked.rows[0];
+  }
+
+  return createUser({
+    nombre: profile.displayName || (email ? email.split('@')[0] : 'Estudiante'),
+    email,
+    avatar,
+    googleId: provider === 'google' ? profile.id : null,
+    facebookId: provider === 'facebook' ? profile.id : null,
+  });
 }
 
 async function findUserById(id) {
@@ -100,19 +118,7 @@ if (googleEnabled) passport.use(
 
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await findUserByGoogleId(profile.id);
-
-        // Si NO existe, crearlo
-        if (!user) {
-          user = await createUser({
-            nombre: profile.displayName,
-            email: profile.emails?.[0]?.value || null,
-            avatar: profile.photos?.[0]?.value || null,
-            googleId: profile.id,
-            facebookId: null,
-          });
-        }
-
+        const user = await findOrLinkUser('google', profile);
         return done(null, user);
       } catch (error) {
         return done(error, null);
@@ -136,18 +142,7 @@ if (facebookEnabled) passport.use(
 
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await findUserByFacebookId(profile.id);
-
-        if (!user) {
-          user = await createUser({
-            nombre: profile.displayName,
-            email: profile.emails?.[0]?.value || null,
-            avatar: profile.photos?.[0]?.value || null,
-            googleId: null,
-            facebookId: profile.id,
-          });
-        }
-
+        const user = await findOrLinkUser('facebook', profile);
         return done(null, user);
       } catch (error) {
         return done(error, null);

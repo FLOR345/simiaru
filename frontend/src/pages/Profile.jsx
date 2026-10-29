@@ -13,6 +13,7 @@ import { api } from '../services/api';
 import { clearQueue, flush } from '../services/telemetry';
 import { saveConsentLocally } from '../components/ConsentDialog';
 import { LlamaImage } from '../components/Mascot';
+import Decor from '../components/Decor';
 
 const authHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -304,7 +305,8 @@ const Profile = ({ user, setUser }) => {
         </div>
       </header>
 
-      <main className="container mx-auto py-8 max-w-5xl">
+      <main className="relative isolate container mx-auto py-8 max-w-5xl">
+        <Decor />
         {loading ? (
           <p className="text-center py-20 text-lg font-semibold text-stone-700" role="status">
             Cargando tu perfil…

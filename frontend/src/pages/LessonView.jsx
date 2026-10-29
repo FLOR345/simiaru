@@ -364,6 +364,7 @@ const LessonView = ({ user, isGuest }) => {
     ];
     return (
       <div className="fondo-burbujas min-h-screen text-stone-900 py-8">
+        <Decor palette="calido" />
         <span className="burbuja burbuja-verde" aria-hidden="true" />
         <span className="burbuja burbuja-azul" aria-hidden="true" />
         <span className="burbuja burbuja-morada" aria-hidden="true" />
@@ -645,7 +646,8 @@ const LessonView = ({ user, isGuest }) => {
       : null;
 
   return (
-    <div className="min-h-screen bg-white text-stone-900 pb-48 overflow-x-clip">
+    <div className="relative isolate min-h-screen bg-white text-stone-900 pb-48 overflow-x-clip">
+      <Decor className="opacity-70" />
       {/* Barra superior: cerrar, avance y racha de aciertos */}
       <header className="sticky top-0 z-20 bg-white/95 backdrop-blur">
         <div className="container mx-auto max-w-3xl py-4 flex items-center gap-3 sm:gap-4">
@@ -727,6 +729,7 @@ const LessonView = ({ user, isGuest }) => {
               answered={!!feedback}
               languageLabel={language.nombre}
               languageId={lesson.idioma}
+              vocabulary={vocabulary.map((v) => v.palabra_objetivo)}
               mood={feedback ? (feedback.correct ? (feedback.combo >= 3 ? 'cheer' : 'happy') : 'sad') : 'idle'}
               beat={feedback ? 1 : 0}
             />

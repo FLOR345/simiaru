@@ -7,7 +7,7 @@ import { AnimatePresence, useReducedMotion } from 'motion/react';
 import * as m from 'motion/react-m';
 import Reveal from '../ui/Reveal';
 // React Bits (reactbits.dev, licencia MIT + Commons Clause): componentes copiados al proyecto
-import { CountUp, SpotlightCard, TiltedCard, BlurText } from '../ui/lazyBits';
+import { CountUp, SpotlightCard, TiltedCard, BlurText, AnimatedContent, RotatingText } from '../ui/lazyBits';
 import Magnet from '../components/reactbits/Magnet';
 import ShinyText from '../components/reactbits/ShinyText';
 import StarBorder from '../components/reactbits/StarBorder';
@@ -26,7 +26,6 @@ import miniTari from '../assets/fotos/tari-aymara-sm.webp';
 import miniPapas from '../assets/fotos/papas-nativas-sm.webp';
 import miniSikuris from '../assets/fotos/sikuris-puno-sm.webp';
 import posterLago from '../assets/video/titicaca-timelapse.webp';
-import RotatingText from '../components/reactbits/RotatingText';
 
 // Paleta con significado (ver PRODUCT.md):
 // - verde = quechua y acción principal, azul lago = aymara, terracota = probar sin cuenta
@@ -742,6 +741,7 @@ const Home = ({ enableGuestMode }) => {
               <BlurText text="Tu viaje hacia las lenguas andinas comienza aquí" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
+            <AnimatedContent distance={60} duration={0.8} threshold={0.15} tilt={12}>
             <ol className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
               {STEPS.map(([title, text], i) => (
                 <li key={title} className="text-center group">
@@ -762,6 +762,7 @@ const Home = ({ enableGuestMode }) => {
                 </li>
               ))}
             </ol>
+            </AnimatedContent>
 
             <ul className="mt-20 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
               {HIGHLIGHTS.map(([Icon, title, text]) => (
@@ -786,7 +787,9 @@ const Home = ({ enableGuestMode }) => {
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Una llamita con su chalina de colores te acompaña en cada lección. Tócala para conocerla.</p>
             </Reveal>
-            <LlamaGallery />
+            <AnimatedContent distance={80} duration={0.9} ease="back.out(1.4)" scale={0.92} blur={6} threshold={0.15}>
+              <LlamaGallery />
+            </AnimatedContent>
           </div>
         </section>
 
