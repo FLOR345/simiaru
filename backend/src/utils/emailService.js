@@ -23,6 +23,8 @@ console.log('✅ Servicio de email Brevo API configurado');
 
 // Función helper para enviar email
 const sendEmail = async (to, subject, htmlContent) => {
+  // Sin correos en pruebas automáticas ni a las cuentas de aula (su dirección interna .invalid no existe)
+  if (process.env.NODE_ENV === 'test' || String(to).endsWith('.invalid')) return { omitido: true };
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail.sender = SENDER;
   sendSmtpEmail.to = [{ email: to }];

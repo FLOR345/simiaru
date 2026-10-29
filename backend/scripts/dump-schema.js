@@ -25,6 +25,8 @@ const typeOf = (c) => {
   if (c.data_type === 'timestamp without time zone') return 'TIMESTAMP';
   if (c.data_type === 'timestamp with time zone') return 'TIMESTAMPTZ';
   if (c.data_type === 'USER-DEFINED') return c.udt_name;
+  // Arreglos: udt_name es '_text', '_int4'… → TEXT[], INT4[]
+  if (c.data_type === 'ARRAY') return `${c.udt_name.replace(/^_/, '').toUpperCase()}[]`;
   return c.data_type.toUpperCase();
 };
 

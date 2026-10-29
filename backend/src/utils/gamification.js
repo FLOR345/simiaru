@@ -39,7 +39,7 @@ export const awardBadge = async (userId, badgeCode) => {
      RETURNING id`,
     [userId, badge.rows[0].id]
   );
-  return inserted.rows.length > 0 ? badge.rows[0].nombre : null;
+  return inserted.rows.length > 0 ? badge.rows[0] : null; // { id, nombre }
 };
 
 /**
@@ -60,9 +60,9 @@ export const applyLessonResult = async ({ userId, leccionId, porcentaje, complet
     [puntosTotales, racha, nivel, userId]
   );
 
-  const insignias = [];
+  const ganadas = []; // { id, nombre }
   if (completado) {
-    const add = (name) => name && insignias.push(name);
+    const add = (badge) => badge && ganadas.push(badge);
 
     const completedCount = await pool.query(
       'SELECT COUNT(*)::int AS total FROM progreso_usuario WHERE usuario_id = $1 AND completado = true',
@@ -101,9 +101,9 @@ export const applyLessonResult = async ({ userId, leccionId, porcentaje, complet
     if (all.rows[0].total > 0 && all.rows[0].hechas >= all.rows[0].total) add(await awardBadge(userId, 'complete_all_units'));
   }
 
-  for (const name of insignias) {
-    notifyBadgeEarned(userId, name).catch((err) => console.log('Error notificando insignia:', err.message));
+  for (const badge of ganadas) {
+    notifyBadgeEarned(userId, badge.id).catch((err) => console.log('Error notificando insignia:', err.message));
   }
 
-  return { puntos: puntosGanados, puntosTotales, racha, nivel, insignias };
+  return { puntos: puntosGanados, puntosTotales, racha, nivel, insignias: ganadas.map((b) => b.nombre) };
 };

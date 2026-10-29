@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main, prueba]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: simiaru
+          POSTGRES_PASSWORD: simiaru
+          POSTGRES_DB: simiaru
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U simiaru -d simiaru"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      PGPASSWORD: simiaru
+      TEST_DATABASE_URL: postgres://simiaru:simiaru@localhost:5432/simiaru
+      DATABASE_URL: postgres://simiaru:simiaru@localhost:5432/simiaru
+      DATABASE_SSL: "false"
+      JWT_SECRET: ci-secret
+      SESSION_SECRET: ci-session
+      NODE_ENV: test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Cargar esquema real, migraciones y contenido
+        run: |
+          psql -h localhost -U simiaru -d simiaru -v ON_ERROR_STOP=1 -q -f ../database/schema.sql
+          for f in ../database/migrations/0*.sql; do
+            case "$f" in *001_*) continue;; esac
+            psql -h localhost -U simiaru -d simiaru -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+          psql -h localhost -U simiaru -d simiaru -v ON_ERROR_STOP=1 -q -f ../database/seed/contenido.sql
+      - run: npm ci
+      - run: npm test
+      - name: El importador de idiomas rechaza la plantilla sin completar
+        run: "! node scripts/import-language.js ../languages/plantilla --dry-run"
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: La plataforma completa arranca con un comando
+        run: |
+          docker compose up -d --build
+          for i in $(seq 1 60); do curl -sf http://localhost:5000/health && break; sleep 3; done
+          curl -sf "http://localhost:5000/api/lessons/units?idioma=quechua" | grep -q '"units"'
+          curl -sf http://localhost:8080/ | grep -q SimiAru
+      - if: always()
+        run: docker compose logs --tail 50

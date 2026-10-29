@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { googleEnabled, facebookEnabled } from '../config/passport.js';
 import { register, login, getProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { validate, schemas } from '../middleware/validation.js';
@@ -24,12 +25,16 @@ router.post('/register', validate(schemas.register), register);
 router.post('/login', validate(schemas.login), login);
 router.get('/profile', protect, getProfile);
 
+// Si el proveedor no está configurado, se avisa en vez de fallar
+const requireProvider = (enabled, name) => (req, res, next) =>
+  enabled ? next() : res.status(503).json({ message: 'El inicio de sesión con ' + name + ' no está configurado en este servidor' });
+
 // ===== GOOGLE OAUTH =====
-router.get('/google', passport.authenticate('google', {
+router.get('/google', requireProvider(googleEnabled, 'Google'), passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 
-router.get('/google/callback', 
+router.get('/google/callback', requireProvider(googleEnabled, 'Google'),
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     const token = generateToken(req.user);
@@ -39,11 +44,11 @@ router.get('/google/callback',
 );
 
 // ===== FACEBOOK OAUTH =====
-router.get('/facebook', passport.authenticate('facebook', {
+router.get('/facebook', requireProvider(facebookEnabled, 'Facebook'), passport.authenticate('facebook', {
   scope: ['email']
 }));
 
-router.get('/facebook/callback',
+router.get('/facebook/callback', requireProvider(facebookEnabled, 'Facebook'),
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   (req, res) => {
     const token = generateToken(req.user);

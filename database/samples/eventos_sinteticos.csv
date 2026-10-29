@@ -1,0 +1,762 @@
+participante,sesion,tipo,idioma,leccion_id,ejercicio_id,vocabulario_id,tipo_ejercicio,resultado,respuesta,esperado,intento,duracion_ms,ocurrido_en
+d72960f85ba5aade,2f154688-5dcd-0458,lesson_started,aymara,14,,,,,,,,,2026-11-03T13:12:44.249Z
+d72960f85ba5aade,2f154688-5dcd-0458,exercise_answered,aymara,14,140,,multiple_choice,incorrecto,Kamisaraka,Kamisaraki,1,14002,2026-11-03T13:12:48.892Z
+d72960f85ba5aade,2f154688-5dcd-0458,audio_played,aymara,14,,1400,,,,,,,2026-11-03T13:12:49.792Z
+d72960f85ba5aade,2f154688-5dcd-0458,exercise_answered,aymara,14,141,,translate,variante,hilata,jilata,1,7098,2026-11-03T13:13:01.453Z
+d72960f85ba5aade,2f154688-5dcd-0458,exercise_answered,aymara,14,142,,translate,incorrecto,chuqi,ch'uqi,1,12021,2026-11-03T13:13:10.221Z
+d72960f85ba5aade,2f154688-5dcd-0458,exercise_answered,aymara,14,143,,translate,correcto,uta,uta,1,8355,2026-11-03T13:13:31.492Z
+d72960f85ba5aade,2f154688-5dcd-0458,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,16082,2026-11-03T13:13:48.085Z
+d72960f85ba5aade,2f154688-5dcd-0458,audio_played,aymara,14,,1404,,,,,,,2026-11-03T13:13:48.985Z
+d72960f85ba5aade,2f154688-5dcd-0458,lesson_completed,aymara,14,,,,,,,,831085,2026-11-03T13:13:51.085Z
+d72960f85ba5aade,65888857-3fab-fbbb,lesson_started,aymara,16,,,,,,,,,2026-11-04T13:29:51.714Z
+d72960f85ba5aade,65888857-3fab-fbbb,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,4753,2026-11-04T13:30:00.270Z
+d72960f85ba5aade,65888857-3fab-fbbb,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,7433,2026-11-04T13:30:06.438Z
+d72960f85ba5aade,65888857-3fab-fbbb,exercise_answered,aymara,16,162,,translate,correcto,ch'uqi,ch'uqi,1,9836,2026-11-04T13:30:25.628Z
+d72960f85ba5aade,65888857-3fab-fbbb,exercise_answered,aymara,16,163,,translate,variante,uma,uta,1,10203,2026-11-04T13:30:45.944Z
+d72960f85ba5aade,65888857-3fab-fbbb,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,8499,2026-11-04T13:30:51.810Z
+d72960f85ba5aade,65888857-3fab-fbbb,lesson_completed,aymara,16,,,,,,,,1854810,2026-11-04T13:30:54.810Z
+d72960f85ba5aade,89cd236d-46b9-6e53,lesson_started,aymara,18,,,,,,,,,2026-11-05T13:33:52.767Z
+d72960f85ba5aade,89cd236d-46b9-6e53,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,9721,2026-11-05T13:34:07.855Z
+d72960f85ba5aade,89cd236d-46b9-6e53,exercise_answered,aymara,18,181,,translate,incorrecto,jilata,jilata,1,13627,2026-11-05T13:34:22.559Z
+d72960f85ba5aade,89cd236d-46b9-6e53,exercise_answered,aymara,18,182,,translate,correcto,ch'uqi,ch'uqi,1,2777,2026-11-05T13:34:32.854Z
+d72960f85ba5aade,89cd236d-46b9-6e53,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,8288,2026-11-05T13:34:42.448Z
+d72960f85ba5aade,89cd236d-46b9-6e53,audio_played,aymara,18,,1803,,,,,,,2026-11-05T13:34:43.348Z
+d72960f85ba5aade,89cd236d-46b9-6e53,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,9858,2026-11-05T13:34:47.526Z
+d72960f85ba5aade,89cd236d-46b9-6e53,audio_played,aymara,18,,1804,,,,,,,2026-11-05T13:34:48.426Z
+d72960f85ba5aade,89cd236d-46b9-6e53,lesson_completed,aymara,18,,,,,,,,2090526,2026-11-05T13:34:50.526Z
+d72960f85ba5aade,4a925c1f-adc7-3365,lesson_started,aymara,20,,,,,,,,,2026-11-06T14:39:55.426Z
+d72960f85ba5aade,4a925c1f-adc7-3365,exercise_answered,aymara,20,200,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,5682,2026-11-06T14:40:19.314Z
+d72960f85ba5aade,4a925c1f-adc7-3365,audio_played,aymara,20,,2000,,,,,,,2026-11-06T14:40:20.214Z
+d72960f85ba5aade,4a925c1f-adc7-3365,exercise_answered,aymara,20,201,,translate,correcto,jilata,jilata,1,12339,2026-11-06T14:40:33.478Z
+d72960f85ba5aade,4a925c1f-adc7-3365,exercise_answered,aymara,20,202,,translate,correcto,ch'uqi,ch'uqi,1,6699,2026-11-06T14:40:53.669Z
+d72960f85ba5aade,4a925c1f-adc7-3365,exercise_answered,aymara,20,203,,translate,correcto,uta,uta,1,10983,2026-11-06T14:40:59.092Z
+d72960f85ba5aade,4a925c1f-adc7-3365,exercise_answered,aymara,20,204,,true_false,correcto,Falso,Falso,1,7885,2026-11-06T14:41:06.901Z
+d72960f85ba5aade,4a925c1f-adc7-3365,lesson_completed,aymara,20,,,,,,,,6069901,2026-11-06T14:41:09.901Z
+d72960f85ba5aade,176a21d5-164d-dfc8,lesson_started,aymara,22,,,,,,,,,2026-11-07T13:12:21.226Z
+d72960f85ba5aade,176a21d5-164d-dfc8,exercise_answered,aymara,22,220,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,10518,2026-11-07T13:12:29.459Z
+d72960f85ba5aade,176a21d5-164d-dfc8,audio_played,aymara,22,,2200,,,,,,,2026-11-07T13:12:30.359Z
+d72960f85ba5aade,176a21d5-164d-dfc8,exercise_answered,aymara,22,221,,translate,correcto,jilata,jilata,1,16151,2026-11-07T13:12:47.197Z
+d72960f85ba5aade,176a21d5-164d-dfc8,exercise_answered,aymara,22,222,,translate,correcto,ch'uqi,ch'uqi,1,4003,2026-11-07T13:13:08.481Z
+d72960f85ba5aade,176a21d5-164d-dfc8,exercise_answered,aymara,22,223,,translate,correcto,uta,uta,1,8552,2026-11-07T13:13:16.938Z
+d72960f85ba5aade,176a21d5-164d-dfc8,audio_played,aymara,22,,2203,,,,,,,2026-11-07T13:13:17.838Z
+d72960f85ba5aade,176a21d5-164d-dfc8,exercise_answered,aymara,22,224,,true_false,correcto,Falso,Falso,1,14101,2026-11-07T13:13:25.791Z
+d72960f85ba5aade,176a21d5-164d-dfc8,lesson_completed,aymara,22,,,,,,,,808791,2026-11-07T13:13:28.791Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,lesson_started,quechua,1,,,,,,,,,2026-11-03T14:20:22.665Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6064,2026-11-03T14:20:30.409Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,15054,2026-11-03T14:20:51.844Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,4359,2026-11-03T14:21:03.160Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,audio_played,quechua,1,,102,,,,,,,2026-11-03T14:21:04.060Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,8542,2026-11-03T14:21:23.736Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,audio_played,quechua,1,,103,,,,,,,2026-11-03T14:21:24.636Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,14,,true_false,incorrecto,Falso,Verdadero,1,12862,2026-11-03T14:21:35.668Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,audio_played,quechua,1,,104,,,,,,,2026-11-03T14:21:36.568Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,7653,2026-11-03T14:21:55.294Z
+ed44aabe6b661810,2b17c7dc-e96a-96cf,lesson_completed,quechua,1,,,,,,,,1318294,2026-11-03T14:21:58.294Z
+ed44aabe6b661810,a65490e7-ab18-4969,lesson_started,quechua,3,,,,,,,,,2026-11-04T15:46:57.132Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6481,2026-11-04T15:47:11.329Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,31,,translate,incorrecto,huasi,wasi,1,4961,2026-11-04T15:47:24.369Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,32,,translate,variante,punchay,p'unchay,1,10473,2026-11-04T15:47:43.444Z
+ed44aabe6b661810,a65490e7-ab18-4969,audio_played,quechua,3,,302,,,,,,,2026-11-04T15:47:44.344Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,15223,2026-11-04T15:48:01.081Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,11860,2026-11-04T15:48:21.211Z
+ed44aabe6b661810,a65490e7-ab18-4969,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,5355,2026-11-04T15:48:28.784Z
+ed44aabe6b661810,a65490e7-ab18-4969,lesson_completed,quechua,3,,,,,,,,6511784,2026-11-04T15:48:31.784Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,lesson_started,quechua,1,,,,,,,,,2026-11-03T15:34:14.692Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,12153,2026-11-03T15:34:22.831Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,audio_played,quechua,1,,100,,,,,,,2026-11-03T15:34:23.731Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,10602,2026-11-03T15:34:40.813Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,2689,2026-11-03T15:35:03.299Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,7444,2026-11-03T15:35:14.866Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,2626,2026-11-03T15:35:21.847Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,audio_played,quechua,1,,104,,,,,,,2026-11-03T15:35:22.747Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,16982,2026-11-03T15:35:39.219Z
+894f803108ea96d9,aa0dfa17-333b-0b0f,lesson_completed,quechua,1,,,,,,,,2142219,2026-11-03T15:35:42.219Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,lesson_started,quechua,3,,,,,,,,,2026-11-04T15:26:49.120Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,15072,2026-11-04T15:26:56.823Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,7404,2026-11-04T15:27:18.831Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,32,,translate,variante,punchay,p'unchay,1,17159,2026-11-04T15:27:28.705Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,33,,translate,incorrecto,qucha,qucha,1,17262,2026-11-04T15:27:33.756Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,audio_played,quechua,3,,303,,,,,,,2026-11-04T15:27:34.656Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,12475,2026-11-04T15:27:41.555Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,13435,2026-11-04T15:27:46.236Z
+894f803108ea96d9,ab4b3696-af5b-7f6d,lesson_completed,quechua,3,,,,,,,,1669236,2026-11-04T15:27:49.236Z
+894f803108ea96d9,2c30e9eb-0a86-b720,lesson_started,quechua,5,,,,,,,,,2026-11-05T16:53:22.181Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10176,2026-11-05T16:53:28.537Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,11609,2026-11-05T16:53:35.775Z
+894f803108ea96d9,2c30e9eb-0a86-b720,audio_played,quechua,5,,501,,,,,,,2026-11-05T16:53:36.675Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,14701,2026-11-05T16:53:54.899Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,11685,2026-11-05T16:54:18.781Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,4919,2026-11-05T16:54:42.607Z
+894f803108ea96d9,2c30e9eb-0a86-b720,audio_played,quechua,5,,504,,,,,,,2026-11-05T16:54:43.507Z
+894f803108ea96d9,2c30e9eb-0a86-b720,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,10119,2026-11-05T16:55:04.948Z
+894f803108ea96d9,2c30e9eb-0a86-b720,lesson_completed,quechua,5,,,,,,,,6907948,2026-11-05T16:55:07.948Z
+54d104e92ffbd550,95c8796c-af62-f1cd,lesson_started,aymara,14,,,,,,,,,2026-11-03T16:14:42.451Z
+54d104e92ffbd550,95c8796c-af62-f1cd,exercise_answered,aymara,14,140,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,5969,2026-11-03T16:15:01.405Z
+54d104e92ffbd550,95c8796c-af62-f1cd,audio_played,aymara,14,,1400,,,,,,,2026-11-03T16:15:02.305Z
+54d104e92ffbd550,95c8796c-af62-f1cd,exercise_answered,aymara,14,141,,translate,variante,hilata,jilata,1,15843,2026-11-03T16:15:23.948Z
+54d104e92ffbd550,95c8796c-af62-f1cd,exercise_answered,aymara,14,142,,translate,correcto,ch'uqi,ch'uqi,1,15353,2026-11-03T16:15:35.810Z
+54d104e92ffbd550,95c8796c-af62-f1cd,audio_played,aymara,14,,1402,,,,,,,2026-11-03T16:15:36.710Z
+54d104e92ffbd550,95c8796c-af62-f1cd,exercise_answered,aymara,14,143,,translate,variante,uma,uta,1,10089,2026-11-03T16:15:48.464Z
+54d104e92ffbd550,95c8796c-af62-f1cd,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,13706,2026-11-03T16:16:01.783Z
+54d104e92ffbd550,95c8796c-af62-f1cd,audio_played,aymara,14,,1404,,,,,,,2026-11-03T16:16:02.683Z
+54d104e92ffbd550,95c8796c-af62-f1cd,lesson_completed,aymara,14,,,,,,,,964783,2026-11-03T16:16:04.783Z
+54d104e92ffbd550,3793f123-2318-1235,lesson_started,aymara,16,,,,,,,,,2026-11-04T16:06:18.141Z
+54d104e92ffbd550,3793f123-2318-1235,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,5894,2026-11-04T16:06:29.561Z
+54d104e92ffbd550,3793f123-2318-1235,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,8492,2026-11-04T16:06:40.867Z
+54d104e92ffbd550,3793f123-2318-1235,exercise_answered,aymara,16,162,,translate,variante,chuqi,ch'uqi,1,5491,2026-11-04T16:06:52.072Z
+54d104e92ffbd550,3793f123-2318-1235,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,14849,2026-11-04T16:07:13.085Z
+54d104e92ffbd550,3793f123-2318-1235,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,10220,2026-11-04T16:07:35.870Z
+54d104e92ffbd550,3793f123-2318-1235,audio_played,aymara,16,,1604,,,,,,,2026-11-04T16:07:36.770Z
+54d104e92ffbd550,3793f123-2318-1235,lesson_completed,aymara,16,,,,,,,,458870,2026-11-04T16:07:38.870Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,lesson_started,aymara,18,,,,,,,,,2026-11-05T16:06:39.415Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,16741,2026-11-05T16:06:52.088Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,audio_played,aymara,18,,1800,,,,,,,2026-11-05T16:06:52.988Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,exercise_answered,aymara,18,181,,translate,variante,hilata,jilata,1,3648,2026-11-05T16:06:58.325Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,exercise_answered,aymara,18,182,,translate,incorrecto,chuqi,ch'uqi,1,9684,2026-11-05T16:07:11.584Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,16304,2026-11-05T16:07:31.296Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,14642,2026-11-05T16:07:42.569Z
+54d104e92ffbd550,60e616c5-0de3-7fc2,lesson_completed,aymara,18,,,,,,,,465569,2026-11-05T16:07:45.569Z
+54d104e92ffbd550,1f77719a-88b5-73e2,lesson_started,aymara,20,,,,,,,,,2026-11-06T17:11:55.708Z
+54d104e92ffbd550,1f77719a-88b5-73e2,exercise_answered,aymara,20,200,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,8268,2026-11-06T17:12:10.208Z
+54d104e92ffbd550,1f77719a-88b5-73e2,exercise_answered,aymara,20,201,,translate,incorrecto,jilata,jilata,1,4166,2026-11-06T17:12:33.732Z
+54d104e92ffbd550,1f77719a-88b5-73e2,exercise_answered,aymara,20,202,,translate,incorrecto,chuqi,ch'uqi,1,16004,2026-11-06T17:12:48.457Z
+54d104e92ffbd550,1f77719a-88b5-73e2,exercise_answered,aymara,20,203,,translate,variante,uma,uta,1,11206,2026-11-06T17:13:10.532Z
+54d104e92ffbd550,1f77719a-88b5-73e2,exercise_answered,aymara,20,204,,true_false,incorrecto,Falsa,Falso,1,8738,2026-11-06T17:13:32.747Z
+54d104e92ffbd550,1f77719a-88b5-73e2,lesson_completed,aymara,20,,,,,,,,4415747,2026-11-06T17:13:35.747Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,lesson_started,quechua,1,,,,,,,,,2026-11-03T18:50:13.607Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,15932,2026-11-03T18:50:22.854Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,audio_played,quechua,1,,100,,,,,,,2026-11-03T18:50:23.754Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,13974,2026-11-03T18:50:38.846Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,15172,2026-11-03T18:50:55.144Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,6456,2026-11-03T18:51:01.078Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,13188,2026-11-03T18:51:20.635Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,11241,2026-11-03T18:51:40.828Z
+535be5ff8c797871,15964ac8-d8cb-5c8d,lesson_completed,quechua,1,,,,,,,,6703828,2026-11-03T18:51:43.828Z
+535be5ff8c797871,d096a2ac-1ba0-2282,lesson_started,quechua,3,,,,,,,,,2026-11-04T18:49:28.720Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,4265,2026-11-04T18:49:35.863Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,7615,2026-11-04T18:49:45.469Z
+535be5ff8c797871,d096a2ac-1ba0-2282,audio_played,quechua,3,,301,,,,,,,2026-11-04T18:49:46.369Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,2709,2026-11-04T18:49:56.986Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,12728,2026-11-04T18:50:12.760Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,9525,2026-11-04T18:50:17.375Z
+535be5ff8c797871,d096a2ac-1ba0-2282,exercise_answered,quechua,3,35,,word_order,incorrecto,Allin p'unchay mamaa,Allin p'unchay mamay,1,14099,2026-11-04T18:50:35.550Z
+535be5ff8c797871,d096a2ac-1ba0-2282,lesson_completed,quechua,3,,,,,,,,6638550,2026-11-04T18:50:38.550Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,lesson_started,quechua,5,,,,,,,,,2026-11-05T18:25:43.979Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,13472,2026-11-05T18:25:56.931Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,audio_played,quechua,5,,500,,,,,,,2026-11-05T18:25:57.831Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,5064,2026-11-05T18:26:09.593Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,5560,2026-11-05T18:26:23.978Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,audio_played,quechua,5,,502,,,,,,,2026-11-05T18:26:24.878Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,16620,2026-11-05T18:26:45.352Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,8244,2026-11-05T18:27:02.693Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,7489,2026-11-05T18:27:07.699Z
+535be5ff8c797871,9ef4e6d1-7a65-15ec,lesson_completed,quechua,5,,,,,,,,5230699,2026-11-05T18:27:10.699Z
+535be5ff8c797871,21da8788-59f7-b936,lesson_started,quechua,7,,,,,,,,,2026-11-06T18:16:01.606Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8590,2026-11-06T18:16:17.555Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,2938,2026-11-06T18:16:27.544Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,4000,2026-11-06T18:16:43.801Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,73,,translate,incorrecto,qucha,qucha,1,8393,2026-11-06T18:17:01.914Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,12430,2026-11-06T18:17:25.092Z
+535be5ff8c797871,21da8788-59f7-b936,audio_played,quechua,7,,704,,,,,,,2026-11-06T18:17:25.992Z
+535be5ff8c797871,21da8788-59f7-b936,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,2619,2026-11-06T18:17:32.342Z
+535be5ff8c797871,21da8788-59f7-b936,lesson_completed,quechua,7,,,,,,,,4655342,2026-11-06T18:17:35.342Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,lesson_started,quechua,1,,,,,,,,,2026-11-03T18:35:17.413Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,3699,2026-11-03T18:35:36.184Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,audio_played,quechua,1,,100,,,,,,,2026-11-03T18:35:37.084Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,2840,2026-11-03T18:35:46.603Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,audio_played,quechua,1,,101,,,,,,,2026-11-03T18:35:47.503Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,6008,2026-11-03T18:36:00.055Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,3931,2026-11-03T18:36:23.967Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,9718,2026-11-03T18:36:34.891Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9861,2026-11-03T18:36:56.677Z
+aa521a728831a4f4,fa72bbfb-3b59-8d8f,lesson_completed,quechua,1,,,,,,,,2219677,2026-11-03T18:36:59.677Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,lesson_started,quechua,3,,,,,,,,,2026-11-04T19:14:44.968Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,30,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,4803,2026-11-04T19:14:59.163Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,10590,2026-11-04T19:15:22.601Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,7036,2026-11-04T19:15:27.547Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,audio_played,quechua,3,,302,,,,,,,2026-11-04T19:15:28.447Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,9876,2026-11-04T19:15:47.070Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,34,,true_false,incorrecto,Verdadera,Verdadero,1,7609,2026-11-04T19:15:56.776Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,15903,2026-11-04T19:16:11.946Z
+aa521a728831a4f4,53ac6a43-c4f2-88ca,lesson_completed,quechua,3,,,,,,,,4574946,2026-11-04T19:16:14.946Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,lesson_started,quechua,5,,,,,,,,,2026-11-05T18:03:32.312Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,50,,multiple_choice,incorrecto,Allin tuta,Allin p'unchay,1,3882,2026-11-05T18:03:51.655Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,audio_played,quechua,5,,500,,,,,,,2026-11-05T18:03:52.555Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,51,,translate,incorrecto,wasa,wasi,1,17382,2026-11-05T18:04:04.415Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,4778,2026-11-05T18:04:12.659Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,9330,2026-11-05T18:04:17.043Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,2538,2026-11-05T18:04:28.494Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,exercise_answered,quechua,5,55,,word_order,incorrecto,mamay allin p'unchay,Allin p'unchay mamay,1,15218,2026-11-05T18:04:41.423Z
+aa521a728831a4f4,47eb5e19-8ce2-01f1,lesson_completed,quechua,5,,,,,,,,284423,2026-11-05T18:04:44.423Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,lesson_started,quechua,7,,,,,,,,,2026-11-06T18:25:31.849Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6813,2026-11-06T18:25:39.234Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,9195,2026-11-06T18:25:56.946Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,6027,2026-11-06T18:26:19.958Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,73,,translate,incorrecto,qucha,qucha,1,13381,2026-11-06T18:26:37.514Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,11096,2026-11-06T18:26:42.051Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,4992,2026-11-06T18:26:56.434Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,audio_played,quechua,7,,705,,,,,,,2026-11-06T18:26:57.334Z
+aa521a728831a4f4,1a7e5f16-e3b0-2f73,lesson_completed,quechua,7,,,,,,,,1619434,2026-11-06T18:26:59.434Z
+aa521a728831a4f4,bde09dba-da0d-98e9,lesson_started,quechua,9,,,,,,,,,2026-11-07T19:08:20.444Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,90,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,13182,2026-11-07T19:08:37.854Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,91,,translate,incorrecto,huasi,wasi,1,17263,2026-11-07T19:08:49.641Z
+aa521a728831a4f4,bde09dba-da0d-98e9,audio_played,quechua,9,,901,,,,,,,2026-11-07T19:08:50.541Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,92,,translate,variante,punchay,p'unchay,1,5360,2026-11-07T19:09:03.333Z
+aa521a728831a4f4,bde09dba-da0d-98e9,audio_played,quechua,9,,902,,,,,,,2026-11-07T19:09:04.233Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,93,,translate,variante,qocha,qucha,1,13543,2026-11-07T19:09:07.335Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,94,,true_false,incorrecto,Verdadera,Verdadero,1,15492,2026-11-07T19:09:23.575Z
+aa521a728831a4f4,bde09dba-da0d-98e9,exercise_answered,quechua,9,95,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,7859,2026-11-07T19:09:27.709Z
+aa521a728831a4f4,bde09dba-da0d-98e9,lesson_completed,quechua,9,,,,,,,,4170709,2026-11-07T19:09:30.709Z
+3e78a126629ebd61,5f0cb596-fc71-92de,lesson_started,aymara,14,,,,,,,,,2026-11-03T20:09:39.044Z
+3e78a126629ebd61,5f0cb596-fc71-92de,exercise_answered,aymara,14,140,,multiple_choice,incorrecto,Aski urukipana,Kamisaraki,1,13331,2026-11-03T20:09:48.969Z
+3e78a126629ebd61,5f0cb596-fc71-92de,audio_played,aymara,14,,1400,,,,,,,2026-11-03T20:09:49.869Z
+3e78a126629ebd61,5f0cb596-fc71-92de,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,13488,2026-11-03T20:10:08.407Z
+3e78a126629ebd61,5f0cb596-fc71-92de,exercise_answered,aymara,14,142,,translate,variante,chuqi,ch'uqi,1,6070,2026-11-03T20:10:19.256Z
+3e78a126629ebd61,5f0cb596-fc71-92de,exercise_answered,aymara,14,143,,translate,incorrecto,uma,uta,1,12164,2026-11-03T20:10:29.172Z
+3e78a126629ebd61,5f0cb596-fc71-92de,exercise_answered,aymara,14,144,,true_false,incorrecto,Falsa,Falso,1,2697,2026-11-03T20:10:40.583Z
+3e78a126629ebd61,5f0cb596-fc71-92de,lesson_completed,aymara,14,,,,,,,,4243583,2026-11-03T20:10:43.583Z
+3e78a126629ebd61,284d66a2-f1a6-d776,lesson_started,aymara,16,,,,,,,,,2026-11-04T19:31:12.209Z
+3e78a126629ebd61,284d66a2-f1a6-d776,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,11363,2026-11-04T19:31:26.347Z
+3e78a126629ebd61,284d66a2-f1a6-d776,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,14419,2026-11-04T19:31:40.289Z
+3e78a126629ebd61,284d66a2-f1a6-d776,exercise_answered,aymara,16,162,,translate,variante,chuqi,ch'uqi,1,14453,2026-11-04T19:31:56.052Z
+3e78a126629ebd61,284d66a2-f1a6-d776,exercise_answered,aymara,16,163,,translate,incorrecto,uma,uta,1,13885,2026-11-04T19:32:08.160Z
+3e78a126629ebd61,284d66a2-f1a6-d776,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,11810,2026-11-04T19:32:14.194Z
+3e78a126629ebd61,284d66a2-f1a6-d776,lesson_completed,aymara,16,,,,,,,,1937194,2026-11-04T19:32:17.194Z
+3e78a126629ebd61,60eccab8-a042-bac0,lesson_started,aymara,18,,,,,,,,,2026-11-05T20:24:14.791Z
+3e78a126629ebd61,60eccab8-a042-bac0,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,13472,2026-11-05T20:24:19.447Z
+3e78a126629ebd61,60eccab8-a042-bac0,audio_played,aymara,18,,1800,,,,,,,2026-11-05T20:24:20.347Z
+3e78a126629ebd61,60eccab8-a042-bac0,exercise_answered,aymara,18,181,,translate,variante,hilata,jilata,1,7456,2026-11-05T20:24:43.199Z
+3e78a126629ebd61,60eccab8-a042-bac0,exercise_answered,aymara,18,182,,translate,correcto,ch'uqi,ch'uqi,1,10183,2026-11-05T20:24:55.636Z
+3e78a126629ebd61,60eccab8-a042-bac0,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,16503,2026-11-05T20:25:17.478Z
+3e78a126629ebd61,60eccab8-a042-bac0,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,5544,2026-11-05T20:25:29.675Z
+3e78a126629ebd61,60eccab8-a042-bac0,lesson_completed,aymara,18,,,,,,,,5132675,2026-11-05T20:25:32.675Z
+3e78a126629ebd61,fdab83c6-11da-d211,lesson_started,aymara,20,,,,,,,,,2026-11-06T19:46:24.409Z
+3e78a126629ebd61,fdab83c6-11da-d211,exercise_answered,aymara,20,200,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,9246,2026-11-06T19:46:35.686Z
+3e78a126629ebd61,fdab83c6-11da-d211,exercise_answered,aymara,20,201,,translate,correcto,jilata,jilata,1,8418,2026-11-06T19:46:58.566Z
+3e78a126629ebd61,fdab83c6-11da-d211,exercise_answered,aymara,20,202,,translate,incorrecto,chuqi,ch'uqi,1,6421,2026-11-06T19:47:06.877Z
+3e78a126629ebd61,fdab83c6-11da-d211,audio_played,aymara,20,,2002,,,,,,,2026-11-06T19:47:07.777Z
+3e78a126629ebd61,fdab83c6-11da-d211,exercise_answered,aymara,20,203,,translate,incorrecto,uma,uta,1,9668,2026-11-06T19:47:17.034Z
+3e78a126629ebd61,fdab83c6-11da-d211,audio_played,aymara,20,,2003,,,,,,,2026-11-06T19:47:17.934Z
+3e78a126629ebd61,fdab83c6-11da-d211,exercise_answered,aymara,20,204,,true_false,correcto,Falso,Falso,1,5109,2026-11-06T19:47:35.076Z
+3e78a126629ebd61,fdab83c6-11da-d211,lesson_completed,aymara,20,,,,,,,,2858076,2026-11-06T19:47:38.076Z
+3e78a126629ebd61,6484a818-7c5b-204d,lesson_started,aymara,22,,,,,,,,,2026-11-07T20:33:25.414Z
+3e78a126629ebd61,6484a818-7c5b-204d,exercise_answered,aymara,22,220,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,5866,2026-11-07T20:33:39.150Z
+3e78a126629ebd61,6484a818-7c5b-204d,exercise_answered,aymara,22,221,,translate,incorrecto,jilata,jilata,1,5818,2026-11-07T20:33:46.498Z
+3e78a126629ebd61,6484a818-7c5b-204d,audio_played,aymara,22,,2201,,,,,,,2026-11-07T20:33:47.398Z
+3e78a126629ebd61,6484a818-7c5b-204d,exercise_answered,aymara,22,222,,translate,correcto,ch'uqi,ch'uqi,1,4277,2026-11-07T20:33:51.398Z
+3e78a126629ebd61,6484a818-7c5b-204d,audio_played,aymara,22,,2202,,,,,,,2026-11-07T20:33:52.298Z
+3e78a126629ebd61,6484a818-7c5b-204d,exercise_answered,aymara,22,223,,translate,correcto,uta,uta,1,8432,2026-11-07T20:34:01.413Z
+3e78a126629ebd61,6484a818-7c5b-204d,exercise_answered,aymara,22,224,,true_false,incorrecto,Verdadero,Falso,1,5618,2026-11-07T20:34:14.047Z
+3e78a126629ebd61,6484a818-7c5b-204d,lesson_completed,aymara,22,,,,,,,,5657047,2026-11-07T20:34:17.047Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,lesson_started,quechua,1,,,,,,,,,2026-11-03T20:19:14.008Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,3554,2026-11-03T20:19:21.693Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,11,,translate,variante,huasi,wasi,1,16152,2026-11-03T20:19:37.956Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,12,,translate,variante,punchay,p'unchay,1,15163,2026-11-03T20:19:47.447Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,17162,2026-11-03T20:19:57.683Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,8192,2026-11-03T20:20:19.121Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,12871,2026-11-03T20:20:29.104Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,audio_played,quechua,1,,105,,,,,,,2026-11-03T20:20:30.004Z
+2ab6572e4fdfaa96,54bc85a3-abdd-8c11,lesson_completed,quechua,1,,,,,,,,1232104,2026-11-03T20:20:32.104Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,lesson_started,quechua,3,,,,,,,,,2026-11-04T21:43:34.251Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6787,2026-11-04T21:43:50.905Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,31,,translate,incorrecto,wasa,wasi,1,7626,2026-11-04T21:44:06.868Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,audio_played,quechua,3,,301,,,,,,,2026-11-04T21:44:07.768Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,12916,2026-11-04T21:44:29.967Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,2919,2026-11-04T21:44:52.485Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,34,,true_false,incorrecto,Falso,Verdadero,1,7401,2026-11-04T21:44:57.190Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,8544,2026-11-04T21:45:10.840Z
+2ab6572e4fdfaa96,37c0b277-a942-f2a5,lesson_completed,quechua,3,,,,,,,,6313840,2026-11-04T21:45:13.840Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,lesson_started,quechua,5,,,,,,,,,2026-11-05T20:17:30.735Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8469,2026-11-05T20:17:50.258Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,16034,2026-11-05T20:18:04.095Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,52,,translate,incorrecto,punchay,p'unchay,1,14862,2026-11-05T20:18:09.272Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,audio_played,quechua,5,,502,,,,,,,2026-11-05T20:18:10.172Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,53,,translate,incorrecto,qocha,qucha,1,16161,2026-11-05T20:18:25.921Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,16244,2026-11-05T20:18:47.721Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,14531,2026-11-05T20:18:51.824Z
+2ab6572e4fdfaa96,8ef06629-48c1-d652,lesson_completed,quechua,5,,,,,,,,1134824,2026-11-05T20:18:54.824Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,lesson_started,quechua,7,,,,,,,,,2026-11-06T21:15:54.827Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,16928,2026-11-06T21:16:14.613Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,14852,2026-11-06T21:16:34.247Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,72,,translate,incorrecto,p'unchaa,p'unchay,1,12166,2026-11-06T21:16:42.617Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,73,,translate,incorrecto,qucha,qucha,1,15189,2026-11-06T21:17:03.830Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,audio_played,quechua,7,,703,,,,,,,2026-11-06T21:17:04.730Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,4222,2026-11-06T21:17:23.448Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,8437,2026-11-06T21:17:46.620Z
+2ab6572e4fdfaa96,8dc3acc9-516a-01c5,lesson_completed,quechua,7,,,,,,,,4669620,2026-11-06T21:17:49.620Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,lesson_started,quechua,9,,,,,,,,,2026-11-07T20:54:25.161Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,90,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,9180,2026-11-07T20:54:45.258Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,audio_played,quechua,9,,900,,,,,,,2026-11-07T20:54:46.158Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,91,,translate,correcto,wasi,wasi,1,6960,2026-11-07T20:54:51.799Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,audio_played,quechua,9,,901,,,,,,,2026-11-07T20:54:52.699Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,92,,translate,incorrecto,punchay,p'unchay,1,15084,2026-11-07T20:55:14.311Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,audio_played,quechua,9,,902,,,,,,,2026-11-07T20:55:15.211Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,93,,translate,correcto,qucha,qucha,1,16910,2026-11-07T20:55:18.975Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,audio_played,quechua,9,,903,,,,,,,2026-11-07T20:55:19.875Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,94,,true_false,correcto,Verdadero,Verdadero,1,9849,2026-11-07T20:55:42.757Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,exercise_answered,quechua,9,95,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,10990,2026-11-07T20:55:53.020Z
+2ab6572e4fdfaa96,29345c0d-9f5c-33dd,lesson_completed,quechua,9,,,,,,,,3356020,2026-11-07T20:55:56.020Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,lesson_started,quechua,1,,,,,,,,,2026-11-03T22:08:28.993Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,17215,2026-11-03T22:08:36.195Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,15086,2026-11-03T22:08:58.442Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,12,,translate,incorrecto,punchay,p'unchay,1,14373,2026-11-03T22:09:06.014Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,2885,2026-11-03T22:09:24.343Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,5481,2026-11-03T22:09:38.625Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,6875,2026-11-03T22:09:46.426Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,audio_played,quechua,1,,105,,,,,,,2026-11-03T22:09:47.326Z
+2fbe66f4e5b70014,15cd2e62-90a8-3b4f,lesson_completed,quechua,1,,,,,,,,4189426,2026-11-03T22:09:49.426Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,lesson_started,quechua,3,,,,,,,,,2026-11-04T22:16:24.416Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,7910,2026-11-04T22:16:43.909Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,14667,2026-11-04T22:16:56.445Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,32,,translate,incorrecto,p'unchaa,p'unchay,1,8822,2026-11-04T22:17:13.375Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,33,,translate,incorrecto,qocha,qucha,1,12150,2026-11-04T22:17:26.915Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,5833,2026-11-04T22:17:47.247Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,5947,2026-11-04T22:18:03.206Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,audio_played,quechua,3,,305,,,,,,,2026-11-04T22:18:04.106Z
+2fbe66f4e5b70014,a0dbcf59-2023-2b7d,lesson_completed,quechua,3,,,,,,,,4686206,2026-11-04T22:18:06.206Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,lesson_started,quechua,5,,,,,,,,,2026-11-05T22:37:13.054Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,3412,2026-11-05T22:37:26.532Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,51,,translate,incorrecto,wasa,wasi,1,3544,2026-11-05T22:37:32.541Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,6465,2026-11-05T22:37:40.408Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,53,,translate,incorrecto,qocha,qucha,1,15341,2026-11-05T22:37:45.134Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,15119,2026-11-05T22:38:05.144Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,exercise_answered,quechua,5,55,,word_order,incorrecto,Allin p'unchay mamaa,Allin p'unchay mamay,1,11950,2026-11-05T22:38:21.742Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,audio_played,quechua,5,,505,,,,,,,2026-11-05T22:38:22.642Z
+2fbe66f4e5b70014,df95daf2-1a35-2586,lesson_completed,quechua,5,,,,,,,,5904742,2026-11-05T22:38:24.742Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,lesson_started,quechua,7,,,,,,,,,2026-11-06T21:59:50.045Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,16550,2026-11-06T21:59:59.769Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,5860,2026-11-06T22:00:17.616Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,15085,2026-11-06T22:00:28.555Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,73,,translate,variante,qocha,qucha,1,8056,2026-11-06T22:00:33.836Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,14851,2026-11-06T22:00:50.893Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,audio_played,quechua,7,,704,,,,,,,2026-11-06T22:00:51.793Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,4902,2026-11-06T22:01:13.616Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,audio_played,quechua,7,,705,,,,,,,2026-11-06T22:01:14.516Z
+2fbe66f4e5b70014,136a626d-9e56-d1d9,lesson_completed,quechua,7,,,,,,,,3676616,2026-11-06T22:01:16.616Z
+3bb547ed27d39024,881cb4f7-3136-ef99,lesson_started,aymara,14,,,,,,,,,2026-11-03T23:50:15.557Z
+3bb547ed27d39024,881cb4f7-3136-ef99,exercise_answered,aymara,14,140,,multiple_choice,incorrecto,Aski urukipana,Kamisaraki,1,14187,2026-11-03T23:50:28.946Z
+3bb547ed27d39024,881cb4f7-3136-ef99,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,11441,2026-11-03T23:50:38.449Z
+3bb547ed27d39024,881cb4f7-3136-ef99,exercise_answered,aymara,14,142,,translate,correcto,ch'uqi,ch'uqi,1,9287,2026-11-03T23:50:51.061Z
+3bb547ed27d39024,881cb4f7-3136-ef99,exercise_answered,aymara,14,143,,translate,correcto,uta,uta,1,8990,2026-11-03T23:51:08.974Z
+3bb547ed27d39024,881cb4f7-3136-ef99,audio_played,aymara,14,,1403,,,,,,,2026-11-03T23:51:09.874Z
+3bb547ed27d39024,881cb4f7-3136-ef99,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,14017,2026-11-03T23:51:26.973Z
+3bb547ed27d39024,881cb4f7-3136-ef99,audio_played,aymara,14,,1404,,,,,,,2026-11-03T23:51:27.873Z
+3bb547ed27d39024,881cb4f7-3136-ef99,lesson_completed,aymara,14,,,,,,,,6689973,2026-11-03T23:51:29.973Z
+3bb547ed27d39024,e4a91d85-6e31-7614,lesson_started,aymara,16,,,,,,,,,2026-11-04T23:53:24.701Z
+3bb547ed27d39024,e4a91d85-6e31-7614,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,8847,2026-11-04T23:53:31.840Z
+3bb547ed27d39024,e4a91d85-6e31-7614,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,13729,2026-11-04T23:53:52.002Z
+3bb547ed27d39024,e4a91d85-6e31-7614,exercise_answered,aymara,16,162,,translate,correcto,ch'uqi,ch'uqi,1,9595,2026-11-04T23:54:03.009Z
+3bb547ed27d39024,e4a91d85-6e31-7614,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,9406,2026-11-04T23:54:09.311Z
+3bb547ed27d39024,e4a91d85-6e31-7614,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,9229,2026-11-04T23:54:26.830Z
+3bb547ed27d39024,e4a91d85-6e31-7614,audio_played,aymara,16,,1604,,,,,,,2026-11-04T23:54:27.730Z
+3bb547ed27d39024,e4a91d85-6e31-7614,lesson_completed,aymara,16,,,,,,,,6869830,2026-11-04T23:54:29.830Z
+3bb547ed27d39024,461efbd2-3773-d160,lesson_started,aymara,18,,,,,,,,,2026-11-05T23:18:29.545Z
+3bb547ed27d39024,461efbd2-3773-d160,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,10347,2026-11-05T23:18:42.235Z
+3bb547ed27d39024,461efbd2-3773-d160,exercise_answered,aymara,18,181,,translate,incorrecto,hilata,jilata,1,9391,2026-11-05T23:18:51.500Z
+3bb547ed27d39024,461efbd2-3773-d160,exercise_answered,aymara,18,182,,translate,variante,chuqi,ch'uqi,1,4989,2026-11-05T23:19:10.752Z
+3bb547ed27d39024,461efbd2-3773-d160,audio_played,aymara,18,,1802,,,,,,,2026-11-05T23:19:11.652Z
+3bb547ed27d39024,461efbd2-3773-d160,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,7392,2026-11-05T23:19:23.829Z
+3bb547ed27d39024,461efbd2-3773-d160,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,12935,2026-11-05T23:19:44.736Z
+3bb547ed27d39024,461efbd2-3773-d160,lesson_completed,aymara,18,,,,,,,,4787736,2026-11-05T23:19:47.736Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,lesson_started,quechua,1,,,,,,,,,2026-11-04T00:19:24.266Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,5372,2026-11-04T00:19:38.326Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,13117,2026-11-04T00:19:48.801Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,12,,translate,incorrecto,p'unchaa,p'unchay,1,14378,2026-11-04T00:19:58.532Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,13,,translate,variante,qocha,qucha,1,4864,2026-11-04T00:20:11.543Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,11824,2026-11-04T00:20:32.741Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,5915,2026-11-04T00:20:51.775Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,audio_played,quechua,1,,105,,,,,,,2026-11-04T00:20:52.675Z
+c1525d1a80a95e03,7ff70e6e-8a74-b2d7,lesson_completed,quechua,1,,,,,,,,4854775,2026-11-04T00:20:54.775Z
+c1525d1a80a95e03,0423c23a-4311-1363,lesson_started,quechua,3,,,,,,,,,2026-11-04T23:44:14.146Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,2826,2026-11-04T23:44:37.608Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,3148,2026-11-04T23:44:49.427Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,32,,translate,variante,punchay,p'unchay,1,5323,2026-11-04T23:45:11.135Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,33,,translate,variante,qocha,qucha,1,9947,2026-11-04T23:45:17.468Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,12854,2026-11-04T23:45:31.830Z
+c1525d1a80a95e03,0423c23a-4311-1363,audio_played,quechua,3,,304,,,,,,,2026-11-04T23:45:32.730Z
+c1525d1a80a95e03,0423c23a-4311-1363,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,11459,2026-11-04T23:45:39.905Z
+c1525d1a80a95e03,0423c23a-4311-1363,lesson_completed,quechua,3,,,,,,,,2742905,2026-11-04T23:45:42.905Z
+c1525d1a80a95e03,19b94341-3535-5cf7,lesson_started,quechua,5,,,,,,,,,2026-11-06T00:10:27.686Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,17229,2026-11-06T00:10:32.777Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,3819,2026-11-06T00:10:51.287Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,3073,2026-11-06T00:11:14.826Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,53,,translate,variante,qocha,qucha,1,14919,2026-11-06T00:11:25.580Z
+c1525d1a80a95e03,19b94341-3535-5cf7,audio_played,quechua,5,,503,,,,,,,2026-11-06T00:11:26.480Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,7482,2026-11-06T00:11:38.377Z
+c1525d1a80a95e03,19b94341-3535-5cf7,audio_played,quechua,5,,504,,,,,,,2026-11-06T00:11:39.277Z
+c1525d1a80a95e03,19b94341-3535-5cf7,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,12804,2026-11-06T00:11:47.827Z
+c1525d1a80a95e03,19b94341-3535-5cf7,lesson_completed,quechua,5,,,,,,,,4310827,2026-11-06T00:11:50.827Z
+dee67635102aad1e,fa70166a-7f9f-6345,lesson_started,quechua,1,,,,,,,,,2026-11-04T01:51:20.934Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10354,2026-11-04T01:51:44.847Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,11,,translate,variante,huasi,wasi,1,3997,2026-11-04T01:51:54.330Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,12,,translate,variante,punchay,p'unchay,1,9166,2026-11-04T01:52:09.014Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,10853,2026-11-04T01:52:24.702Z
+dee67635102aad1e,fa70166a-7f9f-6345,audio_played,quechua,1,,103,,,,,,,2026-11-04T01:52:25.602Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,14313,2026-11-04T01:52:44.495Z
+dee67635102aad1e,fa70166a-7f9f-6345,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,17043,2026-11-04T01:53:07.649Z
+dee67635102aad1e,fa70166a-7f9f-6345,audio_played,quechua,1,,105,,,,,,,2026-11-04T01:53:08.549Z
+dee67635102aad1e,fa70166a-7f9f-6345,lesson_completed,quechua,1,,,,,,,,6790649,2026-11-04T01:53:10.649Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,lesson_started,quechua,3,,,,,,,,,2026-11-05T00:33:54.173Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,30,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,6117,2026-11-05T00:34:00.355Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,audio_played,quechua,3,,300,,,,,,,2026-11-05T00:34:01.255Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,9466,2026-11-05T00:34:07.971Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,32,,translate,variante,punchay,p'unchay,1,3822,2026-11-05T00:34:25.443Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,9757,2026-11-05T00:34:36.364Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,34,,true_false,incorrecto,Verdadera,Verdadero,1,16703,2026-11-05T00:34:55.195Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,16470,2026-11-05T00:35:00.835Z
+dee67635102aad1e,54bdc6e7-7877-0bb1,lesson_completed,quechua,3,,,,,,,,2103835,2026-11-05T00:35:03.835Z
+2df0b4ab733b2424,71e76b95-c53a-897a,lesson_started,aymara,14,,,,,,,,,2026-11-04T01:57:07.493Z
+2df0b4ab733b2424,71e76b95-c53a-897a,exercise_answered,aymara,14,140,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,3747,2026-11-04T01:57:20.020Z
+2df0b4ab733b2424,71e76b95-c53a-897a,audio_played,aymara,14,,1400,,,,,,,2026-11-04T01:57:20.920Z
+2df0b4ab733b2424,71e76b95-c53a-897a,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,13503,2026-11-04T01:57:30.343Z
+2df0b4ab733b2424,71e76b95-c53a-897a,exercise_answered,aymara,14,142,,translate,correcto,ch'uqi,ch'uqi,1,14567,2026-11-04T01:57:40.278Z
+2df0b4ab733b2424,71e76b95-c53a-897a,audio_played,aymara,14,,1402,,,,,,,2026-11-04T01:57:41.178Z
+2df0b4ab733b2424,71e76b95-c53a-897a,exercise_answered,aymara,14,143,,translate,correcto,uta,uta,1,15520,2026-11-04T01:58:04.119Z
+2df0b4ab733b2424,71e76b95-c53a-897a,audio_played,aymara,14,,1403,,,,,,,2026-11-04T01:58:05.019Z
+2df0b4ab733b2424,71e76b95-c53a-897a,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,8638,2026-11-04T01:58:22.419Z
+2df0b4ab733b2424,71e76b95-c53a-897a,lesson_completed,aymara,14,,,,,,,,3505419,2026-11-04T01:58:25.419Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,lesson_started,aymara,16,,,,,,,,,2026-11-05T01:03:37.685Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,17349,2026-11-05T01:03:56.909Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,13244,2026-11-05T01:04:04.971Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,exercise_answered,aymara,16,162,,translate,correcto,ch'uqi,ch'uqi,1,10913,2026-11-05T01:04:21.164Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,17016,2026-11-05T01:04:32.890Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,audio_played,aymara,16,,1603,,,,,,,2026-11-05T01:04:33.790Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,3543,2026-11-05T01:04:40.742Z
+2df0b4ab733b2424,8e1adea0-0c3c-e667,lesson_completed,aymara,16,,,,,,,,283742,2026-11-05T01:04:43.742Z
+2df0b4ab733b2424,73948544-21ba-fab2,lesson_started,aymara,18,,,,,,,,,2026-11-06T01:21:30.925Z
+2df0b4ab733b2424,73948544-21ba-fab2,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,4817,2026-11-06T01:21:35.477Z
+2df0b4ab733b2424,73948544-21ba-fab2,exercise_answered,aymara,18,181,,translate,correcto,jilata,jilata,1,15669,2026-11-06T01:21:57.907Z
+2df0b4ab733b2424,73948544-21ba-fab2,audio_played,aymara,18,,1801,,,,,,,2026-11-06T01:21:58.807Z
+2df0b4ab733b2424,73948544-21ba-fab2,exercise_answered,aymara,18,182,,translate,incorrecto,ch'uqa,ch'uqi,1,10380,2026-11-06T01:22:15.497Z
+2df0b4ab733b2424,73948544-21ba-fab2,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,16963,2026-11-06T01:22:21.799Z
+2df0b4ab733b2424,73948544-21ba-fab2,audio_played,aymara,18,,1803,,,,,,,2026-11-06T01:22:22.699Z
+2df0b4ab733b2424,73948544-21ba-fab2,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,4183,2026-11-06T01:22:40.944Z
+2df0b4ab733b2424,73948544-21ba-fab2,lesson_completed,aymara,18,,,,,,,,1363944,2026-11-06T01:22:43.944Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,lesson_started,quechua,1,,,,,,,,,2026-11-04T03:41:49.274Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6229,2026-11-04T03:42:05.461Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,11,,translate,variante,huasi,wasi,1,2758,2026-11-04T03:42:19.732Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,12,,translate,variante,punchay,p'unchay,1,10103,2026-11-04T03:42:23.738Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,16775,2026-11-04T03:42:34.481Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,4297,2026-11-04T03:42:39.978Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,15125,2026-11-04T03:42:48.171Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,audio_played,quechua,1,,105,,,,,,,2026-11-04T03:42:49.071Z
+d46fd567f2576a7a,53a19732-1df8-1b8d,lesson_completed,quechua,1,,,,,,,,6171171,2026-11-04T03:42:51.171Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,lesson_started,quechua,3,,,,,,,,,2026-11-05T03:21:44.883Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,30,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,14721,2026-11-05T03:22:01.244Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,audio_played,quechua,3,,300,,,,,,,2026-11-05T03:22:02.144Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,31,,translate,variante,huasi,wasi,1,8210,2026-11-05T03:22:22.854Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,13926,2026-11-05T03:22:42.756Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,8964,2026-11-05T03:23:04.911Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,34,,true_false,incorrecto,Falso,Verdadero,1,16341,2026-11-05T03:23:27.090Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,3465,2026-11-05T03:23:50.053Z
+d46fd567f2576a7a,57f09c54-d0cc-ec7b,lesson_completed,quechua,3,,,,,,,,5033053,2026-11-05T03:23:53.053Z
+d46fd567f2576a7a,c744ed30-2922-276f,lesson_started,quechua,5,,,,,,,,,2026-11-06T02:07:05.476Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,12568,2026-11-06T02:07:18.151Z
+d46fd567f2576a7a,c744ed30-2922-276f,audio_played,quechua,5,,500,,,,,,,2026-11-06T02:07:19.051Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,51,,translate,incorrecto,wasa,wasi,1,16658,2026-11-06T02:07:30.466Z
+d46fd567f2576a7a,c744ed30-2922-276f,audio_played,quechua,5,,501,,,,,,,2026-11-06T02:07:31.366Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,3842,2026-11-06T02:07:50.458Z
+d46fd567f2576a7a,c744ed30-2922-276f,audio_played,quechua,5,,502,,,,,,,2026-11-06T02:07:51.358Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,12608,2026-11-06T02:08:03.428Z
+d46fd567f2576a7a,c744ed30-2922-276f,audio_played,quechua,5,,503,,,,,,,2026-11-06T02:08:04.328Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,13322,2026-11-06T02:08:25.342Z
+d46fd567f2576a7a,c744ed30-2922-276f,audio_played,quechua,5,,504,,,,,,,2026-11-06T02:08:26.242Z
+d46fd567f2576a7a,c744ed30-2922-276f,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,13232,2026-11-06T02:08:29.930Z
+d46fd567f2576a7a,c744ed30-2922-276f,lesson_completed,quechua,5,,,,,,,,512930,2026-11-06T02:08:32.930Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,lesson_started,quechua,1,,,,,,,,,2026-11-04T04:27:08.187Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,10,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,7907,2026-11-04T04:27:17.535Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,audio_played,quechua,1,,100,,,,,,,2026-11-04T04:27:18.435Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,12833,2026-11-04T04:27:23.656Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,3060,2026-11-04T04:27:43.507Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,13,,translate,incorrecto,qocha,qucha,1,17126,2026-11-04T04:28:06.707Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,audio_played,quechua,1,,103,,,,,,,2026-11-04T04:28:07.607Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,9393,2026-11-04T04:28:23.794Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,5709,2026-11-04T04:28:34.187Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,audio_played,quechua,1,,105,,,,,,,2026-11-04T04:28:35.087Z
+3599e82f9d80a9fd,4dedff3b-9e11-ae88,lesson_completed,quechua,1,,,,,,,,5317187,2026-11-04T04:28:37.187Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,lesson_started,quechua,3,,,,,,,,,2026-11-05T04:23:28.358Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10814,2026-11-05T04:23:34.442Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,audio_played,quechua,3,,300,,,,,,,2026-11-05T04:23:35.342Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,6075,2026-11-05T04:23:44.810Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,17425,2026-11-05T04:23:58.454Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,audio_played,quechua,3,,302,,,,,,,2026-11-05T04:23:59.354Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,4113,2026-11-05T04:24:05.101Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,7419,2026-11-05T04:24:09.520Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9094,2026-11-05T04:24:18.370Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,audio_played,quechua,3,,305,,,,,,,2026-11-05T04:24:19.270Z
+3599e82f9d80a9fd,2e4de981-5c2f-d209,lesson_completed,quechua,3,,,,,,,,5061370,2026-11-05T04:24:21.370Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,lesson_started,quechua,5,,,,,,,,,2026-11-06T03:06:14.320Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10062,2026-11-06T03:06:24.548Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,16247,2026-11-06T03:06:37.775Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,audio_played,quechua,5,,501,,,,,,,2026-11-06T03:06:38.675Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,52,,translate,variante,punchay,p'unchay,1,11227,2026-11-06T03:07:01.616Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,7202,2026-11-06T03:07:25.069Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,2827,2026-11-06T03:07:42.925Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,14873,2026-11-06T03:08:02.678Z
+3599e82f9d80a9fd,cd6c7cb9-9c2b-6edc,lesson_completed,quechua,5,,,,,,,,485678,2026-11-06T03:08:05.678Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,lesson_started,quechua,7,,,,,,,,,2026-11-07T03:24:15.558Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,9030,2026-11-07T03:24:32.990Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,audio_played,quechua,7,,700,,,,,,,2026-11-07T03:24:33.890Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,4503,2026-11-07T03:24:50.727Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,14612,2026-11-07T03:25:01.064Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,73,,translate,correcto,qucha,qucha,1,12927,2026-11-07T03:25:16.070Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,4026,2026-11-07T03:25:38.474Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,16616,2026-11-07T03:25:46.538Z
+3599e82f9d80a9fd,4eb521c3-242a-d3be,lesson_completed,quechua,7,,,,,,,,1549538,2026-11-07T03:25:49.538Z
+7071d12dc0664134,a618fbfb-c824-a4c3,lesson_started,aymara,14,,,,,,,,,2026-11-04T05:09:46.100Z
+7071d12dc0664134,a618fbfb-c824-a4c3,exercise_answered,aymara,14,140,,multiple_choice,incorrecto,Kamisaraka,Kamisaraki,1,5126,2026-11-04T05:09:51.626Z
+7071d12dc0664134,a618fbfb-c824-a4c3,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,15434,2026-11-04T05:10:10.503Z
+7071d12dc0664134,a618fbfb-c824-a4c3,audio_played,aymara,14,,1401,,,,,,,2026-11-04T05:10:11.403Z
+7071d12dc0664134,a618fbfb-c824-a4c3,exercise_answered,aymara,14,142,,translate,correcto,ch'uqi,ch'uqi,1,16817,2026-11-04T05:10:20.329Z
+7071d12dc0664134,a618fbfb-c824-a4c3,exercise_answered,aymara,14,143,,translate,correcto,uta,uta,1,5760,2026-11-04T05:10:37.110Z
+7071d12dc0664134,a618fbfb-c824-a4c3,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,9107,2026-11-04T05:10:47.860Z
+7071d12dc0664134,a618fbfb-c824-a4c3,audio_played,aymara,14,,1404,,,,,,,2026-11-04T05:10:48.760Z
+7071d12dc0664134,a618fbfb-c824-a4c3,lesson_completed,aymara,14,,,,,,,,4250860,2026-11-04T05:10:50.860Z
+7071d12dc0664134,820c56dd-0136-3a29,lesson_started,aymara,16,,,,,,,,,2026-11-05T04:47:13.958Z
+7071d12dc0664134,820c56dd-0136-3a29,exercise_answered,aymara,16,160,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,8478,2026-11-05T04:47:29.086Z
+7071d12dc0664134,820c56dd-0136-3a29,exercise_answered,aymara,16,161,,translate,incorrecto,jilata,jilata,1,15656,2026-11-05T04:47:36.510Z
+7071d12dc0664134,820c56dd-0136-3a29,exercise_answered,aymara,16,162,,translate,incorrecto,ch'uqa,ch'uqi,1,13117,2026-11-05T04:47:49.077Z
+7071d12dc0664134,820c56dd-0136-3a29,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,5534,2026-11-05T04:48:09.631Z
+7071d12dc0664134,820c56dd-0136-3a29,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,17180,2026-11-05T04:48:21.270Z
+7071d12dc0664134,820c56dd-0136-3a29,lesson_completed,aymara,16,,,,,,,,2904270,2026-11-05T04:48:24.270Z
+be982517553b03d6,ac3f8fc7-2838-d430,lesson_started,quechua,1,,,,,,,,,2026-11-04T06:53:18.042Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8378,2026-11-04T06:53:32.259Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,5358,2026-11-04T06:53:49.135Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,12,,translate,variante,punchay,p'unchay,1,11869,2026-11-04T06:54:03.004Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,3520,2026-11-04T06:54:26.766Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,3266,2026-11-04T06:54:38.718Z
+be982517553b03d6,ac3f8fc7-2838-d430,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,14425,2026-11-04T06:54:49.054Z
+be982517553b03d6,ac3f8fc7-2838-d430,lesson_completed,quechua,1,,,,,,,,6892054,2026-11-04T06:54:52.054Z
+be982517553b03d6,a3c1c8dd-f470-84b1,lesson_started,quechua,3,,,,,,,,,2026-11-05T06:01:52.262Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,30,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,9594,2026-11-05T06:01:58.475Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,8853,2026-11-05T06:02:04.916Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,10560,2026-11-05T06:02:21.853Z
+be982517553b03d6,a3c1c8dd-f470-84b1,audio_played,quechua,3,,302,,,,,,,2026-11-05T06:02:22.753Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,33,,translate,variante,qocha,qucha,1,14401,2026-11-05T06:02:37.571Z
+be982517553b03d6,a3c1c8dd-f470-84b1,audio_played,quechua,3,,303,,,,,,,2026-11-05T06:02:38.471Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,10005,2026-11-05T06:02:54.333Z
+be982517553b03d6,a3c1c8dd-f470-84b1,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,10620,2026-11-05T06:03:00.258Z
+be982517553b03d6,a3c1c8dd-f470-84b1,lesson_completed,quechua,3,,,,,,,,3783258,2026-11-05T06:03:03.258Z
+be982517553b03d6,d303f83b-40d6-ceef,lesson_started,quechua,5,,,,,,,,,2026-11-06T06:26:31.628Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,3647,2026-11-06T06:26:38.994Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,51,,translate,variante,huasi,wasi,1,8244,2026-11-06T06:26:43.072Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,9059,2026-11-06T06:26:57.232Z
+be982517553b03d6,d303f83b-40d6-ceef,audio_played,quechua,5,,502,,,,,,,2026-11-06T06:26:58.132Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,3745,2026-11-06T06:27:15.046Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,54,,true_false,correcto,Verdadero,Verdadero,1,12870,2026-11-06T06:27:29.301Z
+be982517553b03d6,d303f83b-40d6-ceef,exercise_answered,quechua,5,55,,word_order,incorrecto,Allin p'unchay mamaa,Allin p'unchay mamay,1,12739,2026-11-06T06:27:42.112Z
+be982517553b03d6,d303f83b-40d6-ceef,lesson_completed,quechua,5,,,,,,,,5265112,2026-11-06T06:27:45.112Z
+be982517553b03d6,f36be344-b415-21f8,lesson_started,quechua,7,,,,,,,,,2026-11-07T06:43:16.068Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8079,2026-11-07T06:43:35.070Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,71,,translate,incorrecto,huasi,wasi,1,13319,2026-11-07T06:43:54.634Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,6653,2026-11-07T06:43:59.261Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,73,,translate,correcto,qucha,qucha,1,4266,2026-11-07T06:44:06.149Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,5072,2026-11-07T06:44:10.777Z
+be982517553b03d6,f36be344-b415-21f8,audio_played,quechua,7,,704,,,,,,,2026-11-07T06:44:11.677Z
+be982517553b03d6,f36be344-b415-21f8,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,11935,2026-11-07T06:44:25.383Z
+be982517553b03d6,f36be344-b415-21f8,lesson_completed,quechua,7,,,,,,,,6268383,2026-11-07T06:44:28.383Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,lesson_started,quechua,1,,,,,,,,,2026-11-04T07:40:19.343Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,10,,multiple_choice,incorrecto,Allin p'unchaa,Allin p'unchay,1,6904,2026-11-04T07:40:40.716Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,11,,translate,variante,huasi,wasi,1,4955,2026-11-04T07:41:02.101Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,10363,2026-11-04T07:41:06.918Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,audio_played,quechua,1,,102,,,,,,,2026-11-04T07:41:07.818Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,8347,2026-11-04T07:41:11.077Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,9015,2026-11-04T07:41:16.865Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,3142,2026-11-04T07:41:26.903Z
+fdcd3f85510ecb93,3755fb4b-572a-f73b,lesson_completed,quechua,1,,,,,,,,6089903,2026-11-04T07:41:29.903Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,lesson_started,quechua,3,,,,,,,,,2026-11-05T06:17:55.977Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,9089,2026-11-05T06:18:01.749Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,31,,translate,incorrecto,wasa,wasi,1,10060,2026-11-05T06:18:16.910Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,16517,2026-11-05T06:18:33.652Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,audio_played,quechua,3,,302,,,,,,,2026-11-05T06:18:34.552Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,33,,translate,incorrecto,qucha,qucha,1,15648,2026-11-05T06:18:57.591Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,audio_played,quechua,3,,303,,,,,,,2026-11-05T06:18:58.491Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,9119,2026-11-05T06:19:20.965Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9440,2026-11-05T06:19:40.536Z
+fdcd3f85510ecb93,f5443671-fe40-10fd,lesson_completed,quechua,3,,,,,,,,1183536,2026-11-05T06:19:43.536Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,lesson_started,aymara,14,,,,,,,,,2026-11-04T08:05:34.321Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,exercise_answered,aymara,14,140,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,3822,2026-11-04T08:05:38.434Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,11516,2026-11-04T08:05:45.177Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,exercise_answered,aymara,14,142,,translate,variante,chuqi,ch'uqi,1,9755,2026-11-04T08:05:53.729Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,exercise_answered,aymara,14,143,,translate,incorrecto,uta,uta,1,7549,2026-11-04T08:06:06.801Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,8199,2026-11-04T08:06:28.532Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,audio_played,aymara,14,,1404,,,,,,,2026-11-04T08:06:29.432Z
+96e12c9f74d20275,9bb53d0b-0e46-4f2f,lesson_completed,aymara,14,,,,,,,,3991532,2026-11-04T08:06:31.532Z
+96e12c9f74d20275,32497659-d2c8-0b9e,lesson_started,aymara,16,,,,,,,,,2026-11-05T07:14:05.254Z
+96e12c9f74d20275,32497659-d2c8-0b9e,exercise_answered,aymara,16,160,,multiple_choice,incorrecto,Kamisaraka,Kamisaraki,1,10828,2026-11-05T07:14:25.670Z
+96e12c9f74d20275,32497659-d2c8-0b9e,exercise_answered,aymara,16,161,,translate,correcto,jilata,jilata,1,14293,2026-11-05T07:14:35.921Z
+96e12c9f74d20275,32497659-d2c8-0b9e,exercise_answered,aymara,16,162,,translate,correcto,ch'uqi,ch'uqi,1,13141,2026-11-05T07:14:55.185Z
+96e12c9f74d20275,32497659-d2c8-0b9e,audio_played,aymara,16,,1602,,,,,,,2026-11-05T07:14:56.085Z
+96e12c9f74d20275,32497659-d2c8-0b9e,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,14686,2026-11-05T07:15:09.439Z
+96e12c9f74d20275,32497659-d2c8-0b9e,audio_played,aymara,16,,1603,,,,,,,2026-11-05T07:15:10.339Z
+96e12c9f74d20275,32497659-d2c8-0b9e,exercise_answered,aymara,16,164,,true_false,correcto,Falso,Falso,1,10256,2026-11-05T07:15:26.612Z
+96e12c9f74d20275,32497659-d2c8-0b9e,audio_played,aymara,16,,1604,,,,,,,2026-11-05T07:15:27.512Z
+96e12c9f74d20275,32497659-d2c8-0b9e,lesson_completed,aymara,16,,,,,,,,929612,2026-11-05T07:15:29.612Z
+96e12c9f74d20275,02430d8e-e805-fdce,lesson_started,aymara,18,,,,,,,,,2026-11-06T08:03:40.195Z
+96e12c9f74d20275,02430d8e-e805-fdce,exercise_answered,aymara,18,180,,multiple_choice,correcto,Kamisaraki,Kamisaraki,1,5635,2026-11-06T08:04:02.024Z
+96e12c9f74d20275,02430d8e-e805-fdce,exercise_answered,aymara,18,181,,translate,correcto,jilata,jilata,1,14373,2026-11-06T08:04:14.288Z
+96e12c9f74d20275,02430d8e-e805-fdce,audio_played,aymara,18,,1801,,,,,,,2026-11-06T08:04:15.188Z
+96e12c9f74d20275,02430d8e-e805-fdce,exercise_answered,aymara,18,182,,translate,correcto,ch'uqi,ch'uqi,1,10923,2026-11-06T08:04:37.161Z
+96e12c9f74d20275,02430d8e-e805-fdce,exercise_answered,aymara,18,183,,translate,correcto,uta,uta,1,6860,2026-11-06T08:04:52.618Z
+96e12c9f74d20275,02430d8e-e805-fdce,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,12868,2026-11-06T08:05:15.317Z
+96e12c9f74d20275,02430d8e-e805-fdce,lesson_completed,aymara,18,,,,,,,,3918317,2026-11-06T08:05:18.317Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,lesson_started,quechua,1,,,,,,,,,2026-11-04T08:32:10.270Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10263,2026-11-04T08:32:26.732Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,3050,2026-11-04T08:32:39.682Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,audio_played,quechua,1,,101,,,,,,,2026-11-04T08:32:40.582Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,16607,2026-11-04T08:32:58.618Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,13,,translate,variante,qocha,qucha,1,11490,2026-11-04T08:33:04.543Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,13162,2026-11-04T08:33:27.395Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,12949,2026-11-04T08:33:43.371Z
+3f395b58dea24ae8,42192ed8-4e6e-7f9e,lesson_completed,quechua,1,,,,,,,,2026371,2026-11-04T08:33:46.371Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,lesson_started,quechua,3,,,,,,,,,2026-11-05T09:35:38.066Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,10374,2026-11-05T09:35:49.878Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,audio_played,quechua,3,,300,,,,,,,2026-11-05T09:35:50.778Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,31,,translate,incorrecto,huasi,wasi,1,15623,2026-11-05T09:35:56.433Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,15706,2026-11-05T09:36:08.487Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,33,,translate,incorrecto,qocha,qucha,1,2507,2026-11-05T09:36:16.274Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,13852,2026-11-05T09:36:35.551Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,8407,2026-11-05T09:36:45.517Z
+3f395b58dea24ae8,498cbda9-66c5-fc62,lesson_completed,quechua,3,,,,,,,,5808517,2026-11-05T09:36:48.517Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,lesson_started,quechua,1,,,,,,,,,2026-11-04T10:36:47.061Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,11873,2026-11-04T10:37:09.125Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,13870,2026-11-04T10:37:27.337Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,11417,2026-11-04T10:37:38.755Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,3215,2026-11-04T10:37:48.330Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,13004,2026-11-04T10:38:01.226Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9058,2026-11-04T10:38:10.972Z
+30999d0f3d32b40c,83d51f3e-c499-5e36,lesson_completed,quechua,1,,,,,,,,5893972,2026-11-04T10:38:13.972Z
+30999d0f3d32b40c,f10bc664-608d-8852,lesson_started,quechua,3,,,,,,,,,2026-11-05T10:50:18.850Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,16607,2026-11-05T10:50:39.358Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,11540,2026-11-05T10:51:01.759Z
+30999d0f3d32b40c,f10bc664-608d-8852,audio_played,quechua,3,,301,,,,,,,2026-11-05T10:51:02.659Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,32,,translate,variante,punchay,p'unchay,1,10140,2026-11-05T10:51:23.581Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,33,,translate,incorrecto,qocha,qucha,1,11663,2026-11-05T10:51:35.701Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,11446,2026-11-05T10:51:50.516Z
+30999d0f3d32b40c,f10bc664-608d-8852,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9853,2026-11-05T10:51:56.255Z
+30999d0f3d32b40c,f10bc664-608d-8852,lesson_completed,quechua,3,,,,,,,,6719255,2026-11-05T10:51:59.255Z
+30999d0f3d32b40c,366ccc38-d90e-583c,lesson_started,quechua,5,,,,,,,,,2026-11-06T10:49:47.939Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,12808,2026-11-06T10:49:56.993Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,10754,2026-11-06T10:50:09.798Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,17296,2026-11-06T10:50:27.906Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,53,,translate,variante,qocha,qucha,1,6300,2026-11-06T10:50:43.260Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,54,,true_false,incorrecto,Falso,Verdadero,1,14467,2026-11-06T10:50:59.836Z
+30999d0f3d32b40c,366ccc38-d90e-583c,exercise_answered,quechua,5,55,,word_order,incorrecto,Allin p'unchay mamaa,Allin p'unchay mamay,1,9153,2026-11-06T10:51:07.998Z
+30999d0f3d32b40c,366ccc38-d90e-583c,lesson_completed,quechua,5,,,,,,,,6670998,2026-11-06T10:51:10.998Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,lesson_started,quechua,7,,,,,,,,,2026-11-07T10:52:18.127Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6762,2026-11-07T10:52:23.764Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,10027,2026-11-07T10:52:36.688Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,14348,2026-11-07T10:52:51.250Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,73,,translate,incorrecto,qucha,qucha,1,7750,2026-11-07T10:53:07.145Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,5863,2026-11-07T10:53:16.119Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,14914,2026-11-07T10:53:36.612Z
+30999d0f3d32b40c,259b5ae8-d81c-b6a5,lesson_completed,quechua,7,,,,,,,,6819612,2026-11-07T10:53:39.612Z
+30999d0f3d32b40c,434f35a9-2b99-7354,lesson_started,quechua,9,,,,,,,,,2026-11-08T10:15:01.748Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,90,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,16703,2026-11-08T10:15:15.901Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,91,,translate,incorrecto,wasa,wasi,1,10884,2026-11-08T10:15:39.740Z
+30999d0f3d32b40c,434f35a9-2b99-7354,audio_played,quechua,9,,901,,,,,,,2026-11-08T10:15:40.640Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,92,,translate,incorrecto,punchay,p'unchay,1,15133,2026-11-08T10:15:57.301Z
+30999d0f3d32b40c,434f35a9-2b99-7354,audio_played,quechua,9,,902,,,,,,,2026-11-08T10:15:58.201Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,93,,translate,incorrecto,qocha,qucha,1,6154,2026-11-08T10:16:15.670Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,94,,true_false,correcto,Verdadero,Verdadero,1,9000,2026-11-08T10:16:37.136Z
+30999d0f3d32b40c,434f35a9-2b99-7354,exercise_answered,quechua,9,95,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,10616,2026-11-08T10:16:49.899Z
+30999d0f3d32b40c,434f35a9-2b99-7354,lesson_completed,quechua,9,,,,,,,,4612899,2026-11-08T10:16:52.899Z
+6212a4c142113db8,08347cfa-6d46-a111,lesson_started,aymara,14,,,,,,,,,2026-11-04T11:46:23.594Z
+6212a4c142113db8,08347cfa-6d46-a111,exercise_answered,aymara,14,140,,multiple_choice,incorrecto,Aski urukipana,Kamisaraki,1,10762,2026-11-04T11:46:46.293Z
+6212a4c142113db8,08347cfa-6d46-a111,exercise_answered,aymara,14,141,,translate,correcto,jilata,jilata,1,16670,2026-11-04T11:46:50.464Z
+6212a4c142113db8,08347cfa-6d46-a111,audio_played,aymara,14,,1401,,,,,,,2026-11-04T11:46:51.364Z
+6212a4c142113db8,08347cfa-6d46-a111,exercise_answered,aymara,14,142,,translate,correcto,ch'uqi,ch'uqi,1,4239,2026-11-04T11:47:04.843Z
+6212a4c142113db8,08347cfa-6d46-a111,exercise_answered,aymara,14,143,,translate,correcto,uta,uta,1,16401,2026-11-04T11:47:22.234Z
+6212a4c142113db8,08347cfa-6d46-a111,exercise_answered,aymara,14,144,,true_false,correcto,Falso,Falso,1,8523,2026-11-04T11:47:26.378Z
+6212a4c142113db8,08347cfa-6d46-a111,lesson_completed,aymara,14,,,,,,,,6449378,2026-11-04T11:47:29.378Z
+6212a4c142113db8,3b710f77-3d0a-0548,lesson_started,aymara,16,,,,,,,,,2026-11-05T10:11:15.487Z
+6212a4c142113db8,3b710f77-3d0a-0548,exercise_answered,aymara,16,160,,multiple_choice,incorrecto,Aski urukipana,Kamisaraki,1,8542,2026-11-05T10:11:19.543Z
+6212a4c142113db8,3b710f77-3d0a-0548,exercise_answered,aymara,16,161,,translate,variante,hilata,jilata,1,5928,2026-11-05T10:11:32.815Z
+6212a4c142113db8,3b710f77-3d0a-0548,exercise_answered,aymara,16,162,,translate,incorrecto,chuqi,ch'uqi,1,3211,2026-11-05T10:11:49.527Z
+6212a4c142113db8,3b710f77-3d0a-0548,exercise_answered,aymara,16,163,,translate,correcto,uta,uta,1,6386,2026-11-05T10:11:56.427Z
+6212a4c142113db8,3b710f77-3d0a-0548,exercise_answered,aymara,16,164,,true_false,incorrecto,Falsa,Falso,1,13168,2026-11-05T10:12:13.451Z
+6212a4c142113db8,3b710f77-3d0a-0548,lesson_completed,aymara,16,,,,,,,,736451,2026-11-05T10:12:16.451Z
+6212a4c142113db8,c6203e22-6d46-17a3,lesson_started,aymara,18,,,,,,,,,2026-11-06T11:53:16.519Z
+6212a4c142113db8,c6203e22-6d46-17a3,exercise_answered,aymara,18,180,,multiple_choice,incorrecto,Aski urukipana,Kamisaraki,1,3214,2026-11-06T11:53:26.011Z
+6212a4c142113db8,c6203e22-6d46-17a3,exercise_answered,aymara,18,181,,translate,variante,hilata,jilata,1,13828,2026-11-06T11:53:39.839Z
+6212a4c142113db8,c6203e22-6d46-17a3,exercise_answered,aymara,18,182,,translate,incorrecto,chuqi,ch'uqi,1,8160,2026-11-06T11:54:03.670Z
+6212a4c142113db8,c6203e22-6d46-17a3,exercise_answered,aymara,18,183,,translate,incorrecto,uta,uta,1,15779,2026-11-06T11:54:19.626Z
+6212a4c142113db8,c6203e22-6d46-17a3,exercise_answered,aymara,18,184,,true_false,correcto,Falso,Falso,1,9604,2026-11-06T11:54:35.164Z
+6212a4c142113db8,c6203e22-6d46-17a3,lesson_completed,aymara,18,,,,,,,,6878164,2026-11-06T11:54:38.164Z
+de68876e42181565,45c44431-9159-82c7,lesson_started,quechua,1,,,,,,,,,2026-11-04T11:44:03.433Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,10,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,5249,2026-11-04T11:44:18.722Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,11,,translate,incorrecto,wasa,wasi,1,7171,2026-11-04T11:44:31.011Z
+de68876e42181565,45c44431-9159-82c7,audio_played,quechua,1,,101,,,,,,,2026-11-04T11:44:31.911Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,11945,2026-11-04T11:44:53.401Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,13,,translate,incorrecto,qocha,qucha,1,5529,2026-11-04T11:45:10.583Z
+de68876e42181565,45c44431-9159-82c7,audio_played,quechua,1,,103,,,,,,,2026-11-04T11:45:11.483Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,14,,true_false,correcto,Verdadero,Verdadero,1,7919,2026-11-04T11:45:26.223Z
+de68876e42181565,45c44431-9159-82c7,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,4150,2026-11-04T11:45:40.538Z
+de68876e42181565,45c44431-9159-82c7,lesson_completed,quechua,1,,,,,,,,2743538,2026-11-04T11:45:43.538Z
+de68876e42181565,5af2486e-b06a-a810,lesson_started,quechua,3,,,,,,,,,2026-11-05T12:04:42.413Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,2512,2026-11-05T12:04:52.026Z
+de68876e42181565,5af2486e-b06a-a810,audio_played,quechua,3,,300,,,,,,,2026-11-05T12:04:52.926Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,31,,translate,correcto,wasi,wasi,1,5814,2026-11-05T12:04:59.912Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,32,,translate,correcto,p'unchay,p'unchay,1,8839,2026-11-05T12:05:19.806Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,33,,translate,variante,qocha,qucha,1,15374,2026-11-05T12:05:39.737Z
+de68876e42181565,5af2486e-b06a-a810,audio_played,quechua,3,,303,,,,,,,2026-11-05T12:05:40.637Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,5685,2026-11-05T12:06:01.659Z
+de68876e42181565,5af2486e-b06a-a810,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,8647,2026-11-05T12:06:11.513Z
+de68876e42181565,5af2486e-b06a-a810,audio_played,quechua,3,,305,,,,,,,2026-11-05T12:06:12.413Z
+de68876e42181565,5af2486e-b06a-a810,lesson_completed,quechua,3,,,,,,,,3974513,2026-11-05T12:06:14.513Z
+de68876e42181565,849e3d6b-687e-f61e,lesson_started,quechua,5,,,,,,,,,2026-11-06T12:00:02.307Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8812,2026-11-06T12:00:14.952Z
+de68876e42181565,849e3d6b-687e-f61e,audio_played,quechua,5,,500,,,,,,,2026-11-06T12:00:15.852Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,51,,translate,correcto,wasi,wasi,1,3947,2026-11-06T12:00:38.483Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,52,,translate,correcto,p'unchay,p'unchay,1,2628,2026-11-06T12:00:52.113Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,12901,2026-11-06T12:01:03.509Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,54,,true_false,incorrecto,Verdadera,Verdadero,1,14818,2026-11-06T12:01:20.089Z
+de68876e42181565,849e3d6b-687e-f61e,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,9647,2026-11-06T12:01:34.497Z
+de68876e42181565,849e3d6b-687e-f61e,lesson_completed,quechua,5,,,,,,,,3697497,2026-11-06T12:01:37.497Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,lesson_started,quechua,1,,,,,,,,,2026-11-04T13:49:03.764Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,10,,multiple_choice,incorrecto,Allin tuta,Allin p'unchay,1,7472,2026-11-04T13:49:27.630Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,11,,translate,correcto,wasi,wasi,1,6642,2026-11-04T13:49:38.308Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,12,,translate,correcto,p'unchay,p'unchay,1,10461,2026-11-04T13:49:52.872Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,13,,translate,correcto,qucha,qucha,1,15869,2026-11-04T13:50:08.417Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,audio_played,quechua,1,,103,,,,,,,2026-11-04T13:50:09.317Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,14,,true_false,incorrecto,Verdadera,Verdadero,1,10919,2026-11-04T13:50:22.209Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,exercise_answered,quechua,1,15,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,16084,2026-11-04T13:50:29.734Z
+2e46429bdc3c8d3b,e563462e-5bb3-6da7,lesson_completed,quechua,1,,,,,,,,6632734,2026-11-04T13:50:32.734Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,lesson_started,quechua,3,,,,,,,,,2026-11-05T13:34:38.621Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,30,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,6202,2026-11-05T13:34:46.648Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,31,,translate,incorrecto,huasi,wasi,1,2598,2026-11-05T13:35:10.161Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,audio_played,quechua,3,,301,,,,,,,2026-11-05T13:35:11.061Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,32,,translate,incorrecto,punchay,p'unchay,1,6748,2026-11-05T13:35:26.622Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,33,,translate,correcto,qucha,qucha,1,4581,2026-11-05T13:35:44.212Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,audio_played,quechua,3,,303,,,,,,,2026-11-05T13:35:45.112Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,34,,true_false,correcto,Verdadero,Verdadero,1,13167,2026-11-05T13:35:49.701Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,audio_played,quechua,3,,304,,,,,,,2026-11-05T13:35:50.601Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,exercise_answered,quechua,3,35,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,4756,2026-11-05T13:36:13.303Z
+2e46429bdc3c8d3b,50089656-c4ea-56fc,lesson_completed,quechua,3,,,,,,,,5776303,2026-11-05T13:36:16.303Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,lesson_started,quechua,5,,,,,,,,,2026-11-06T13:59:52.049Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,50,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,8110,2026-11-06T14:00:09.523Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,51,,translate,incorrecto,wasa,wasi,1,7655,2026-11-06T14:00:27.090Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,52,,translate,variante,punchay,p'unchay,1,3722,2026-11-06T14:00:34.904Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,audio_played,quechua,5,,502,,,,,,,2026-11-06T14:00:35.804Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,53,,translate,correcto,qucha,qucha,1,2885,2026-11-06T14:00:51.291Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,54,,true_false,incorrecto,Falso,Verdadero,1,14745,2026-11-06T14:01:07.924Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,exercise_answered,quechua,5,55,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,6004,2026-11-06T14:01:21.084Z
+2e46429bdc3c8d3b,03b3b800-5d56-c256,lesson_completed,quechua,5,,,,,,,,7284084,2026-11-06T14:01:24.084Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,lesson_started,quechua,7,,,,,,,,,2026-11-07T12:42:44.236Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,70,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,4317,2026-11-07T12:42:53.561Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,71,,translate,correcto,wasi,wasi,1,3922,2026-11-07T12:43:06.510Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,72,,translate,correcto,p'unchay,p'unchay,1,13700,2026-11-07T12:43:25.022Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,73,,translate,correcto,qucha,qucha,1,13073,2026-11-07T12:43:31.962Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,audio_played,quechua,7,,703,,,,,,,2026-11-07T12:43:32.862Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,74,,true_false,correcto,Verdadero,Verdadero,1,7746,2026-11-07T12:43:39.761Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,audio_played,quechua,7,,704,,,,,,,2026-11-07T12:43:40.661Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,exercise_answered,quechua,7,75,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,11415,2026-11-07T12:43:56.204Z
+2e46429bdc3c8d3b,49567969-f65b-d0f4,lesson_completed,quechua,7,,,,,,,,2639204,2026-11-07T12:43:59.204Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,lesson_started,quechua,9,,,,,,,,,2026-11-08T12:20:16.208Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,90,,multiple_choice,correcto,Allin p'unchay,Allin p'unchay,1,11188,2026-11-08T12:20:32.341Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,91,,translate,incorrecto,huasi,wasi,1,3548,2026-11-08T12:20:46.205Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,92,,translate,variante,punchay,p'unchay,1,2951,2026-11-08T12:20:58.642Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,93,,translate,incorrecto,qocha,qucha,1,14225,2026-11-08T12:21:11.341Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,94,,true_false,correcto,Verdadero,Verdadero,1,10923,2026-11-08T12:21:18.384Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,exercise_answered,quechua,9,95,,word_order,correcto,Allin p'unchay mamay,Allin p'unchay mamay,1,7092,2026-11-08T12:21:40.807Z
+2e46429bdc3c8d3b,37fdbf14-fcab-d32d,lesson_completed,quechua,9,,,,,,,,1303807,2026-11-08T12:21:43.807Z

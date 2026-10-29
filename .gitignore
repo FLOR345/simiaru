@@ -32,3 +32,7 @@ Thumbs.db
 .taste-skill/
 .claude/
 frontend/assets/
+
+# Audio MMS: entorno de Python y audios generados localmente
+tools/tts/.venv/
+tools/tts/salida/

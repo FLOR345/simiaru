@@ -1,93 +1,105 @@
-# SimiAru 🦙
+# SimiAru
 
-**SimiAru** es una aplicación web para aprender **quechua** y **aymara**, las lenguas originarias de los Andes. Ofrece lecciones por unidades, un diccionario, contenido cultural, seguimiento de progreso y notificaciones.
+**An open-source, extensible web platform for teaching and studying Quechua and Aymara, with neural speech synthesis and learner-level data export.**
 
-> *Simi* significa "lengua/palabra" en quechua y *Aru* significa lo mismo en aymara.
+*Simi* means "word/language" in Quechua and *aru* means the same in Aymara. SimiAru was built in Puno, Peru, by Quechua speakers of the region, as a tool the language community can inspect, modify and reuse.
 
-## Demo
+[Versión en español](README.es.md) · Live demo: https://simiaru-3j6b.vercel.app
 
-- Frontend: https://simiaru-3j6b.vercel.app
+---
 
-## Tecnologías
+## What makes it different
 
-| Parte | Tecnologías |
-|---|---|
-| Frontend | React 18, Vite, React Router, Tailwind CSS, Axios, Motion, Mantine 8, Sonner y componentes de React Bits |
-| Backend | Node.js, Express, Passport (Google, Facebook, JWT) |
-| Base de datos | PostgreSQL (Neon) |
-| Servicios | Cloudinary (imágenes), Brevo (correos), node-cron |
-| Despliegue | Vercel (frontend), Render (backend) |
+| | SimiAru |
+| --- | --- |
+| **Open and auditable** | MIT-licensed code; anyone can inspect, modify and deploy it. |
+| **Speech trained on the language** | Audio is pre-generated once with Meta's MMS models (`facebook/mms-tts-quz` for Cusco-Collao Quechua, `facebook/mms-tts-ayr` for Central Aymara) instead of a Spanish synthesizer that erases glottalized and aspirated consonants. |
+| **Research instrument** | Learning events (answer, result, response time, audio plays) are recorded **only with explicit consent**, pseudonymized, and exportable as CSV/JSON. |
+| **Extensible by language packs** | A new language is a folder with two JSON files and one command. No application code changes. |
+| **Works offline** | Installable PWA; opened lessons work without connection and progress syncs later. |
+| **Classroom mode** | Student accounts by code, with no email or personal data. |
 
-## Estructura
+## Run it in one command
 
-```
-SIMIARU/
-├── backend/        API en Express
-│   └── src/
-│       ├── config/       base de datos, passport, cloudinary
-│       ├── controllers/
-│       ├── middleware/
-│       ├── routes/       auth, lessons, progress, dictionary, culture, notifications
-│       └── utils/
-├── frontend/       App en React + Vite
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── services/
-│       └── context/
-└── database/       migraciones y datos iniciales (SQL)
+Requirements: Docker.
+
+```bash
+docker compose up --build
 ```
 
-## Cómo ejecutarlo en tu computadora
+- App: http://localhost:8080
+- API: http://localhost:5000/health
+- PostgreSQL: `localhost:5433` (user/password/db: `simiaru`)
 
-### Requisitos
+The database is created from the real schema (`database/schema.sql`), the migrations (`database/migrations/`) and the content seed (`database/seed/contenido.sql`: 12 units, 26 lessons, 1,503 lexical entries, 285 exercises, 69 cultural texts; no personal data).
 
-- Node.js 18 o superior
-- Una base de datos PostgreSQL (local o gratuita en [Neon](https://neon.tech))
+## Verify the three claims in five minutes
 
-### 1. Base de datos
+**1. Neural speech synthesis**
 
-Crea la base de datos y ejecuta los scripts de `database/migrations` y luego `database/seeds`.
+```bash
+cd tools/tts
+python -m venv .venv && .venv/Scripts/pip install torch --index-url https://download.pytorch.org/whl/cpu && .venv/Scripts/pip install -r requirements.txt
+DATABASE_URL=postgres://simiaru:simiaru@localhost:5433/simiaru .venv/Scripts/python generate_audio.py --idioma quechua --muestra 10
+```
 
-### 2. Backend
+Writes 10 WAV files and a manifest to `tools/tts/salida/` without touching the database. See [`tools/tts/README.md`](tools/tts/README.md).
+
+**2. Learner-level data export**
+
+Create an account in the app, accept the consent dialog, complete a lesson, then open *Profile → My learning data → Download CSV/JSON*. A synthetic example with the same format is in [`database/samples/`](database/samples/). Export format: `participante` (HMAC pseudonym), `sesion`, `tipo`, `idioma`, `leccion_id`, `ejercicio_id`, `vocabulario_id`, `tipo_ejercicio`, `resultado` (`correcto` / `variante` / `incorrecto`), `respuesta`, `esperado`, `intento`, `duracion_ms`, `ocurrido_en`.
+
+**3. Extensibility by language packs**
 
 ```bash
 cd backend
-npm install
-cp .env.example .env    # luego completa los valores
-npm run dev
+npm run import-language -- ../languages/plantilla --dry-run   # the template is rejected until completed
 ```
 
-El servidor queda en `http://localhost:5000` (prueba `http://localhost:5000/health`).
+See [`docs/paquete-de-idioma.md`](docs/paquete-de-idioma.md).
 
-Variables obligatorias en `backend/.env`: `DATABASE_URL`, `JWT_SECRET` y `SESSION_SECRET`. El resto (Google, Facebook, Cloudinary, Resend) solo hace falta para esas funciones. Mira `backend/.env.example`.
-
-### 3. Frontend
+## Tests
 
 ```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
+cd backend && npm test      # unit tests; integration tests run when TEST_DATABASE_URL points to a local/CI database
+cd frontend && npm test     # dialect normalizer
 ```
 
-La app queda en `http://localhost:5173`.
+CI (`.github/workflows/ci.yml`) loads the real schema and content into PostgreSQL, runs both test suites, builds the frontend and starts the full stack with Docker Compose.
 
-## Publicar en internet
+## Architecture
 
-- **Backend → Render (gratis):** en Render elige *New → Blueprint* y selecciona este repositorio. El archivo `render.yaml` configura todo; solo hay que pegar los valores de `backend/.env.example`. En el plan gratuito el servidor se duerme tras 15 minutos sin uso y tarda unos segundos en despertar.
-- **Frontend → Vercel:** carpeta `frontend`, ya apunta al backend de Render (ver `frontend/src/config.js`).
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 18, Vite, Tailwind CSS, Motion, Mantine 8, Sonner; PWA (manifest + service worker) |
+| Backend | Node.js 22, Express, Passport (JWT; Google/Facebook optional), helmet, rate limiting |
+| Database | PostgreSQL (Neon in production) |
+| Speech | Meta MMS (VITS) via Hugging Face Transformers; audio stored in Cloudinary |
 
-## Seguridad
+```
+frontend/        React app (src/languages: language packs; src/utils/normalizer.js: dialect normalizer)
+backend/         Express API (src/app.js), scripts (migrate, import-language, dump-schema, dump-content)
+database/        schema.sql, migrations/, seed/contenido.sql, samples/ (synthetic dataset)
+languages/       language pack template
+tools/tts/       MMS audio generation pipeline
+docs/            documentation
+```
 
-Las contraseñas y claves **nunca** se escriben en el código: van en archivos `.env`, que están en `.gitignore`.
+**Dialect normalizer.** Written answers are classified as *correct*, *correct with a variant* or *incorrect*. Variant rules (trivocalic e/o → i/u, q/k alternation, unmarked glottalized and aspirated consonants, Spanish-style spellings such as *hu-*, *c-*, *qu-*) live in each language pack and were written from knowledge of the variety, not generated by a language model.
 
-## Autor
+## Design decisions and limitations
 
-Proyecto desarrollado por [FLOR345](https://github.com/FLOR345) para el curso de Desarrollo de Software II.
+- The audio is **synthetic**, not recorded by native speakers. No Puno-specific model exists; `quz` (Cusco-Collao) is the closest variety.
+- A language model was deliberately **not** used to generate Quechua or Aymara content (invented morphology, mixed varieties), and speech recognition was **not** used to grade pronunciation (high error rates in these languages make false negatives discouraging).
+- Learning data is collected only with consent, can be downloaded and deleted by the learner, and is exported only under a pseudonym.
 
-## Licencia
+## Licenses
 
-- **Código:** [MIT](LICENSE). Puedes usarlo, modificarlo y redistribuirlo, manteniendo el aviso de copyright.
-- **Componentes de React Bits** (`frontend/src/components/reactbits/`): tienen su propia licencia, MIT + Commons Clause ([ver aquí](frontend/src/components/reactbits/LICENSE-react-bits.md)). Se pueden usar dentro de SimiAru, pero no vender ni redistribuir esos componentes por sí solos.
-- **Contenido lingüístico** (vocabulario, ejercicios y textos culturales): no está cubierto por la licencia MIT. Parte del vocabulario proviene de diccionarios del Ministerio de Educación de Chile, y su licencia de redistribución está pendiente de confirmar.
+- **Code:** [MIT](LICENSE).
+- **Generated audio:** CC BY-NC 4.0, inherited from the MMS models.
+- **React Bits components** (`frontend/src/components/reactbits/`): MIT + Commons Clause ([license](frontend/src/components/reactbits/LICENSE-react-bits.md)).
+- **Linguistic content:** not covered by the MIT license. Part of the Aymara vocabulary comes from dictionaries of Chile's Ministry of Education; redistribution terms are pending confirmation.
+
+## Author
+
+Developed by [FLOR345](https://github.com/FLOR345) in Puno, Peru.

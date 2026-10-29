@@ -1,0 +1,53 @@
+# SimiAru completo en un comando:   docker compose up --build
+#   App:      http://localhost:8080
+#   API:      http://localhost:5000/health
+#   Base:     localhost:5433 (usuario/clave/base: simiaru)
+# La base se crea con el esquema real, las migraciones y el contenido (sin datos de personas).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: simiaru
+      POSTGRES_PASSWORD: simiaru
+      POSTGRES_DB: simiaru
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/migrations/002_datos_aula_eventos.sql:/docker-entrypoint-initdb.d/02_datos_aula_eventos.sql:ro
+      - ./database/seed/contenido.sql:/docker-entrypoint-initdb.d/03_contenido.sql:ro
+      - simiaru-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simiaru -d simiaru"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://simiaru:simiaru@db:5432/simiaru
+      DATABASE_SSL: "false"
+      JWT_SECRET: solo-para-uso-local-cambiar-en-produccion
+      SESSION_SECRET: solo-para-uso-local-cambiar-en-produccion
+      FRONTEND_URL: http://localhost:8080
+      NODE_ENV: production
+      PORT: "5000"
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_BACKEND_URL: http://localhost:5000
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  simiaru-db:

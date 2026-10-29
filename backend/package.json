@@ -6,7 +6,10 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "migrate": "node scripts/migrate.js",
-    "import-language": "node scripts/import-language.js"
+    "import-language": "node scripts/import-language.js",
+    "db:content": "node scripts/dump-content.js",
+    "test": "node --test \"test/**/*.test.js\"",
+    "dataset:ejemplo": "node scripts/generate-sample-dataset.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -28,7 +31,8 @@
     "sib-api-v3-sdk": "^8.5.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "supertest": "7.1.4"
   },
   "description": "",
   "main": "index.js",

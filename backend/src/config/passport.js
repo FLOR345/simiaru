@@ -86,7 +86,11 @@ passport.use(
 // 🟢 GOOGLE STRATEGY
 // ========================================
 
-passport.use(
+// Solo si hay claves: una instalación nueva (Docker, revisores) arranca sin cuentas de Google ni Facebook
+export const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+export const facebookEnabled = Boolean(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET);
+
+if (googleEnabled) passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -121,7 +125,7 @@ passport.use(
 // 🔵 FACEBOOK STRATEGY
 // ========================================
 
-passport.use(
+if (facebookEnabled) passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_APP_ID,
