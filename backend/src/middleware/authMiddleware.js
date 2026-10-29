@@ -1,4 +1,5 @@
 import { verifyToken } from '../utils/jwt.js';
+import { pool } from '../config/database.js';
 
 // Protección obligatoria - requiere token válido
 export const protect = async (req, res, next) => {
@@ -55,10 +56,18 @@ export const isAdmin = async (req, res, next) => {
       });
     }
 
-    if (req.user.rol !== 'admin') {
-      return res.status(403).json({ 
+    // El token solo lleva el id: el rol se decide con la lista ADMIN_EMAILS del servidor
+    // (antes se revisaba req.user.rol, que nunca existía, y nadie podía ser administrador)
+    const admins = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    const { rows } = await pool.query('SELECT email FROM usuarios WHERE id = $1', [req.user.id]);
+    const email = rows[0]?.email?.toLowerCase();
+    if (!email || !admins.includes(email)) {
+      return res.status(403).json({
         success: false,
-        message: 'Acceso denegado. Se requiere rol de administrador' 
+        message: 'Acceso denegado. Se requiere rol de administrador'
       });
     }
 

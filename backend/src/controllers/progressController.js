@@ -1,231 +1,39 @@
 import { pool } from '../config/database.js';
-import { notifyLessonCompleted, notifyBadgeEarned } from './notificationController.js';
-
-// ==================== FUNCIÓN PARA OTORGAR INSIGNIAS ====================
-const checkAndAwardBadges = async (userId, leccionId, porcentajeAciertos) => {
-  try {
-    const badgesAwarded = [];
-
-    // 1. PRIMER PASO - Primera lección completada
-    const firstLessonCheck = await pool.query(
-      `SELECT COUNT(*) as total FROM progreso_usuario 
-       WHERE usuario_id = $1 AND completado = true`,
-      [userId]
-    );
-    
-    if (parseInt(firstLessonCheck.rows[0].total) === 1) {
-      const awarded = await awardBadge(userId, 'complete_first_lesson');
-      if (awarded) badgesAwarded.push('Primer Paso 🎯');
-    }
-
-    // 2. PERFECCIONISTA - 100% en una lección
-    if (porcentajeAciertos === 100) {
-      const awarded = await awardBadge(userId, 'perfect_lesson');
-      if (awarded) badgesAwarded.push('Perfeccionista ⭐');
-    }
-
-    // 3. VERIFICAR UNIDADES COMPLETADAS
-    const unidadResult = await pool.query(
-      `SELECT u.id, u.numero, u.nombre 
-       FROM lecciones l 
-       JOIN unidades u ON l.unidad_id = u.id 
-       WHERE l.id = $1`,
-      [leccionId]
-    );
-
-    if (unidadResult.rows.length > 0) {
-      const unidad = unidadResult.rows[0];
-      
-      // Contar lecciones de la unidad
-      const totalLessons = await pool.query(
-        `SELECT COUNT(*) as total FROM lecciones WHERE unidad_id = $1`,
-        [unidad.id]
-      );
-
-      // Contar lecciones completadas de la unidad
-      const completedLessons = await pool.query(
-        `SELECT COUNT(*) as completed 
-         FROM progreso_usuario pu
-         JOIN lecciones l ON pu.leccion_id = l.id
-         WHERE pu.usuario_id = $1 AND l.unidad_id = $2 AND pu.completado = true`,
-        [userId, unidad.id]
-      );
-
-      const total = parseInt(totalLessons.rows[0].total);
-      const completed = parseInt(completedLessons.rows[0].completed);
-
-      // Si completó toda la unidad
-      if (total > 0 && completed >= total) {
-        const unitBadgeCode = `complete_unit_${unidad.numero}`;
-        const awarded = await awardBadge(userId, unitBadgeCode);
-        if (awarded) badgesAwarded.push(`${unidad.nombre} completada 🎉`);
-      }
-    }
-
-    // 4. SABIO ANDINO - Todas las unidades completadas
-    const allUnitsCheck = await pool.query(
-      `SELECT 
-        (SELECT COUNT(DISTINCT id) FROM unidades) as total_units,
-        (SELECT COUNT(DISTINCT l.unidad_id) 
-         FROM progreso_usuario pu
-         JOIN lecciones l ON pu.leccion_id = l.id
-         WHERE pu.usuario_id = $1 AND pu.completado = true
-        ) as completed_units`,
-      [userId]
-    );
-
-    const totalUnits = parseInt(allUnitsCheck.rows[0].total_units);
-    const completedUnits = parseInt(allUnitsCheck.rows[0].completed_units);
-
-    if (totalUnits > 0 && completedUnits >= totalUnits) {
-      const awarded = await awardBadge(userId, 'complete_all_units');
-      if (awarded) badgesAwarded.push('Sabio Andino 🏆');
-    }
-
-    // Notificar insignias ganadas por email
-    for (const badge of badgesAwarded) {
-      notifyBadgeEarned(userId, badge).catch(err => 
-        console.log('Error notificando insignia:', err.message)
-      );
-    }
-
-    return badgesAwarded;
-
-  } catch (error) {
-    console.error('Error verificando insignias:', error);
-    return [];
-  }
-};
-
-// Función para otorgar una insignia específica
-const awardBadge = async (userId, badgeCode) => {
-  try {
-    // Verificar si ya tiene la insignia
-    const existingBadge = await pool.query(
-      `SELECT ui.id FROM usuarios_insignias ui
-       JOIN insignias i ON ui.insignia_id = i.id
-       WHERE ui.usuario_id = $1 AND i.codigo = $2`,
-      [userId, badgeCode]
-    );
-
-    if (existingBadge.rows.length > 0) {
-      return false; // Ya tiene la insignia
-    }
-
-    // Obtener ID de la insignia
-    const badgeResult = await pool.query(
-      `SELECT id, nombre FROM insignias WHERE codigo = $1`,
-      [badgeCode]
-    );
-
-    if (badgeResult.rows.length === 0) {
-      console.log(`Insignia no encontrada: ${badgeCode}`);
-      return false;
-    }
-
-    const badge = badgeResult.rows[0];
-
-    // Otorgar la insignia
-    await pool.query(
-      `INSERT INTO usuarios_insignias (usuario_id, insignia_id, fecha_obtencion)
-       VALUES ($1, $2, NOW())`,
-      [userId, badge.id]
-    );
-
-    console.log(`🏆 Insignia otorgada: ${badge.nombre} al usuario ${userId}`);
-    return true;
-
-  } catch (error) {
-    console.error('Error otorgando insignia:', error);
-    return false;
-  }
-};
-
-// Verificar insignia de racha
-export const checkStreakBadge = async (userId) => {
-  try {
-    const result = await pool.query(
-      `SELECT racha_actual FROM usuarios WHERE id = $1`,
-      [userId]
-    );
-
-    if (result.rows.length > 0) {
-      const racha = result.rows[0].racha_actual;
-      
-      // Racha de 7 días
-      if (racha >= 7) {
-        const awarded = await awardBadge(userId, 'streak_7_days');
-        if (awarded) {
-          console.log(`🔥 Insignia de racha otorgada al usuario ${userId}`);
-          notifyBadgeEarned(userId, 'Racha de Fuego 🔥').catch(err => 
-            console.log('Error notificando insignia:', err.message)
-          );
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error verificando racha:', error);
-  }
-};
+import { notifyLessonCompleted } from './notificationController.js';
+import { applyLessonResult } from '../utils/gamification.js';
 
 // ==================== GUARDAR PROGRESO ====================
-export const saveProgress = async (req, res) => {
+// Guarda el mejor resultado de la lección y delega puntos, racha, nivel e insignias en utils/gamification.js
+export const saveProgress = async (req, res, next) => {
   try {
-    const { leccionId, porcentajeAciertos } = req.body;
+    const leccionId = Number(req.body.leccionId);
+    const porcentaje = Math.round(Number(req.body.porcentajeAciertos));
     const userId = req.user.id;
-    const completado = porcentajeAciertos >= 80;
+    const completado = porcentaje >= 80;
 
-    console.log('Guardando progreso:', { userId, leccionId, porcentajeAciertos, completado });
+    const exists = await pool.query('SELECT 1 FROM lecciones WHERE id = $1', [leccionId]);
+    if (exists.rows.length === 0) return res.status(404).json({ message: 'La lección no existe' });
 
-    // Guardar progreso
+    // Se conserva el mejor porcentaje y, una vez aprobada, la lección sigue completada
     await pool.query(
       `INSERT INTO progreso_usuario (usuario_id, leccion_id, completado, porcentaje_aciertos, fecha_completado)
        VALUES ($1, $2, $3, $4, NOW())
-       ON CONFLICT (usuario_id, leccion_id) 
-       DO UPDATE SET porcentaje_aciertos = $4, completado = $3, fecha_completado = NOW()`,
-      [userId, leccionId, completado, porcentajeAciertos]
+       ON CONFLICT (usuario_id, leccion_id)
+       DO UPDATE SET porcentaje_aciertos = GREATEST(progreso_usuario.porcentaje_aciertos, EXCLUDED.porcentaje_aciertos),
+                     completado = progreso_usuario.completado OR EXCLUDED.completado,
+                     fecha_completado = NOW()`,
+      [userId, leccionId, completado, porcentaje]
     );
 
-    // Actualizar puntos si completó
-    let puntosGanados = 0;
-    if (completado) {
-      puntosGanados = Math.floor(porcentajeAciertos);
-      await pool.query(
-        'UPDATE usuarios SET puntos_totales = puntos_totales + $1 WHERE id = $2',
-        [puntosGanados, userId]
-      );
-      console.log(`Agregados ${puntosGanados} puntos al usuario ${userId}`);
+    const result = await applyLessonResult({ userId, leccionId, porcentaje, completado });
+
+    if (porcentaje >= 60) {
+      notifyLessonCompleted(userId, leccionId, porcentaje).catch((err) => console.log('Error enviando notificación:', err.message));
     }
 
-    // Actualizar racha
-    await pool.query(
-      'UPDATE usuarios SET racha_actual = racha_actual + 1, ultima_actividad = NOW() WHERE id = $1',
-      [userId]
-    );
-
-    // 🏆 VERIFICAR Y OTORGAR INSIGNIAS
-    let badgesAwarded = [];
-    if (completado) {
-      badgesAwarded = await checkAndAwardBadges(userId, leccionId, porcentajeAciertos);
-      await checkStreakBadge(userId);
-    }
-
-    // 🔔 Notificar por email si aprobó (no bloqueante)
-    if (porcentajeAciertos >= 60) {
-      notifyLessonCompleted(userId, leccionId, porcentajeAciertos)
-        .catch(err => console.log('Error enviando notificación:', err.message));
-    }
-
-    res.json({ 
-      success: true, 
-      message: 'Progreso guardado exitosamente',
-      puntos: puntosGanados,
-      insignias: badgesAwarded
-    });
-
+    res.json({ success: true, message: 'Progreso guardado', ...result });
   } catch (error) {
-    console.error('Error en saveProgress:', error);
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 

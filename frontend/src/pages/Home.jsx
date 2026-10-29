@@ -627,9 +627,9 @@ const Home = ({ enableGuestMode }) => {
                 <span className="absolute -z-10 -top-6 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-30" aria-hidden="true" />
                 <span className="absolute -z-10 -bottom-6 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-25" aria-hidden="true" />
 
-                {/* Foto del Titicaca como copia impresa inclinada, detrás de la tarjeta */}
+                {/* Foto del Titicaca como copia impresa inclinada, encima de la esquina de la tarjeta */}
                 <m.figure
-                  className="absolute -right-1 sm:-right-12 -top-2 w-40 sm:w-52 bg-white p-2 rounded-2xl shadow-xl rotate-6"
+                  className="absolute z-20 -right-1 sm:-right-12 -top-2 w-40 sm:w-52 bg-white p-2 rounded-2xl shadow-2xl rotate-6"
                   initial={{ opacity: 0, rotate: 18, y: 20 }}
                   animate={{ opacity: 1, rotate: 6, y: 0 }}
                   transition={{ type: 'spring', bounce: 0.35, duration: 0.9, delay: 0.7 }}

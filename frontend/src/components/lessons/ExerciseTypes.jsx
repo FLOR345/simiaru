@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Volume2, Check, X, RotateCcw } from 'lucide-react';
+import { classifyAnswer } from '../../utils/normalizer';
 
 // ==================== COMPARACIÓN DE RESPUESTAS ====================
 // Acepta diferencias de escritura que no cambian la palabra:
@@ -82,10 +83,11 @@ const ResetButton = ({ onClick }) => (
 );
 
 /**
- * Muestra un ejercicio y llama a onAnswer(esCorrecta, respuestaCorrectaLegible).
+ * Muestra un ejercicio y llama a onAnswer(esCorrecta, respuestaCorrectaLegible, detalle).
+ * detalle = { resultado: 'correcto' | 'variante' | 'incorrecto', fenomenos, respuesta } (normalizador dialectal).
  * Con answered=true queda bloqueado mientras se muestra la corrección.
  */
-const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageLabel = 'Quechua' }) => {
+const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageLabel = 'Quechua', languageId = 'quechua' }) => {
   const [selected, setSelected] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -126,28 +128,34 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
     return <p className="text-center text-stone-600 p-6">No hay ejercicio disponible</p>;
   }
 
-  const answer = (isCorrect, correctText) => {
+  const answer = (isCorrect, correctText, detail = {}) => {
     if (answered) return;
-    onAnswer(isCorrect, correctText);
+    onAnswer(isCorrect, correctText, { resultado: isCorrect ? 'correcto' : 'incorrecto', fenomenos: [], ...detail });
+  };
+
+  // Respuestas escritas: el normalizador dialectal acepta variantes (glotalizadas, q/k, e/o...) como correctas
+  const answerWritten = (given, expected) => {
+    const r = classifyAnswer(given, expected, languageId);
+    answer(r.resultado !== 'incorrecto', expected, { resultado: r.resultado, fenomenos: r.fenomenos, respuesta: given });
   };
 
   const handleSubmit = () => {
     switch (exercise.tipo) {
       case 'multiple_choice':
         if (selected === null) return;
-        answer(sameAnswer(selected, exercise.respuesta_correcta), exercise.respuesta_correcta);
+        answer(sameAnswer(selected, exercise.respuesta_correcta), exercise.respuesta_correcta, { respuesta: selected });
         break;
 
       case 'listen_write':
       case 'translate':
         if (!userAnswer.trim()) return;
-        answer(sameAnswer(userAnswer, exercise.respuesta_correcta), exercise.respuesta_correcta);
+        answerWritten(userAnswer, exercise.respuesta_correcta);
         break;
 
       case 'true_false': {
         if (selected === null) return;
         const correctBool = exercise.respuesta_correcta === 'true' || exercise.respuesta_correcta === true;
-        answer(selected === correctBool, correctBool ? 'Verdadero' : 'Falso');
+        answer(selected === correctBool, correctBool ? 'Verdadero' : 'Falso', { respuesta: selected ? 'Verdadero' : 'Falso' });
         break;
       }
 
@@ -155,8 +163,17 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
         const answers = Object.values(fillBlanks);
         if (answers.length === 0) return;
         const correctAnswers = safeJsonParse(exercise.respuesta_correcta, []);
-        const isCorrect = answers.every((ans, idx) => sameAnswer(ans, correctAnswers[idx] || ''));
-        answer(isCorrect, correctAnswers.join(', '));
+        const results = answers.map((ans, idx) => classifyAnswer(ans, correctAnswers[idx] || '', languageId));
+        const resultado = results.some((r) => r.resultado === 'incorrecto')
+          ? 'incorrecto'
+          : results.some((r) => r.resultado === 'variante')
+            ? 'variante'
+            : 'correcto';
+        answer(resultado !== 'incorrecto', correctAnswers.join(', '), {
+          resultado,
+          fenomenos: [...new Set(results.flatMap((r) => r.fenomenos))],
+          respuesta: answers.join(', '),
+        });
         break;
       }
 
@@ -174,7 +191,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
         if (!Array.isArray(correctOrder)) correctOrder = [correctOrder];
         const isOrderCorrect =
           selectedWords.length === correctOrder.length && selectedWords.every((word, idx) => sameAnswer(word, correctOrder[idx] || ''));
-        answer(isOrderCorrect, correctOrder.join(' '));
+        answer(isOrderCorrect, correctOrder.join(' '), { respuesta: selectedWords.join(' ') });
         break;
       }
 

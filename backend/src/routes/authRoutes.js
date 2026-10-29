@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { register, login, getProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validate, schemas } from '../middleware/validation.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { pool } from '../config/database.js';  // <-- AGREGAR ESTO
@@ -18,8 +19,8 @@ const generateToken = (user) => {
 };
 
 // Rutas normales (email/password)
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', validate(schemas.register), register);
+router.post('/login', validate(schemas.login), login);
 router.get('/profile', protect, getProfile);
 
 // ===== GOOGLE OAUTH =====

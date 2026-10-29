@@ -1,0 +1,36 @@
+{
+  "id": "aymara",
+  "nombre": "Aymara",
+  "nombreNativo": "Jaqi aru",
+  "iso639_3": "ayr",
+  "variedad": "Aymara central",
+  "region": "Altiplano puneño",
+  "descripcion": "La lengua del lago Titicaca, hablada por alrededor de 2 millones de personas en Perú, Bolivia y Chile. SimiAru enseña el aymara central.",
+  "color": "azul",
+  "lang": "ay",
+  "voz": {
+    "modelo": "facebook/mms-tts-ayr",
+    "licencia": "CC-BY-NC-4.0",
+    "respaldo": "es-BO"
+  },
+  "frases": {
+    "saludo": "Kamisaraki",
+    "felicitacion": "¡Wali luratawa!",
+    "animo": "¡Ch'amanchasiñani!"
+  },
+  "normalizador": {
+    "nota": "Reglas del aymara central: tres vocales, alternancia q/k, glotalizadas y aspiradas, j/x/h y grafías castellanas.",
+    "reglas": [
+      { "patron": "chh", "reemplazo": "ch", "fenomeno": "aspirada" },
+      { "patron": "([ptkq])h", "reemplazo": "$1", "fenomeno": "aspirada" },
+      { "patron": "(ch|[ptkq])'", "reemplazo": "$1", "fenomeno": "glotalizada" },
+      { "patron": "hu(?=[aeiou])", "reemplazo": "w", "fenomeno": "grafia" },
+      { "patron": "qu(?=[ei])", "reemplazo": "k", "fenomeno": "grafia" },
+      { "patron": "c(?=[aou])", "reemplazo": "k", "fenomeno": "grafia" },
+      { "patron": "[xh]", "reemplazo": "j", "fenomeno": "grafia" },
+      { "patron": "e", "reemplazo": "i", "fenomeno": "vocal" },
+      { "patron": "o", "reemplazo": "u", "fenomeno": "vocal" },
+      { "patron": "q", "reemplazo": "k", "fenomeno": "uvular" }
+    ]
+  }
+}

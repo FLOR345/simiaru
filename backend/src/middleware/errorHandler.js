@@ -92,7 +92,8 @@ export const errorHandler = (err, req, res, next) => {
 
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
-  } else if (process.env.NODE_ENV === 'production') {
+  } else {
+    // Producción y cualquier otro entorno (pruebas incluidas): mensaje seguro, sin detalles internos
     let error = { ...err };
     error.message = err.message;
 

@@ -13,23 +13,19 @@ if (!connectionString) {
   process.exit(1);
 }
 
-console.log('🔗 Conectando a Neon...');
+console.log('🔗 Conectando a la base de datos...');
 
 export const pool = new Pool({
   connectionString: connectionString,
-  ssl: true,
+  // Neon exige SSL; en Docker/local (DATABASE_SSL=false) se conecta sin SSL
+  ssl: process.env.DATABASE_SSL === 'false' ? false : true,
   connectionTimeoutMillis: 30000,
   idleTimeoutMillis: 30000,
 });
 
+// Lanza el error para que server.js detenga el arranque si la base no responde (fail-fast)
 export const connectDB = async () => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    console.log('✅ Database connected to Neon');
-    console.log('📅 Server time:', result.rows[0].now);
-  } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
-    console.error('⚠️ El servidor sigue encendido, pero las rutas que usan la base de datos fallarán.');
-    console.error('   Revisa que DATABASE_URL en .env sea correcta (¿cambiaste la contraseña en Neon?).');
-  }
+  const result = await pool.query('SELECT NOW()');
+  console.log('✅ Database connected');
+  console.log('📅 Server time:', result.rows[0].now);
 };

@@ -1,5 +1,5 @@
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx,json}'],
   theme: {
     // Contenedor centrado con márgenes que crecen con la pantalla y un ancho máximo cómodo:
     // en monitores anchos el contenido ya no queda pegado a los bordes

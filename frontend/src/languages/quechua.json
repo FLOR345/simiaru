@@ -1,0 +1,37 @@
+{
+  "id": "quechua",
+  "nombre": "Quechua",
+  "nombreNativo": "Runasimi",
+  "iso639_3": "quz",
+  "variedad": "Cusco-Collao",
+  "region": "Cusco - Puno (Collao)",
+  "descripcion": "La lengua del Tahuantinsuyo, hablada hoy por millones de personas en los Andes. SimiAru enseña la variedad Cusco-Collao, la que se habla en Puno.",
+  "color": "verde",
+  "lang": "qu",
+  "voz": {
+    "modelo": "facebook/mms-tts-quz",
+    "licencia": "CC-BY-NC-4.0",
+    "respaldo": "es-PE"
+  },
+  "frases": {
+    "saludo": "Rimaykullayki",
+    "felicitacion": "¡Allin rurasqayki!",
+    "animo": "¡Kallpachakuy!"
+  },
+  "normalizador": {
+    "nota": "Reglas de la variedad Cusco-Collao: alfabeto trivocálico, alternancia q/k, glotalizadas y aspiradas, y grafías castellanas frecuentes.",
+    "reglas": [
+      { "patron": "chh", "reemplazo": "ch", "fenomeno": "aspirada" },
+      { "patron": "([ptkq])h", "reemplazo": "$1", "fenomeno": "aspirada" },
+      { "patron": "(ch|[ptkq])'", "reemplazo": "$1", "fenomeno": "glotalizada" },
+      { "patron": "hu(?=[aeiou])", "reemplazo": "w", "fenomeno": "grafia" },
+      { "patron": "qu(?=[ei])", "reemplazo": "k", "fenomeno": "grafia" },
+      { "patron": "cc", "reemplazo": "q", "fenomeno": "grafia" },
+      { "patron": "c(?=[aou])", "reemplazo": "k", "fenomeno": "grafia" },
+      { "patron": "j", "reemplazo": "h", "fenomeno": "grafia" },
+      { "patron": "e", "reemplazo": "i", "fenomeno": "vocal" },
+      { "patron": "o", "reemplazo": "u", "fenomeno": "vocal" },
+      { "patron": "q", "reemplazo": "k", "fenomeno": "uvular" }
+    ]
+  }
+}

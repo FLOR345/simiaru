@@ -106,27 +106,33 @@ export const login = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, nombre, email, idioma_objetivo, puntos_totales, 
-              nivel_actual, racha_actual, google_id, password_hash IS NOT NULL as has_password
-       FROM usuarios 
+      `SELECT id, nombre, email, idioma_objetivo, puntos_totales,
+              nivel_actual, racha_actual, google_id, password_hash IS NOT NULL as has_password,
+              consentimiento_datos, es_cuenta_aula, aula_id
+       FROM usuarios
        WHERE id = $1`,
       [req.user.id]
     );
 
     const user = result.rows[0];
-    
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
     res.json({
       success: true,
       user: {
         id: user.id,
         nombre: user.nombre,
-        email: user.email,
+        // Las cuentas de aula no tienen correo real: no se muestra el interno
+        email: user.es_cuenta_aula ? null : user.email,
         idioma_objetivo: user.idioma_objetivo,
         puntos_totales: user.puntos_totales,
         nivel_actual: user.nivel_actual,
         racha_actual: user.racha_actual,
         isGoogleUser: !!user.google_id,
-        hasPassword: user.has_password
+        hasPassword: user.es_cuenta_aula ? false : user.has_password,
+        consentimiento_datos: user.consentimiento_datos,
+        es_cuenta_aula: user.es_cuenta_aula,
+        aula_id: user.aula_id
       }
     });
   } catch (error) {
