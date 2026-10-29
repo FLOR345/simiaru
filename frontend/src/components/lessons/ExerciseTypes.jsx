@@ -52,7 +52,7 @@ const speakWord = (word) => {
 };
 
 const optionClass = (active) =>
-  `w-full p-4 text-left rounded-xl border-2 transition-colors ${
+  `w-full p-4 text-left rounded-xl border-2 toque ${
     active ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
   }`;
 
@@ -64,7 +64,7 @@ const VerifyButton = ({ disabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="w-full min-h-12 py-4 px-6 rounded-xl font-bold transition-colors bg-green-700 hover:bg-green-800 text-white disabled:bg-stone-200 disabled:text-stone-500 disabled:cursor-not-allowed"
+    className="w-full min-h-12 py-4 px-6 rounded-xl font-bold toque bg-green-700 hover:bg-green-800 text-white disabled:bg-stone-200 disabled:text-stone-500 disabled:cursor-not-allowed"
   >
     Verificar
   </button>
@@ -74,7 +74,7 @@ const ResetButton = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-lg transition-colors font-semibold"
+    className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-lg toque font-semibold"
   >
     <RotateCcw className="w-4 h-4" aria-hidden="true" />
     Reiniciar
@@ -224,7 +224,8 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
               aria-pressed={selected === opcion}
               disabled={answered}
               onClick={() => setSelected(opcion)}
-              className={optionClass(selected === opcion)}
+              className={`${optionClass(selected === opcion)} anim-entra`}
+              style={{ "--i": index }}
             >
               <span className="font-semibold">{opcion}</span>
             </button>
@@ -244,7 +245,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
           type="button"
           onClick={playAudio}
           disabled={isPlaying}
-          className="flex items-center gap-3 mx-auto mb-6 px-8 min-h-12 rounded-full bg-green-700 hover:bg-green-800 text-white font-bold transition-colors disabled:bg-green-600"
+          className="flex items-center gap-3 mx-auto mb-6 px-8 min-h-12 rounded-full bg-green-700 hover:bg-green-800 text-white font-bold toque disabled:bg-green-600"
         >
           <Volume2 className="w-6 h-6" aria-hidden="true" />
           {isPlaying ? 'Reproduciendo…' : 'Escuchar'}
@@ -272,18 +273,19 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
     return (
       <div className="max-w-2xl mx-auto p-6">
         <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
-        <div className="flex gap-4 mb-6" role="group" aria-labelledby={questionId}>
+        <div className="grid grid-cols-1 min-[440px]:grid-cols-2 gap-3 sm:gap-4 mb-6" role="group" aria-labelledby={questionId}>
           {[
             [true, 'Verdadero', Check, 'text-green-700'],
             [false, 'Falso', X, 'text-red-700'],
-          ].map(([value, label, Icon, iconClass]) => (
+          ].map(([value, label, Icon, iconClass], index) => (
             <button
               key={label}
               type="button"
               aria-pressed={selected === value}
               disabled={answered}
               onClick={() => setSelected(value)}
-              className={`flex-1 p-6 rounded-xl border-2 transition-colors flex items-center justify-center gap-3 ${
+              style={{ "--i": index }}
+              className={`anim-entra min-w-0 p-5 sm:p-6 rounded-xl border-2 toque flex items-center justify-center gap-3 ${
                 selected === value ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
               }`}
             >
@@ -361,7 +363,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
                 onClick={() => setSelectedLeft(item)}
                 aria-pressed={selectedLeft === item}
                 disabled={answered || !!matchingPairs[item]}
-                className={`w-full p-4 rounded-xl border-2 transition-colors text-left ${
+                className={`w-full p-4 rounded-xl border-2 toque text-left ${
                   matchingPairs[item]
                     ? 'bg-green-50 border-green-700 text-green-900'
                     : selectedLeft === item
@@ -370,7 +372,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
                 }`}
               >
                 <span className="font-semibold">{item}</span>
-                {matchingPairs[item] && <span className="block text-sm text-green-800">= {matchingPairs[item]}</span>}
+                {matchingPairs[item] && <span className="block text-sm text-green-800 anim-despliega">= {matchingPairs[item]}</span>}
               </button>
             ))}
           </div>
@@ -387,7 +389,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
                   setSelectedLeft(null);
                 }}
                 disabled={answered || isRightMatched(item) || !selectedLeft}
-                className={`w-full p-4 rounded-xl border-2 transition-colors text-left ${
+                className={`w-full p-4 rounded-xl border-2 toque text-left ${
                   isRightMatched(item)
                     ? 'bg-green-50 border-green-700 text-green-900'
                     : selectedLeft
@@ -445,7 +447,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
                 disabled={answered}
                 onClick={() => setSelectedWords(selectedWords.filter((_, i) => i !== index))}
                 aria-label={`Quitar ${word}`}
-                className="inline-flex items-center gap-1.5 px-4 min-h-11 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors font-semibold"
+                className="anim-pop inline-flex items-center gap-1.5 px-4 min-h-11 bg-green-700 text-white rounded-lg hover:bg-green-800 toque font-semibold"
               >
                 {word}
                 <X className="w-4 h-4" aria-hidden="true" />
@@ -462,7 +464,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
               type="button"
               disabled={answered}
               onClick={() => setSelectedWords([...selectedWords, word])}
-              className="px-4 min-h-11 bg-white border-2 border-stone-300 rounded-lg hover:border-green-700 transition-colors font-semibold"
+              className="px-4 min-h-11 bg-white border-2 border-stone-300 rounded-lg hover:border-green-700 toque font-semibold"
             >
               {word}
             </button>
@@ -491,7 +493,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
             type="button"
             onClick={() => speakWord(exercise.pregunta)}
             aria-label={`Escuchar ${exercise.pregunta}`}
-            className="mt-3 w-11 h-11 inline-flex items-center justify-center text-green-800 hover:bg-green-50 rounded-full transition-colors"
+            className="mt-3 w-11 h-11 inline-flex items-center justify-center text-green-800 hover:bg-green-50 rounded-full toque"
           >
             <Volume2 className="w-6 h-6" aria-hidden="true" />
           </button>
@@ -526,7 +528,7 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
         <button
           type="button"
           onClick={onSkip}
-          className="w-full min-h-12 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors"
+          className="w-full min-h-12 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque"
         >
           Saltar este ejercicio
         </button>

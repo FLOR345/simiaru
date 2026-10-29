@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { api } from '../services/api';
 import ExerciseTypes from '../components/lessons/ExerciseTypes';
 import { Volume2, X, Check, ArrowLeft, ArrowRight, Star, Trophy, AlertCircle, RefreshCw, UserX } from 'lucide-react';
@@ -11,6 +12,53 @@ const THEMES = {
 };
 
 const PASS_PERCENT = 80;
+
+// Colores de la celebración: los de la app (verde quechua, azul aymara) y el dorado de las estrellas
+const CONFETTI_COLORS = ['#15803d', '#1e40af', '#f59e0b', '#c2410c', '#16a34a', '#2563eb'];
+// Trayectorias fijas (no aleatorias): la misma celebración cada vez, sin saltos al volver a renderizar
+const CONFETTI = Array.from({ length: 24 }, (_, i) => {
+  const angle = (i / 24) * Math.PI * 2;
+  const distance = 90 + (i % 4) * 28;
+  return {
+    x: `${Math.round(Math.cos(angle) * distance)}px`,
+    y: `${Math.round(Math.sin(angle) * distance * 0.8 + 60)}px`,
+    r: `${(i % 2 ? 1 : -1) * (180 + i * 15)}deg`,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  };
+});
+
+// El porcentaje sube de 0 a su valor (count-up) una sola vez, al ver los resultados.
+// Con movimiento reducido aparece directamente el número final.
+const useCountUp = (target, duration = 900) => {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target);
+      return undefined;
+    }
+    let frame;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      setValue(Math.round(target * (1 - Math.pow(1 - t, 3)))); // ease-out cúbico
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, duration]);
+  return value;
+};
+
+// Pantalla de resultados en su propio componente para poder usar el contador
+const ResultsScore = ({ percentage, passed, theme }) => {
+  const shown = useCountUp(percentage);
+  return (
+    <p className={`text-6xl font-extrabold mb-2 tabular-nums ${passed ? theme.text : 'text-orange-800'}`}>
+      <span aria-hidden="true">{shown}%</span>
+      <span className="sr-only">{percentage}%</span>
+    </p>
+  );
+};
 
 // Pronunciación con la voz del navegador (síntesis en español; ver PRODUCT.md)
 const speakWord = (word) => {
@@ -78,8 +126,15 @@ const LessonView = ({ user, isGuest }) => {
     if (isGuest || !user) return;
     setSaveState('saving');
     try {
-      await api.saveProgress({ leccionId: parseInt(lessonId, 10), porcentajeAciertos: percentage });
+      const { data } = await api.saveProgress({ leccionId: parseInt(lessonId, 10), porcentajeAciertos: percentage });
       setSaveState('saved');
+      // Confirmación con lo que se ganó: puntos y, si hubo, cada insignia nueva
+      if (data?.puntos > 0) {
+        toast.success(`+${data.puntos} Ayni Points`, { description: 'Tu progreso quedó guardado.' });
+      }
+      (data?.insignias || []).forEach((insignia, i) => {
+        setTimeout(() => toast(`¡Nueva insignia! ${insignia}`, { description: 'Mírala en tu perfil.' }), 500 + i * 400);
+      });
     } catch (error) {
       console.error('Error saving progress:', error);
       setSaveState('error');
@@ -160,12 +215,12 @@ const LessonView = ({ user, isGuest }) => {
             <button
               type="button"
               onClick={loadLesson}
-              className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg toque"
             >
               <RefreshCw className="w-5 h-5" aria-hidden="true" />
               Reintentar
             </button>
-            <Link to="/dashboard" className="inline-flex items-center px-6 min-h-11 border-2 border-stone-300 font-bold rounded-lg hover:bg-stone-50 transition-colors">
+            <Link to="/dashboard" className="inline-flex items-center px-6 min-h-11 border-2 border-stone-300 font-bold rounded-lg hover:bg-stone-50 toque">
               Volver al panel
             </Link>
           </div>
@@ -180,13 +235,27 @@ const LessonView = ({ user, isGuest }) => {
     return (
       <div className="min-h-screen bg-stone-50 text-stone-900 py-8">
         <main className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 text-center">
-            <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${passed ? theme.solid : 'bg-orange-700'}`} aria-hidden="true">
-              <Trophy className="w-12 h-12 text-white" />
+          <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 text-center anim-entra">
+            {/* Pop in del trofeo; si aprobó, papelitos que salen de él */}
+            <div className="relative w-24 h-24 mx-auto mb-6" aria-hidden="true">
+              {passed &&
+                CONFETTI.map((piece, i) => (
+                  <span
+                    key={i}
+                    className="papelito"
+                    style={{ '--x': piece.x, '--y': piece.y, '--r': piece.r, '--i': i, background: piece.color }}
+                  />
+                ))}
+              <div
+                className={`anim-pop relative w-24 h-24 rounded-full flex items-center justify-center ${passed ? theme.solid : 'bg-orange-700'}`}
+                style={{ '--i': 2 }}
+              >
+                <Trophy className="w-12 h-12 text-white" />
+              </div>
             </div>
 
-            <h1 className="text-3xl font-bold mb-2">{passed ? '¡Felicitaciones!' : '¡Buen intento!'}</h1>
-            <p className="text-stone-600 mb-6">
+            <h1 className="text-3xl font-bold mb-2 anim-entra" style={{ '--i': 3 }}>{passed ? '¡Felicitaciones!' : '¡Buen intento!'}</h1>
+            <p className="text-stone-600 mb-6 anim-entra" style={{ '--i': 4 }}>
               {passed
                 ? lesson.idioma === 'aymara'
                   ? '¡Wali luratawa! (¡Bien hecho!)'
@@ -194,8 +263,8 @@ const LessonView = ({ user, isGuest }) => {
                 : `Con ${PASS_PERCENT}% o más se considera aprobada. Puedes repetirla cuando quieras.`}
             </p>
 
-            <div className={`${passed ? theme.soft : 'bg-orange-50'} rounded-2xl p-6 mb-6`}>
-              <p className={`text-6xl font-extrabold mb-2 ${passed ? theme.text : 'text-orange-800'}`}>{percentage}%</p>
+            <div className={`${passed ? theme.soft : 'bg-orange-50'} rounded-2xl p-6 mb-6 anim-entra`} style={{ '--i': 5 }}>
+              <ResultsScore percentage={percentage} passed={passed} theme={theme} />
               <p className="text-stone-700 text-lg">
                 {score} de {exercises.length} respuestas correctas
               </p>
@@ -226,18 +295,18 @@ const LessonView = ({ user, isGuest }) => {
               </p>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 anim-entra" style={{ '--i': 7 }}>
               <button
                 type="button"
                 onClick={repeatLesson}
-                className="flex-1 min-h-12 px-6 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors"
+                className="flex-1 min-h-12 px-6 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque"
               >
                 Repetir lección
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/dashboard')}
-                className={`flex-1 min-h-12 px-6 ${theme.solid} ${theme.hover} text-white font-bold rounded-xl transition-colors`}
+                className={`flex-1 min-h-12 px-6 ${theme.solid} ${theme.hover} text-white font-bold rounded-xl toque`}
               >
                 Volver al panel
               </button>
@@ -280,7 +349,7 @@ const LessonView = ({ user, isGuest }) => {
               {learnedWords.length} de {vocabulary.length} palabras marcadas como aprendidas
             </p>
             <div className="w-32 h-3 bg-stone-200 rounded-full overflow-hidden shrink-0" aria-hidden="true">
-              <div className={`h-full ${theme.solid} transition-all duration-300`} style={{ width: `${learnedPercent}%` }} />
+              <div className={`barra h-full w-full ${theme.solid}`} style={{ transform: `scaleX(${learnedPercent / 100})` }} />
             </div>
           </div>
 
@@ -309,7 +378,7 @@ const LessonView = ({ user, isGuest }) => {
                         type="button"
                         onClick={() => playAudio(word.audio_url, word.palabra_objetivo)}
                         aria-label={`Escuchar ${word.palabra_objetivo}`}
-                        className={`w-11 h-11 flex items-center justify-center ${theme.solid} ${theme.hover} text-white rounded-full transition-colors`}
+                        className={`w-11 h-11 flex items-center justify-center ${theme.solid} ${theme.hover} text-white rounded-full toque`}
                       >
                         <Volume2 className="w-5 h-5" aria-hidden="true" />
                       </button>
@@ -318,11 +387,12 @@ const LessonView = ({ user, isGuest }) => {
                         onClick={() => toggleLearnedWord(word.id)}
                         aria-pressed={learned}
                         aria-label={`Marcar ${word.palabra_objetivo} como aprendida`}
-                        className={`w-11 h-11 flex items-center justify-center rounded-full transition-colors ${
+                        className={`w-11 h-11 flex items-center justify-center rounded-full toque ${
                           learned ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                         }`}
                       >
-                        <Star className={`w-5 h-5 ${learned ? 'fill-white' : ''}`} aria-hidden="true" />
+                        {/* key: al marcarla, la estrella late una vez */}
+                        <Star key={learned ? 'si' : 'no'} className={`w-5 h-5 ${learned ? 'fill-white anim-latido' : ''}`} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -339,7 +409,7 @@ const LessonView = ({ user, isGuest }) => {
                   setShowVocab(false);
                   window.scrollTo(0, 0);
                 }}
-                className={`w-full min-h-14 ${theme.solid} ${theme.hover} text-white font-bold text-lg rounded-2xl transition-colors flex items-center justify-center gap-3`}
+                className={`w-full min-h-14 ${theme.solid} ${theme.hover} text-white font-bold text-lg rounded-2xl toque flex items-center justify-center gap-3`}
               >
                 Comenzar ejercicios ({exercises.length} preguntas)
                 <ArrowRight className="w-6 h-6" aria-hidden="true" />
@@ -371,7 +441,8 @@ const LessonView = ({ user, isGuest }) => {
             Volver al vocabulario
           </button>
           <p className="flex items-center gap-2 bg-white border border-stone-200 px-4 py-2 rounded-full font-bold">
-            <Star className="w-5 h-5 text-amber-500 fill-amber-500" aria-hidden="true" />
+            {/* Cada acierto hace latir la estrella del marcador */}
+            <Star key={score} className={`w-5 h-5 text-amber-500 fill-amber-500 ${score > 0 ? 'anim-latido' : ''}`} aria-hidden="true" />
             <span className="sr-only">Respuestas correctas: </span>
             {score}/{exercises.length}
           </p>
@@ -392,11 +463,15 @@ const LessonView = ({ user, isGuest }) => {
             aria-valuemin={1}
             aria-valuemax={exercises.length}
           >
-            <div className={`${theme.solid} h-3 rounded-full transition-all duration-300`} style={{ width: `${questionPercent}%` }} />
+            <div className="h-3 rounded-full overflow-hidden">
+              <div className={`barra h-full w-full rounded-full ${theme.solid}`} style={{ transform: `scaleX(${questionPercent / 100})` }} />
+            </div>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+          {/* key: cada pregunta nueva entra desde un poco más abajo en vez de reemplazar a la anterior de golpe */}
+          <div key={currentExercise} className="anim-entra">
           <ExerciseTypes
             exercise={exercise}
             onAnswer={handleAnswer}
@@ -404,13 +479,23 @@ const LessonView = ({ user, isGuest }) => {
             answered={!!feedback}
             languageLabel={theme.name}
           />
+          </div>
 
-          {/* Corrección: se anuncia y espera a que la persona pulse Continuar */}
+          {/* Corrección: se anuncia y espera a que la persona pulse Continuar.
+              Entra desde abajo; si es correcta el ícono hace pop, si no, el mensaje se sacude suave */}
           <div role="status" aria-live="polite">
             {feedback && (
-              <div className={`p-5 sm:p-6 border-t-2 ${feedback.correct ? 'bg-green-50 border-green-700' : 'bg-red-50 border-red-700'}`}>
-                <p className={`flex items-center gap-3 font-bold text-lg ${feedback.correct ? 'text-green-900' : 'text-red-900'}`}>
-                  {feedback.correct ? <Check className="w-6 h-6" aria-hidden="true" /> : <X className="w-6 h-6" aria-hidden="true" />}
+              <div className={`anim-entra p-5 sm:p-6 border-t-2 ${feedback.correct ? 'bg-green-50 border-green-700' : 'bg-red-50 border-red-700'}`}>
+                <p className={`flex items-center gap-3 font-bold text-lg ${feedback.correct ? 'text-green-900' : 'text-red-900 anim-sacude'}`}>
+                  {feedback.correct ? (
+                    <span className="anim-pop w-8 h-8 rounded-full bg-green-700 text-white flex items-center justify-center" style={{ '--i': 2 }} aria-hidden="true">
+                      <Check className="w-5 h-5" strokeWidth={3} />
+                    </span>
+                  ) : (
+                    <span className="w-8 h-8 rounded-full bg-red-700 text-white flex items-center justify-center" aria-hidden="true">
+                      <X className="w-5 h-5" strokeWidth={3} />
+                    </span>
+                  )}
                   {feedback.correct ? '¡Correcto!' : 'No es correcto'}
                 </p>
                 {!feedback.correct && feedback.correctText && (
@@ -423,12 +508,12 @@ const LessonView = ({ user, isGuest }) => {
           </div>
 
           {feedback && (
-            <div className="px-5 sm:px-6 pb-6 pt-2 bg-white">
+            <div className="px-5 sm:px-6 pb-6 pt-2 bg-white anim-entra" style={{ '--i': 2 }}>
               <button
                 ref={continueRef}
                 type="button"
                 onClick={goToNext}
-                className={`w-full min-h-12 ${theme.solid} ${theme.hover} text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2`}
+                className={`w-full min-h-12 ${theme.solid} ${theme.hover} text-white font-bold rounded-xl toque flex items-center justify-center gap-2`}
               >
                 {isLast ? 'Ver resultados' : 'Continuar'}
                 <ArrowRight className="w-5 h-5" aria-hidden="true" />

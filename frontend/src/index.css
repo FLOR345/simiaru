@@ -8,10 +8,74 @@
   box-sizing: border-box;
 }
 
+/* ==================== Movimiento: tokens compartidos ====================
+   Una sola familia de curvas para toda la app (Emil Kowalski):
+   --ease-out para lo que entra o responde, --ease-in-out para lo que se mueve en pantalla,
+   --ease-pop (con un leve rebote) solo para celebrar un acierto o una insignia. */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Barra de estado del celular del mismo color que la app */
+  color-scheme: light;
+}
+
+html {
+  /* Sin el destello gris al tocar en el celular: cada botón ya tiene su propia respuesta */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 100vh en el celular incluye la barra del navegador y corta el contenido: 100dvh no */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Toques inmediatos (sin la espera del doble toque) y sin seleccionar el texto del botón al mantenerlo */
+button,
+a,
+[role='button'],
+label {
+  touch-action: manipulation;
+}
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* En pantallas táctiles, un campo con letra menor a 16px hace que iOS acerque toda la página */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Palabras larguísimas sin espacios (el quechua y el aymara las tienen, y también los correos):
+   se parten solo si no caben, en vez de empujar la tarjeta fuera de la pantalla */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+li,
+dd,
+dt,
+figcaption,
+label,
+strong,
+em {
+  overflow-wrap: anywhere;
 }
 
 /* Foco del teclado y selección de texto con la paleta de SimiAru, en todas las pantallas */
@@ -26,36 +90,184 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Botones que se sienten presionados: se hunden un poco al tocarlos.
+/* ==================== Presionar ====================
+   Botones que se sienten presionados: se hunden un poco al tocarlos.
    Va fuera de @layer para ganarle a transition-colors de Tailwind. */
 .toque {
   transition:
-    transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 160ms var(--ease-out),
     background-color 150ms ease,
     border-color 150ms ease,
-    color 150ms ease;
+    color 150ms ease,
+    box-shadow 150ms ease;
 }
 /* Respuesta al presionar: más rápida que la vuelta, para sentirse inmediata */
-.toque:active {
+.toque:active:not(:disabled) {
   transform: scale(0.97);
   transition-duration: 100ms;
 }
-@media (prefers-reduced-motion: reduce) {
-  .toque:active {
-    transform: none;
-  }
+
+/* ==================== Barras de avance ====================
+   Se llenan con transform (no con width): no recalculan el diseño de la página en cada cuadro */
+.barra {
+  transform-origin: left center;
+  transition: transform 600ms var(--ease-out);
+  will-change: transform;
 }
 
-@layer components {
-  .btn-primary {
-    @apply bg-wiphala-green hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl;
+/* ==================== Entradas ==================== */
+@keyframes entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  
-  .btn-secondary {
-    @apply bg-white hover:bg-gray-100 text-gray-800 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-all duration-200;
+}
+/* Aparece desde un poco más abajo: un panel, una pregunta nueva, un mensaje */
+.anim-entra {
+  animation: entra 260ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@keyframes despliega {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
-  
-  .card {
-    @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300;
+}
+/* Baja desde quien lo abrió: el contenido de una unidad, un menú */
+.anim-despliega {
+  animation: despliega 220ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+/* Pop in: un ícono que celebra (nunca desde scale(0)) */
+.anim-pop {
+  animation: pop 420ms var(--ease-pop) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes latido {
+  40% {
+    transform: scale(1.28);
+  }
+}
+/* Un latido corto al marcar algo (favorito, palabra aprendida, punto ganado) */
+.anim-latido {
+  animation: latido 320ms var(--ease-out);
+}
+
+@keyframes sacude {
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+/* Shake: un "no" suave al equivocarse, sin castigar */
+.anim-sacude {
+  animation: sacude 380ms var(--ease-out);
+}
+
+/* ==================== Ventanas modales ==================== */
+@keyframes modal-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+@keyframes velo-entra {
+  from {
+    opacity: 0;
+  }
+}
+/* Una modal se queda centrada (no tiene un botón de origen) y llega de un poco más lejos */
+dialog.modal[open] {
+  animation: modal-entra 240ms var(--ease-out);
+}
+dialog.modal[open]::backdrop {
+  animation: velo-entra 240ms ease;
+}
+dialog.modal {
+  overscroll-behavior: contain;
+}
+
+/* ==================== Celebración ==================== */
+@keyframes papelito {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--r));
+  }
+}
+.papelito {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: papelito 1100ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 12ms + 180ms);
+}
+
+/* ==================== Espera ==================== */
+/* Aparece tras 300ms: si la pantalla llega antes, nunca se ve */
+.espera {
+  animation: solo-aparece 200ms ease 300ms backwards;
+}
+@keyframes gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Un giro rápido hace que la espera se sienta más corta */
+.espera-punto {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 3px solid #d6d3d1;
+  border-top-color: #15803d;
+  animation: gira 700ms linear infinite;
+}
+
+/* ==================== Movimiento reducido ====================
+   Menos movimiento no es cero: se conservan los fundidos que ayudan a entender, sin desplazamientos */
+@keyframes solo-aparece {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toque:active:not(:disabled) {
+    transform: none;
+  }
+  .barra {
+    transition: none;
+  }
+  .anim-entra,
+  .anim-despliega,
+  .anim-pop,
+  dialog.modal[open] {
+    animation: solo-aparece 150ms ease backwards;
+  }
+  .anim-latido,
+  .anim-sacude {
+    animation: none;
+  }
+  .papelito {
+    display: none;
+  }
+  /* El indicador de carga sigue (dice que algo pasa), pero más lento */
+  .espera-punto {
+    animation-duration: 1600ms;
   }
 }

@@ -28,6 +28,10 @@ const LANGUAGE_STYLE = {
   },
 };
 
+// Saludo con el primer nombre: el nombre completo vive en el perfil
+const firstName = (nombre) => String(nombre || '').trim().split(/\s+/)[0] || 'amigo';
+// Números con separador de miles (9,999,999) para que se lean de un vistazo
+const formatNumber = (value) => Number(value || 0).toLocaleString('es-PE');
 const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [units, setUnits] = useState([]);
   const [progress, setProgress] = useState([]);
@@ -116,14 +120,14 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       Icon: Flame,
       iconClass: 'text-orange-700',
       label: 'Racha',
-      value: displayUser?.racha_actual || 0,
+      value: formatNumber(displayUser?.racha_actual),
       detail: isGuest ? 'Regístrate para guardar tu racha' : 'días seguidos',
     },
     {
       Icon: Star,
       iconClass: 'text-amber-600',
       label: 'Ayni Points',
-      value: displayUser?.puntos_totales || 0,
+      value: formatNumber(displayUser?.puntos_totales),
       detail: isGuest ? 'Regístrate para ganar puntos' : 'puntos ganados',
     },
     {
@@ -142,7 +146,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     },
   ];
 
-  const navLink = 'flex items-center gap-2 min-h-11 px-2 text-stone-700 hover:text-green-800 font-semibold rounded-lg transition-colors';
+  const navLink = 'flex items-center gap-2 min-h-11 px-2 text-stone-700 hover:text-green-800 font-semibold rounded-lg toque';
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900">
@@ -155,10 +159,10 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
               Estás en modo invitado: solo puedes acceder a la Unidad 1
             </p>
             <div className="flex items-center gap-3">
-              <Link to="/register" className="px-4 py-2 min-h-11 inline-flex items-center bg-white text-orange-800 font-bold rounded-lg hover:bg-orange-50 transition-colors">
+              <Link to="/register" className="px-4 py-2 min-h-11 inline-flex items-center bg-white text-orange-800 font-bold rounded-lg hover:bg-orange-50 toque">
                 Crear cuenta gratis
               </Link>
-              <Link to="/login" className="px-4 py-2 min-h-11 inline-flex items-center border-2 border-white text-white font-bold rounded-lg hover:bg-orange-900 transition-colors">
+              <Link to="/login" className="px-4 py-2 min-h-11 inline-flex items-center border-2 border-white text-white font-bold rounded-lg hover:bg-orange-900 toque">
                 Iniciar sesión
               </Link>
             </div>
@@ -206,7 +210,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                 onClick={handleLogout}
                 aria-label={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'}
                 title={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'}
-                className="w-11 h-11 flex items-center justify-center text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                className="w-11 h-11 flex items-center justify-center text-red-700 hover:bg-red-50 rounded-lg toque"
               >
                 <LogOut className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -219,7 +223,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         {/* ==================== SALUDO ==================== */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-            {isGuest ? '¡Bienvenido!' : `¡Rimaykullayki, ${displayUser?.nombre}!`}
+            {isGuest ? '¡Bienvenido!' : `¡Rimaykullayki, ${firstName(displayUser?.nombre)}!`}
           </h1>
           <p className="text-lg sm:text-xl text-stone-600">
             {isGuest
@@ -256,10 +260,10 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                   ))}
                 </ul>
                 <div className="flex flex-wrap gap-3">
-                  <Link to="/register" className="px-6 min-h-11 inline-flex items-center bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg transition-colors">
+                  <Link to="/register" className="px-6 min-h-11 inline-flex items-center bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg toque">
                     Crear cuenta gratis <span aria-hidden="true">&nbsp;→</span>
                   </Link>
-                  <Link to="/login" className="px-6 min-h-11 inline-flex items-center border-2 border-stone-300 text-stone-800 font-bold rounded-lg hover:bg-stone-50 transition-colors">
+                  <Link to="/login" className="px-6 min-h-11 inline-flex items-center border-2 border-stone-300 text-stone-800 font-bold rounded-lg hover:bg-stone-50 toque">
                     Ya tengo cuenta
                   </Link>
                 </div>
@@ -276,7 +280,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                 <Icon className={`w-6 h-6 ${isGuest ? 'text-stone-400' : iconClass}`} aria-hidden="true" />
                 <span className="text-sm font-bold text-stone-600">{label}</span>
               </div>
-              <p className="text-3xl sm:text-4xl font-extrabold mb-1">{value}</p>
+              <p className="text-[clamp(1.25rem,6vw,1.875rem)] sm:text-4xl font-extrabold mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">{value}</p>
               <p className="text-sm text-stone-600">{detail}</p>
             </li>
           ))}
@@ -296,7 +300,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setSelectedLanguage(key)}
-                  className={`text-left p-6 rounded-2xl border-2 transition-colors ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
+                  className={`text-left p-6 rounded-2xl border-2 toque ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
                 >
                   <span className="flex items-center justify-between mb-2">
                     <span className={`text-2xl font-bold ${style.accent}`}>{style.label}</span>
@@ -321,14 +325,14 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
               <div className="w-48">
                 <p className="text-right text-2xl font-extrabold mb-1">{overallProgress}%</p>
                 <div
-                  className="w-full bg-stone-200 rounded-full h-3"
+                  className="w-full bg-stone-200 rounded-full h-3 overflow-hidden"
                   role="progressbar"
                   aria-label={`Progreso en ${lang.label}`}
                   aria-valuenow={overallProgress}
                   aria-valuemin={0}
                   aria-valuemax={100}
                 >
-                  <div className={`${lang.bar} h-3 rounded-full transition-all duration-500`} style={{ width: `${overallProgress}%` }} />
+                  <Barra value={overallProgress} className={lang.bar} />
                 </div>
               </div>
             )}
@@ -348,7 +352,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
               <button
                 type="button"
                 onClick={loadData}
-                className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg toque"
               >
                 <RefreshCw className="w-5 h-5" aria-hidden="true" />
                 Reintentar
@@ -392,10 +396,10 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
               Crea tu cuenta gratis para guardar tu progreso, ganar puntos y acceder a todas las unidades
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/register" className="px-8 min-h-12 inline-flex items-center bg-white text-green-800 font-bold rounded-xl hover:bg-green-50 transition-colors">
+              <Link to="/register" className="px-8 min-h-12 inline-flex items-center bg-white text-green-800 font-bold rounded-xl hover:bg-green-50 toque">
                 Crear cuenta gratis
               </Link>
-              <Link to="/login" className="px-8 min-h-12 inline-flex items-center border-2 border-white text-white font-bold rounded-xl hover:bg-green-700 transition-colors">
+              <Link to="/login" className="px-8 min-h-12 inline-flex items-center border-2 border-white text-white font-bold rounded-xl hover:bg-green-700 toque">
                 Ya tengo cuenta
               </Link>
             </div>
@@ -478,8 +482,8 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
               </span>
               <span>{progress}%</span>
             </span>
-            <span className="block w-full bg-stone-200 rounded-full h-2" aria-hidden="true">
-              <span className={`block ${style.bar} h-2 rounded-full transition-all duration-500`} style={{ width: `${progress}%` }} />
+            <span className="block w-full bg-stone-200 rounded-full h-2 overflow-hidden" aria-hidden="true">
+              <Barra value={progress} className={style.bar} />
             </span>
           </span>
         )}
@@ -523,7 +527,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
               <button
                 type="button"
                 onClick={loadLessons}
-                className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 font-bold rounded-lg hover:bg-white transition-colors"
+                className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 font-bold rounded-lg hover:bg-white toque"
               >
                 <RefreshCw className="w-4 h-4" aria-hidden="true" />
                 Reintentar
@@ -563,7 +567,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
                 );
 
                 return (
-                  <li key={lesson.id}>
+                  <li key={lesson.id} className="anim-despliega" style={{ "--i": lessonIndex }}>
                     {locked ? (
                       <div className="flex items-center gap-4 p-4 rounded-xl bg-stone-100 text-stone-500" aria-disabled="true">
                         {content}
@@ -571,7 +575,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
                     ) : (
                       <Link
                         to={`/lesson/${lesson.id}`}
-                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-colors ${
+                        className={`flex items-center gap-4 p-4 rounded-xl border-2 toque ${
                           completed ? 'bg-white border-stone-200 hover:border-stone-400' : 'bg-white border-stone-200 hover:border-green-700'
                         }`}
                       >
@@ -590,3 +594,21 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
 };
 
 export default Dashboard;
+
+// Barra de avance: se llena desde cero al aparecer, con transform (sin recalcular el diseño).
+// Con movimiento reducido, .barra no tiene transición y muestra el valor directamente.
+function Barra({ value, className }) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    // Dos cuadros: el primero pinta la barra vacía, el segundo dispara la transición
+    let second;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setShown(value));
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, [value]);
+  return <span className={`barra block h-full w-full ${className}`} style={{ transform: `scaleX(${shown / 100})` }} />;
+}

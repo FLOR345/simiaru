@@ -1,11 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
+
+// Sonner llega en su propio archivo, después de la primera pantalla: los avisos siempre
+// responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
+const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
 import Home from './pages/Home';
 import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule } from './routes';
 
+// Pantalla de espera: mismo fondo claro que la app y solo visible si la carga pasa de 0,3 s
+// (las cargas rápidas no muestran un destello de "Cargando")
 const LoadingScreen = () => (
-  <div className="min-h-screen flex items-center justify-center text-white" role="status">
-    Cargando...
+  <div className="min-h-screen flex items-center justify-center bg-stone-50 text-stone-600" role="status">
+    <span className="espera flex items-center gap-3 font-semibold">
+      <span className="espera-punto" aria-hidden="true" />
+      Cargando…
+    </span>
   </div>
 );
 
@@ -100,6 +109,11 @@ function App() {
 
   return (
     <BrowserRouter>
+      {/* Avisos de toda la app (progreso guardado, insignias, favoritos, perfil).
+          Arriba al centro: nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
+      <Suspense fallback={null}>
+        <Toaster position="top-center" richColors closeButton duration={4000} toastOptions={{ style: { fontFamily: 'inherit' } }} />
+      </Suspense>
       <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path="/" element={<Home enableGuestMode={() => setIsGuest(true)} />} />

@@ -60,7 +60,7 @@ const Login = ({ setUser, setIsGuest }) => {
           <button
             type="button"
             onClick={handleGuestMode}
-            className="inline-flex items-center gap-2 min-h-11 px-4 text-orange-800 font-bold hover:bg-orange-50 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 min-h-11 px-4 text-orange-800 font-bold hover:bg-orange-50 rounded-xl toque"
           >
             <UserX className="w-4 h-4" aria-hidden="true" />
             Probar sin cuenta

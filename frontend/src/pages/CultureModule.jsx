@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Volume2, Heart, Search, ArrowLeft, CheckCircle, AlertCircle, RefreshCw, BookOpen } from 'lucide-react';
 import { api } from '../services/api';
 import logo from '../assets/logo.jpg';
@@ -35,9 +36,10 @@ const FavoriteButton = ({ isFavorite, onToggle, name }) => (
     onClick={onToggle}
     aria-pressed={isFavorite}
     aria-label={`${isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}: ${name}`}
-    className="w-11 h-11 flex items-center justify-center rounded-full transition-colors shrink-0 text-stone-600 hover:bg-stone-100"
+    className="w-11 h-11 flex items-center justify-center rounded-full toque shrink-0 text-stone-600 hover:bg-stone-100"
   >
-    <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-600 text-red-600' : ''}`} aria-hidden="true" />
+    {/* key: al guardarlo, el corazón late una vez */}
+    <Heart key={isFavorite ? 'si' : 'no'} className={`w-6 h-6 ${isFavorite ? 'fill-red-600 text-red-600 anim-latido' : ''}`} aria-hidden="true" />
   </button>
 );
 
@@ -66,7 +68,7 @@ const ContentBody = ({ item, lang }) => (
       <button
         type="button"
         onClick={() => new Audio(item.audio_url).play().catch((err) => console.error('Error playing audio:', err))}
-        className={`w-full flex items-center justify-center gap-2 px-5 min-h-12 ${lang.solid} text-white rounded-xl font-bold transition-colors`}
+        className={`w-full flex items-center justify-center gap-2 px-5 min-h-12 ${lang.solid} text-white rounded-xl font-bold toque`}
       >
         <Volume2 className="w-5 h-5" aria-hidden="true" />
         Escuchar
@@ -117,14 +119,26 @@ const CultureModule = ({ user }) => {
   };
 
   // Los favoritos se guardan en este dispositivo (sirve también en modo invitado)
+  const setFavorite = (itemId, favorite) => {
+    setFavorites((prev) => {
+      const next = favorite ? (prev.includes(itemId) ? prev : [...prev, itemId]) : prev.filter((id) => id !== itemId);
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+      } catch {
+        // almacenamiento bloqueado: los favoritos duran solo esta visita
+      }
+      return next;
+    });
+  };
+
+  // Confirmación con "Deshacer": un toque accidental se corrige sin buscar el texto otra vez
   const toggleFavorite = (itemId) => {
-    const next = favorites.includes(itemId) ? favorites.filter((id) => id !== itemId) : [...favorites, itemId];
-    setFavorites(next);
-    try {
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
-    } catch {
-      // almacenamiento bloqueado: los favoritos duran solo esta visita
-    }
+    const wasFavorite = favorites.includes(itemId);
+    setFavorite(itemId, !wasFavorite);
+    toast(wasFavorite ? 'Quitado de favoritos' : 'Guardado en favoritos', {
+      id: `favorito-${itemId}`,
+      action: { label: 'Deshacer', onClick: () => setFavorite(itemId, wasFavorite) },
+    });
   };
 
 
@@ -161,7 +175,7 @@ const CultureModule = ({ user }) => {
           <AlertCircle className="w-10 h-10 text-red-700 mx-auto mb-3" aria-hidden="true" />
           <p className="text-lg font-semibold mb-1">No pudimos cargar el contenido cultural</p>
           <p className="text-stone-600 mb-5">Revisa tu conexión. Si es tu primera visita del día, el servidor puede tardar hasta un minuto.</p>
-          <button type="button" onClick={loadContent} className={`inline-flex items-center gap-2 px-6 min-h-11 ${lang.solid} text-white font-bold rounded-lg transition-colors`}>
+          <button type="button" onClick={loadContent} className={`inline-flex items-center gap-2 px-6 min-h-11 ${lang.solid} text-white font-bold rounded-lg toque`}>
             <RefreshCw className="w-5 h-5" aria-hidden="true" />
             Reintentar
           </button>
@@ -186,7 +200,7 @@ const CultureModule = ({ user }) => {
         <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
           <Search className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
           <h2 className="text-xl font-bold mb-2">{showFavorites ? 'Aún no guardaste favoritos aquí' : `Sin resultados para “${searchTerm.trim()}”`}</h2>
-          <button type="button" onClick={resetFilters} className="mt-3 px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 transition-colors">
+          <button type="button" onClick={resetFilters} className="mt-3 px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 toque">
             Ver todo el contenido
           </button>
         </div>
@@ -232,7 +246,7 @@ const CultureModule = ({ user }) => {
               <button
                 type="button"
                 onClick={() => setSelectedStory(story)}
-                className="w-full h-full text-left p-5 rounded-2xl bg-white border-2 border-stone-200 hover:border-stone-400 transition-colors"
+                className="w-full h-full text-left p-5 rounded-2xl bg-white border-2 border-stone-200 hover:border-stone-400 toque"
               >
                 <span className="flex items-start justify-between gap-2">
                   <span className="font-bold text-lg">{story.titulo || 'Sin título'}</span>
@@ -272,7 +286,7 @@ const CultureModule = ({ user }) => {
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 transition-colors">
+          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 toque">
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
           <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
@@ -298,7 +312,7 @@ const CultureModule = ({ user }) => {
                     setSelectedLanguage(key);
                     resetFilters();
                   }}
-                  className={`text-left p-4 sm:p-6 rounded-2xl border-2 transition-colors ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
+                  className={`text-left p-4 sm:p-6 rounded-2xl border-2 toque ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
                 >
                   <span className="flex items-center justify-between">
                     <span className={`text-xl sm:text-2xl font-bold ${style.accent}`}>{style.label}</span>
@@ -326,7 +340,7 @@ const CultureModule = ({ user }) => {
                       setSelectedType(t.value);
                       resetFilters();
                     }}
-                    className={`px-5 min-h-11 rounded-full border-2 font-semibold transition-colors ${selected ? `${lang.selected} ${lang.accent}` : 'border-stone-200 bg-white hover:border-stone-400'}`}
+                    className={`px-5 min-h-11 rounded-full border-2 font-semibold toque ${selected ? `${lang.selected} ${lang.accent}` : 'border-stone-200 bg-white hover:border-stone-400'}`}
                   >
                     {t.label}
                   </button>
@@ -356,7 +370,7 @@ const CultureModule = ({ user }) => {
                 type="button"
                 onClick={() => setShowFavorites(!showFavorites)}
                 aria-pressed={showFavorites}
-                className={`px-5 min-h-12 rounded-xl font-semibold whitespace-nowrap transition-colors flex items-center justify-center gap-2 border-2 ${
+                className={`px-5 min-h-12 rounded-xl font-semibold whitespace-nowrap toque flex items-center justify-center gap-2 border-2 ${
                   showFavorites ? 'border-red-700 bg-red-50 text-red-800' : 'border-stone-200 bg-white hover:border-stone-400'
                 }`}
               >

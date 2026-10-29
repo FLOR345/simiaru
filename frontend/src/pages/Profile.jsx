@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
@@ -26,14 +27,14 @@ const Modal = ({ id, open, onClose, title, children }) => {
       ref={ref}
       onClose={onClose}
       aria-labelledby={`${id}-titulo`}
-      className="w-[calc(100%-2rem)] max-w-md rounded-3xl p-0 backdrop:bg-stone-900/60 text-stone-900"
+      className="modal w-[calc(100%-2rem)] max-w-md rounded-3xl p-0 backdrop:bg-stone-900/60 text-stone-900"
     >
       <div className="p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4 mb-6">
           <h2 id={`${id}-titulo`} className="text-2xl font-bold">
             {title}
           </h2>
-          <button type="button" onClick={onClose} aria-label="Cerrar" className="w-11 h-11 -mt-2 -mr-2 flex items-center justify-center rounded-full hover:bg-stone-100">
+          <button type="button" onClick={onClose} aria-label="Cerrar" className="toque w-11 h-11 -mt-2 -mr-2 flex items-center justify-center rounded-full hover:bg-stone-100">
             <X className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
@@ -47,14 +48,14 @@ const Message = ({ message }) =>
   message ? (
     <p
       role={message.type === 'error' ? 'alert' : 'status'}
-      className={`p-4 rounded-xl mb-5 font-semibold ${message.type === 'success' ? 'bg-green-50 text-green-900 border border-green-300' : 'bg-red-50 text-red-800 border border-red-300'}`}
+      className={`anim-entra p-4 rounded-xl mb-5 font-semibold ${message.type === 'success' ? 'bg-green-50 text-green-900 border border-green-300' : 'bg-red-50 text-red-800 border border-red-300'}`}
     >
       {message.text}
     </p>
   ) : null;
 
 const fieldClass = 'w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none bg-white';
-const primaryButton = 'w-full min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60';
+const primaryButton = 'w-full min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque flex items-center justify-center gap-2 disabled:opacity-60';
 
 const Profile = ({ user, setUser }) => {
   const navigate = useNavigate();
@@ -139,7 +140,8 @@ const Profile = ({ user, setUser }) => {
       } catch {
         // sin almacenamiento: se actualiza solo en esta visita
       }
-      setMessage({ type: 'success', text: 'Perfil actualizado' });
+      closeModal();
+      toast.success('Perfil actualizado');
     } catch (error) {
       setMessage({ type: 'error', text: error.response?.data?.message || 'No pudimos guardar los cambios. Inténtalo de nuevo.' });
     } finally {
@@ -167,7 +169,8 @@ const Profile = ({ user, setUser }) => {
         { currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword },
         authHeaders(),
       );
-      setMessage({ type: 'success', text: data.message || 'Contraseña actualizada' });
+      closeModal();
+      toast.success(data.message || 'Contraseña actualizada');
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       setProfile((p) => ({ ...p, hasPassword: true }));
     } catch (error) {
@@ -197,7 +200,7 @@ const Profile = ({ user, setUser }) => {
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-40 border-b border-stone-200">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 transition-colors">
+          <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 toque">
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
           <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
@@ -215,7 +218,7 @@ const Profile = ({ user, setUser }) => {
             <AlertCircle className="w-10 h-10 text-red-700 mx-auto mb-3" aria-hidden="true" />
             <p className="text-lg font-semibold mb-1">No pudimos cargar tu perfil</p>
             <p className="text-stone-600 mb-5">Revisa tu conexión. Si es tu primera visita del día, el servidor puede tardar hasta un minuto.</p>
-            <button type="button" onClick={loadAll} className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg transition-colors">
+            <button type="button" onClick={loadAll} className="inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg toque">
               <RefreshCw className="w-5 h-5" aria-hidden="true" />
               Reintentar
             </button>
@@ -229,7 +232,7 @@ const Profile = ({ user, setUser }) => {
                   {profile?.nombre?.charAt(0).toUpperCase() || '?'}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <h2 id="nombre-usuario" className="text-3xl font-bold break-words">
+                  <h2 id="nombre-usuario" className="text-3xl font-bold">
                     {profile?.nombre || 'Usuario'}
                   </h2>
                   <p className="text-stone-600 break-all">{profile?.email}</p>
@@ -245,11 +248,11 @@ const Profile = ({ user, setUser }) => {
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 mt-6">
-                <button type="button" onClick={openEdit} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors">
+                <button type="button" onClick={openEdit} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque">
                   <Edit3 className="w-4 h-4" aria-hidden="true" />
                   Editar perfil
                 </button>
-                <button type="button" onClick={openPassword} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 transition-colors">
+                <button type="button" onClick={openPassword} className="inline-flex items-center gap-2 px-5 min-h-11 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque">
                   <Lock className="w-4 h-4" aria-hidden="true" />
                   {hasPassword ? 'Cambiar contraseña' : 'Crear contraseña'}
                 </button>
@@ -315,7 +318,7 @@ const Profile = ({ user, setUser }) => {
                 <div className="text-center py-10">
                   <BookOpen className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
                   <p className="text-lg font-semibold mb-4">Todavía no completaste ninguna lección</p>
-                  <Link to="/dashboard" className="inline-flex items-center px-6 min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl transition-colors">
+                  <Link to="/dashboard" className="inline-flex items-center px-6 min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque">
                     Empezar la primera lección
                   </Link>
                 </div>

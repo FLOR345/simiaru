@@ -125,7 +125,7 @@ const Dictionary = () => {
           <Link
             to={backTo}
             aria-label={backTo === '/' ? 'Volver a la portada' : 'Volver al panel'}
-            className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 transition-colors"
+            className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 toque"
           >
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
@@ -154,7 +154,7 @@ const Dictionary = () => {
                     setSelectedLanguage(key);
                     clearSearch();
                   }}
-                  className={`text-left p-4 sm:p-6 rounded-2xl border-2 transition-colors ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
+                  className={`text-left p-4 sm:p-6 rounded-2xl border-2 toque ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
                 >
                   <span className="flex items-center justify-between">
                     <span className={`text-xl sm:text-2xl font-bold ${style.accent}`}>{style.label}</span>
@@ -194,7 +194,7 @@ const Dictionary = () => {
                 type="button"
                 onClick={clearSearch}
                 aria-label="Borrar búsqueda"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center hover:bg-stone-100 rounded-xl transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center hover:bg-stone-100 rounded-xl toque"
               >
                 <X className="w-5 h-5 text-stone-600" aria-hidden="true" />
               </button>
@@ -216,7 +216,7 @@ const Dictionary = () => {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-xl font-semibold transition-colors"
+                  className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-xl font-semibold toque"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
                   Quitar filtro
@@ -232,7 +232,7 @@ const Dictionary = () => {
                     type="button"
                     aria-pressed={isSelected}
                     onClick={() => openCategory(cat.categoria)}
-                    className={`inline-flex items-center gap-2 px-4 min-h-11 rounded-full border-2 font-semibold transition-colors ${
+                    className={`inline-flex items-center gap-2 px-4 min-h-11 rounded-full border-2 font-semibold toque ${
                       isSelected ? `${lang.selected} ${lang.accent}` : 'border-stone-200 bg-white hover:border-stone-400'
                     }`}
                   >
@@ -259,7 +259,7 @@ const Dictionary = () => {
               <button
                 type="button"
                 onClick={retry}
-                className={`inline-flex items-center gap-2 px-6 min-h-11 ${lang.solid} text-white font-bold rounded-lg transition-colors`}
+                className={`inline-flex items-center gap-2 px-6 min-h-11 ${lang.solid} text-white font-bold rounded-lg toque`}
               >
                 <RefreshCw className="w-5 h-5" aria-hidden="true" />
                 Reintentar
@@ -287,7 +287,7 @@ const Dictionary = () => {
               <Search className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
               <h2 className="text-xl font-bold mb-2">Sin resultados para “{searchTerm.trim()}”</h2>
               <p className="text-stone-600 mb-5">Prueba con otra palabra, en español o en {lang.label.toLowerCase()}, o elige una categoría.</p>
-              <button type="button" onClick={clearSearch} className="px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 transition-colors">
+              <button type="button" onClick={clearSearch} className="px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 toque">
                 Borrar búsqueda
               </button>
             </div>
@@ -330,7 +330,7 @@ const WordCard = ({ word, lang }) => {
 
       <div className="flex items-start gap-4">
         <div className="flex-1 min-w-0">
-          <p className={`text-2xl sm:text-3xl font-bold ${lang.accent} break-words`} lang={lang.lang}>
+          <p className={`text-2xl sm:text-3xl font-bold ${lang.accent}`} lang={lang.lang}>
             {word.palabra_objetivo}
           </p>
           {word.pronunciacion && <p className="text-stone-600 mt-1">/{word.pronunciacion}/</p>}
@@ -353,7 +353,7 @@ const WordCard = ({ word, lang }) => {
           onClick={handlePlayAudio}
           disabled={isPlaying}
           aria-label={`Escuchar ${word.palabra_objetivo}${word.audio_url ? ' (audio grabado)' : ' (voz sintetizada)'}`}
-          className={`w-12 h-12 shrink-0 flex items-center justify-center ${lang.solid} text-white rounded-xl transition-colors disabled:opacity-70`}
+          className={`w-12 h-12 shrink-0 flex items-center justify-center ${lang.solid} text-white rounded-xl toque disabled:opacity-70`}
         >
           <Volume2 className={`w-6 h-6 ${isPlaying ? 'motion-safe:animate-pulse' : ''}`} aria-hidden="true" />
         </button>

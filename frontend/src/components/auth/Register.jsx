@@ -72,7 +72,7 @@ const Register = ({ setUser }) => {
         <button
           type="button"
           onClick={handleFacebookLogin}
-          className="w-full min-h-12 px-4 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-3"
+          className="w-full min-h-12 px-4 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl font-bold toque flex items-center justify-center gap-3"
         >
           <Facebook className="w-5 h-5 fill-white" aria-hidden="true" />
           Continuar con Facebook

@@ -25,7 +25,7 @@ export const GoogleButton = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl font-bold text-stone-800 hover:bg-stone-50 hover:border-stone-400 transition-colors flex items-center justify-center gap-3"
+    className="w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl font-bold text-stone-800 hover:bg-stone-50 hover:border-stone-400 toque flex items-center justify-center gap-3"
   >
     <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -45,10 +45,10 @@ export const Divider = ({ children }) => (
   </div>
 );
 
-// El mensaje se anuncia a lectores de pantalla en cuanto aparece
+// El mensaje se anuncia a lectores de pantalla en cuanto aparece y entra con una sacudida suave
 export const ErrorMessage = ({ children }) =>
   children ? (
-    <p role="alert" className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-xl mb-6 font-semibold">
+    <p role="alert" className="anim-sacude bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-xl mb-6 font-semibold">
       {children}
     </p>
   ) : null;
@@ -63,7 +63,7 @@ export const Field = ({ id, label, icon: Icon, hint, ...inputProps }) => (
       <input
         id={id}
         aria-describedby={hint ? `${id}-ayuda` : undefined}
-        className="w-full min-h-12 pl-12 pr-4 border-2 border-stone-300 rounded-xl bg-white focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none transition-colors"
+        className="w-full min-h-12 pl-12 pr-4 border-2 border-stone-300 rounded-xl bg-white focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none toque"
         {...inputProps}
       />
     </div>
@@ -79,7 +79,7 @@ export const SubmitButton = ({ loading, loadingText, children }) => (
   <button
     type="submit"
     disabled={loading}
-    className="w-full min-h-12 py-3 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+    className="w-full min-h-12 py-3 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
   >
     {loading ? (
       <>
