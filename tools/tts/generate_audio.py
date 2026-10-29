@@ -27,6 +27,11 @@ import re
 import sys
 from pathlib import Path
 
+# La consola de Windows usa cp1252 y no imprime caracteres como la flecha o la ñ
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 MODELS = {"quechua": "facebook/mms-tts-quz", "aymara": "facebook/mms-tts-ayr"}
 ROOT = Path(__file__).resolve().parents[2]
 
