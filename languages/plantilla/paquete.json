@@ -13,6 +13,7 @@
     "licencia": "CC-BY-NC-4.0",
     "respaldo": "es-PE"
   },
+  "teclado": ["'"],
   "frases": {
     "saludo": "COMPLETAR",
     "felicitacion": "COMPLETAR",

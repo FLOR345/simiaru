@@ -1,6 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Volume2, Check, X, RotateCcw } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import * as m from 'motion/react-m';
+import { Volume2, Check, X, Snail, Delete } from 'lucide-react';
 import { classifyAnswer } from '../../utils/normalizer';
+import { getLanguage, languageStyle } from '../../languages';
+import { playTap, playMatch, playWrong } from '../../utils/sounds';
+import Mascot from '../Mascot';
+import { speak } from '../../utils/speech';
 
 // ==================== COMPARACIÓN DE RESPUESTAS ====================
 // Acepta diferencias de escritura que no cambian la palabra:
@@ -42,69 +48,149 @@ const shuffle = (list) => {
   return copy;
 };
 
-// Pronunciación con la voz del navegador (síntesis en español; ver PRODUCT.md)
-const speakWord = (word) => {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = 'es-PE';
-  utterance.rate = 0.8;
-  window.speechSynthesis.speak(utterance);
+// Inserta un carácter donde está el cursor y deja el cursor justo después
+const insertAtCursor = (el, value, setValue, ch) => {
+  const start = el?.selectionStart ?? value.length;
+  const end = el?.selectionEnd ?? value.length;
+  setValue(value.slice(0, start) + ch + value.slice(end));
+  requestAnimationFrame(() => {
+    if (!el) return;
+    el.focus();
+    el.setSelectionRange(start + ch.length, start + ch.length);
+  });
 };
 
-const optionClass = (active) =>
-  `w-full p-4 text-left rounded-xl border-2 toque ${
-    active ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
-  }`;
+const TYPE_LABELS = {
+  multiple_choice: 'Elige la respuesta',
+  true_false: '¿Verdadero o falso?',
+  listen_write: 'Escucha y escribe',
+  translate: 'Traduce',
+  fill_blanks: 'Completa la frase',
+  matching: 'Empareja',
+  word_order: 'Ordena la frase',
+  drag_words: 'Ordena la frase',
+};
 
-const textInputClass =
-  'w-full px-4 py-4 border-2 border-stone-300 rounded-xl focus:ring-2 focus:ring-green-700 focus:border-green-700 focus:outline-none text-lg';
+// ==================== PIEZAS COMPARTIDAS ====================
 
-const VerifyButton = ({ disabled, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    className="w-full min-h-12 py-4 px-6 rounded-xl font-bold toque bg-green-700 hover:bg-green-800 text-white disabled:bg-stone-200 disabled:text-stone-500 disabled:cursor-not-allowed"
+// Estado visual de una ficha: reposo, elegida, correcta, incorrecta o apagada
+const tileClass = (state, theme) => {
+  const base = 'ficha w-full min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3 text-left font-bold disabled:cursor-default';
+  switch (state) {
+    case 'selected':
+      return `${base} ${theme.border} ${theme.soft} ${theme.text}`;
+    case 'right':
+      return `${base} border-green-600 bg-green-50 text-green-900`;
+    case 'wrong':
+      return `${base} border-red-500 bg-red-50 text-red-900 anim-sacude`;
+    case 'done':
+      return `${base} border-stone-200 bg-stone-50 text-stone-400`;
+    case 'dim':
+      return `${base} border-stone-200 bg-white text-stone-400`;
+    default:
+      return `${base} border-stone-300 bg-white text-stone-800 hover:bg-stone-50`;
+  }
+};
+
+const KeyHint = ({ n, state }) => (
+  <span
+    className={`tecla hidden sm:inline-flex w-7 h-7 shrink-0 items-center justify-center rounded-lg border-2 text-xs font-black ${
+      state === 'selected' ? 'border-current' : 'border-stone-200 text-stone-500'
+    }`}
+    aria-hidden="true"
   >
-    Verificar
-  </button>
+    {n}
+  </span>
 );
 
-const ResetButton = ({ onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="inline-flex items-center gap-2 px-4 min-h-11 text-stone-700 hover:bg-stone-100 rounded-lg toque font-semibold"
-  >
-    <RotateCcw className="w-4 h-4" aria-hidden="true" />
-    Reiniciar
-  </button>
+// Barra fija de abajo con "Verificar" (y "Saltar" cuando aplica), como en Duolingo.
+// Va directo al <body>: dentro de la pregunta que se desliza, "fixed" se movería con ella.
+const CheckBar = (props) => createPortal(<CheckBarInner {...props} />, document.body);
+const CheckBarInner = ({ disabled, onCheck, onSkip, skipLabel }) => (
+  <div className="fixed inset-x-0 bottom-0 z-20 border-t-2 border-stone-100 bg-white/95 backdrop-blur">
+    <div className="container mx-auto max-w-3xl py-4 flex items-center gap-3">
+      {onSkip && (
+        <button
+          type="button"
+          onClick={onSkip}
+          className="ficha min-h-12 px-5 rounded-2xl border-stone-300 bg-white font-black text-stone-600 uppercase tracking-wide text-sm hover:bg-stone-50"
+        >
+          {skipLabel}
+        </button>
+      )}
+      <p className="hidden md:block text-sm text-stone-500 mr-auto">
+        <kbd className="px-1.5 py-0.5 rounded border border-stone-300 font-sans text-xs">Enter</kbd> para verificar
+      </p>
+      <button
+        type="button"
+        onClick={onCheck}
+        disabled={disabled}
+        className={`ficha flex-1 sm:flex-none sm:min-w-52 min-h-12 px-8 rounded-2xl font-black uppercase tracking-wide ${
+          disabled ? 'border-stone-200 bg-stone-200 text-stone-500 cursor-not-allowed' : 'border-green-800 bg-green-600 text-white hover:bg-green-500'
+        }`}
+      >
+        Verificar
+      </button>
+    </div>
+  </div>
+);
+
+// Botones para las letras que no están en todos los teclados (apóstrofo de las glotalizadas, ñ, ä…)
+const LetterKeys = ({ keys, onKey, disabled }) => (
+  <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Letras especiales">
+    {keys.map((k) => (
+      <button
+        key={k}
+        type="button"
+        disabled={disabled}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => onKey(k)}
+        aria-label={k === "'" ? 'Escribir apóstrofo' : `Escribir ${k}`}
+        className="ficha min-w-11 min-h-11 px-3 rounded-xl border-stone-300 bg-white text-lg font-bold hover:bg-stone-50"
+      >
+        {k}
+      </button>
+    ))}
+  </div>
 );
 
 /**
  * Muestra un ejercicio y llama a onAnswer(esCorrecta, respuestaCorrectaLegible, detalle).
  * detalle = { resultado: 'correcto' | 'variante' | 'incorrecto', fenomenos, respuesta } (normalizador dialectal).
  * Con answered=true queda bloqueado mientras se muestra la corrección.
+ * mood/beat animan a la llamita (la lección le dice si se acertó o no).
  */
-const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageLabel = 'Quechua', languageId = 'quechua' }) => {
+const ExerciseTypes = ({
+  exercise,
+  onAnswer,
+  onSkip,
+  answered = false,
+  languageLabel = 'Quechua',
+  languageId = 'quechua',
+  mood = 'idle',
+  beat = 0,
+}) => {
   const [selected, setSelected] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [matchingPairs, setMatchingPairs] = useState({});
-  const [selectedLeft, setSelectedLeft] = useState(null);
   const [fillBlanks, setFillBlanks] = useState({});
-  const [selectedWords, setSelectedWords] = useState([]);
+  const [order, setOrder] = useState([]); // índices de las fichas elegidas, en orden
+  const [pick, setPick] = useState(null); // emparejar: { side: 'L' | 'R', value }
+  const [matched, setMatched] = useState({}); // emparejar: izquierda → derecha
+  const [wrongPair, setWrongPair] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Reiniciar al cambiar de ejercicio
-  useEffect(() => {
-    setSelected(null);
-    setUserAnswer('');
-    setMatchingPairs({});
-    setSelectedLeft(null);
-    setFillBlanks({});
-    setSelectedWords([]);
-  }, [exercise?.id]);
+  const inputRef = useRef(null);
+  const blankRefs = useRef([]);
+  const lastBlank = useRef(0);
+  const errorsRef = useRef(0);
+  const submitRef = useRef(() => {});
+  const numberRef = useRef(null);
+  const backRef = useRef(null);
+
+  const language = getLanguage(languageId);
+  const theme = languageStyle(languageId);
+  const letterKeys = language?.teclado ?? ["'"];
+  const voice = { url: exercise?.audio_url, lang: language?.voz?.respaldo };
 
   // Orden aleatorio, fijo mientras dure cada ejercicio
   const shuffled = useMemo(() => {
@@ -112,9 +198,14 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
     const opciones = safeJsonParse(exercise.opciones, exercise.tipo === 'multiple_choice' ? [] : {});
     if (exercise.tipo === 'multiple_choice') return { options: shuffle(Array.isArray(opciones) ? opciones : []) };
     if (exercise.tipo === 'matching') {
+      let left = opciones.columna_izquierda || [];
       let right = opciones.columna_derecha || [];
-      if (right.length === 0) right = Object.values(safeJsonParse(exercise.respuesta_correcta, {}));
-      return { right: shuffle(right) };
+      const correct = safeJsonParse(exercise.respuesta_correcta, {});
+      if (left.length === 0) {
+        left = Object.keys(correct);
+        right = Object.values(correct);
+      }
+      return { left: shuffle(left), right: shuffle(right), pairs: correct };
     }
     if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
       const words = opciones.palabras || (Array.isArray(opciones) ? opciones : []);
@@ -123,6 +214,42 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
     return {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise?.id]);
+
+  // En "escucha y escribe" el audio suena solo al aparecer
+  useEffect(() => {
+    if (exercise?.tipo !== 'listen_write') return undefined;
+    const t = setTimeout(() => speak(exercise.respuesta_correcta, voice), 450);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercise?.id]);
+
+  // Teclado: Enter verifica, 1-9 elige, Retroceso quita la última ficha
+  useEffect(() => {
+    if (answered) return undefined;
+    const onKey = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = e.target?.tagName;
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+      const onOption = !!e.target?.closest?.('[data-opcion]');
+      // Los campos de texto manejan su propio Enter; en otros botones Enter los activa
+      if (typing) return;
+      if (e.key === 'Enter') {
+        if (tag === 'BUTTON' && !onOption) return;
+        e.preventDefault();
+        submitRef.current();
+        return;
+      }
+      if (e.key === 'Backspace' && backRef.current) {
+        e.preventDefault();
+        backRef.current();
+        return;
+      }
+      const n = e.key === '0' ? 10 : Number(e.key);
+      if (n >= 1 && n <= 10 && numberRef.current) numberRef.current(n - 1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [answered]);
 
   if (!exercise) {
     return <p className="text-center text-stone-600 p-6">No hay ejercicio disponible</p>;
@@ -160,8 +287,9 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
       }
 
       case 'fill_blanks': {
-        const answers = Object.values(fillBlanks);
-        if (answers.length === 0) return;
+        const blanks = exercise.pregunta.split('___').length - 1;
+        const answers = Array.from({ length: blanks }, (_, i) => fillBlanks[i] || '');
+        if (answers.some((a) => !a.trim())) return;
         const correctAnswers = safeJsonParse(exercise.respuesta_correcta, []);
         const results = answers.map((ans, idx) => classifyAnswer(ans, correctAnswers[idx] || '', languageId));
         const resultado = results.some((r) => r.resultado === 'incorrecto')
@@ -177,21 +305,14 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
         break;
       }
 
-      case 'matching': {
-        const correctPairs = safeJsonParse(exercise.respuesta_correcta, {});
-        const keys = Object.keys(correctPairs);
-        const isMatch = keys.length === Object.keys(matchingPairs).length && keys.every((key) => matchingPairs[key] === correctPairs[key]);
-        answer(isMatch, keys.map((key) => `${key} = ${correctPairs[key]}`).join('; '));
-        break;
-      }
-
       case 'word_order':
       case 'drag_words': {
+        if (order.length === 0) return;
         let correctOrder = safeJsonParse(exercise.respuesta_correcta, []);
         if (!Array.isArray(correctOrder)) correctOrder = [correctOrder];
-        const isOrderCorrect =
-          selectedWords.length === correctOrder.length && selectedWords.every((word, idx) => sameAnswer(word, correctOrder[idx] || ''));
-        answer(isOrderCorrect, correctOrder.join(' '), { respuesta: selectedWords.join(' ') });
+        const given = order.map((i) => shuffled.words[i]);
+        const isOrderCorrect = given.length === correctOrder.length && given.every((word, idx) => sameAnswer(word, correctOrder[idx] || ''));
+        answer(isOrderCorrect, correctOrder.join(' '), { respuesta: given.join(' ') });
         break;
       }
 
@@ -199,137 +320,222 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
         break;
     }
   };
+  submitRef.current = handleSubmit;
+  numberRef.current = null;
+  backRef.current = null;
 
-  // Enter envía la respuesta en los campos de texto
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSubmit();
-    }
+  const choose = (value) => {
+    if (answered) return;
+    playTap();
+    setSelected(value);
   };
 
-  const playAudio = () => {
+  const playAudio = (slow = false) => {
     setIsPlaying(true);
-    const fallback = () => {
-      setIsPlaying(false);
-      speakWord(exercise.respuesta_correcta);
-    };
-    if (exercise.audio_url) {
-      const audio = new Audio(exercise.audio_url);
-      audio.onended = () => setIsPlaying(false);
-      audio.onerror = fallback;
-      audio.play().catch(fallback);
-    } else {
-      speakWord(exercise.respuesta_correcta);
-      setTimeout(() => setIsPlaying(false), 1500);
-    }
+    speak(exercise.respuesta_correcta, { ...voice, slow });
+    setTimeout(() => setIsPlaying(false), slow ? 2200 : 1400);
   };
+
+  // Ordenar con una sola palabra correcta es, en realidad, "elegir la palabra"
+  const oneWord =
+    (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') &&
+    (() => {
+      const r = safeJsonParse(exercise.respuesta_correcta, []);
+      return !Array.isArray(r) || r.length === 1;
+    })();
+  const label = oneWord ? 'Elige la palabra' : TYPE_LABELS[exercise.tipo] ?? 'Ejercicio';
+
+  // La llamita con su globo: la consigna o la pregunta de cada ejercicio
+  const prompt = (content) => (
+    <div className="mb-6 sm:mb-8">
+      <p className={`mb-3 text-sm font-black uppercase tracking-wider ${theme.text}`}>{label}</p>
+      <Mascot mood={mood} beat={beat} say={content} size="w-20 sm:w-28" eager />
+    </div>
+  );
 
   const questionId = `pregunta-${exercise.id}`;
 
-  // 1. OPCIÓN MÚLTIPLE
+  // ==================== 1. OPCIÓN MÚLTIPLE ====================
   if (exercise.tipo === 'multiple_choice') {
     const opciones = shuffled.options || [];
+    numberRef.current = (i) => opciones[i] !== undefined && choose(opciones[i]);
+    const stateOf = (op) => {
+      if (!answered) return selected === op ? 'selected' : 'idle';
+      if (sameAnswer(op, exercise.respuesta_correcta)) return 'right';
+      return selected === op ? 'wrong' : 'dim';
+    };
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
-        <div className="space-y-3 mb-6" role="group" aria-labelledby={questionId}>
-          {opciones.map((opcion, index) => (
-            <button
-              key={index}
-              type="button"
-              aria-pressed={selected === opcion}
-              disabled={answered}
-              onClick={() => setSelected(opcion)}
-              className={`${optionClass(selected === opcion)} anim-entra`}
-              style={{ "--i": index }}
-            >
-              <span className="font-semibold">{opcion}</span>
-            </button>
-          ))}
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(<p id={questionId} className="text-lg sm:text-xl font-bold">{exercise.pregunta}</p>)}
+        <div className="grid gap-3 sm:grid-cols-2" role="group" aria-labelledby={questionId}>
+          {opciones.map((opcion, index) => {
+            const state = stateOf(opcion);
+            return (
+              <button
+                key={opcion}
+                data-opcion
+                type="button"
+                aria-pressed={selected === opcion}
+                disabled={answered}
+                onClick={() => choose(opcion)}
+                className={`${tileClass(state, theme)} anim-entra`}
+                style={{ '--i': index }}
+              >
+                <KeyHint n={index + 1} state={state} />
+                <span className="flex-1 text-lg">{opcion}</span>
+                {state === 'right' && <Check className="w-6 h-6 text-green-700" strokeWidth={3} aria-hidden="true" />}
+                {state === 'wrong' && <X className="w-6 h-6 text-red-600" strokeWidth={3} aria-hidden="true" />}
+              </button>
+            );
+          })}
         </div>
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={selected === null} />}
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={selected === null} />}
       </div>
     );
   }
 
-  // 2. ESCUCHAR Y ESCRIBIR
+  // ==================== 2. VERDADERO O FALSO ====================
+  if (exercise.tipo === 'true_false') {
+    const correctBool = exercise.respuesta_correcta === 'true' || exercise.respuesta_correcta === true;
+    const choices = [
+      [true, 'Verdadero', Check, 'text-green-700'],
+      [false, 'Falso', X, 'text-red-600'],
+    ];
+    numberRef.current = (i) => choices[i] && choose(choices[i][0]);
+    return (
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(<p id={questionId} className="text-lg sm:text-xl font-bold">{exercise.pregunta}</p>)}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4" role="group" aria-labelledby={questionId}>
+          {choices.map(([value, label, Icon, iconClass], index) => {
+            const state = !answered ? (selected === value ? 'selected' : 'idle') : value === correctBool ? 'right' : selected === value ? 'wrong' : 'dim';
+            return (
+              <button
+                key={label}
+                data-opcion
+                type="button"
+                aria-pressed={selected === value}
+                disabled={answered}
+                onClick={() => choose(value)}
+                style={{ '--i': index }}
+                className={`${tileClass(state, theme)} anim-entra !flex-col justify-center min-h-32 sm:min-h-36`}
+              >
+                <Icon className={`w-10 h-10 ${state === 'dim' ? 'text-stone-300' : iconClass}`} strokeWidth={3} aria-hidden="true" />
+                <span className="text-xl">{label}</span>
+                <KeyHint n={index + 1} state={state} />
+              </button>
+            );
+          })}
+        </div>
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={selected === null} />}
+      </div>
+    );
+  }
+
+  // Campo de texto con las letras especiales debajo (escuchar y traducir)
+  const writtenField = (label, placeholder) => (
+    <div className="space-y-3">
+      <label htmlFor={`${questionId}-campo`} className="sr-only">
+        {label}
+      </label>
+      <textarea
+        id={`${questionId}-campo`}
+        ref={inputRef}
+        rows={2}
+        autoComplete="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        value={userAnswer}
+        disabled={answered}
+        onChange={(e) => setUserAnswer(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+          }
+        }}
+        placeholder={placeholder}
+        className={`w-full resize-none rounded-2xl border-2 bg-stone-50 px-4 py-4 text-xl font-semibold focus:outline-none focus:bg-white ${
+          answered ? 'border-stone-200 text-stone-600' : 'border-stone-300 focus:border-stone-500'
+        }`}
+        lang={exercise.tipo === 'listen_write' ? language?.lang : undefined}
+      />
+      {!answered && <LetterKeys keys={letterKeys} onKey={(k) => insertAtCursor(inputRef.current, userAnswer, setUserAnswer, k)} />}
+    </div>
+  );
+
+  // ==================== 3. ESCUCHAR Y ESCRIBIR ====================
   if (exercise.tipo === 'listen_write') {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 id={questionId} className="text-2xl font-bold mb-6">Escucha y escribe lo que oyes</h2>
-        <button
-          type="button"
-          onClick={playAudio}
-          disabled={isPlaying}
-          className="flex items-center gap-3 mx-auto mb-6 px-8 min-h-12 rounded-full bg-green-700 hover:bg-green-800 text-white font-bold toque disabled:bg-green-600"
-        >
-          <Volume2 className="w-6 h-6" aria-hidden="true" />
-          {isPlaying ? 'Reproduciendo…' : 'Escuchar'}
-        </button>
-        <input
-          type="text"
-          aria-labelledby={questionId}
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          value={userAnswer}
-          disabled={answered}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Escribe aquí lo que escuchaste"
-          className={`${textInputClass} mb-6`}
-        />
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={!userAnswer.trim()} />}
-      </div>
-    );
-  }
-
-  // 3. VERDADERO O FALSO
-  if (exercise.tipo === 'true_false') {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 id={questionId} className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
-        <div className="grid grid-cols-1 min-[440px]:grid-cols-2 gap-3 sm:gap-4 mb-6" role="group" aria-labelledby={questionId}>
-          {[
-            [true, 'Verdadero', Check, 'text-green-700'],
-            [false, 'Falso', X, 'text-red-700'],
-          ].map(([value, label, Icon, iconClass], index) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={selected === value}
-              disabled={answered}
-              onClick={() => setSelected(value)}
-              style={{ "--i": index }}
-              className={`anim-entra min-w-0 p-5 sm:p-6 rounded-xl border-2 toque flex items-center justify-center gap-3 ${
-                selected === value ? 'border-green-700 bg-green-50' : 'border-stone-300 hover:border-stone-500 hover:bg-stone-50'
-              }`}
-            >
-              <Icon className={`w-8 h-8 ${iconClass}`} aria-hidden="true" />
-              <span className="text-xl font-bold">{label}</span>
-            </button>
-          ))}
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(<p className="text-lg sm:text-xl font-bold">¡Escucha bien y escribe lo que oyes!</p>)}
+        <div className="flex items-end justify-center gap-4 mb-8">
+          <button
+            type="button"
+            onClick={() => playAudio(false)}
+            aria-label="Escuchar"
+            className={`ficha w-28 h-28 sm:w-32 sm:h-32 rounded-3xl ${theme.solid} border-black/25 text-white flex items-center justify-center shadow-lg`}
+          >
+            <Volume2 className={`w-14 h-14 ${isPlaying ? 'anim-latido' : ''}`} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => playAudio(true)}
+            aria-label="Escuchar despacio"
+            title="Despacio"
+            className={`ficha w-16 h-16 rounded-2xl border-stone-300 bg-white ${theme.text} flex items-center justify-center`}
+          >
+            <Snail className="w-8 h-8" aria-hidden="true" />
+          </button>
         </div>
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={selected === null} />}
+        {writtenField('Lo que escuchaste', 'Escribe lo que escuchaste')}
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={!userAnswer.trim()} onSkip={onSkip} skipLabel="No puedo escuchar" />}
       </div>
     );
   }
 
-  // 4. COMPLETAR ESPACIOS
+  // ==================== 4. TRADUCIR ====================
+  if (exercise.tipo === 'translate') {
+    return (
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => speak(exercise.pregunta, { lang: language?.voz?.respaldo })}
+              aria-label={`Escuchar ${exercise.pregunta}`}
+              className={`ficha w-11 h-11 shrink-0 rounded-xl ${theme.solid} border-black/25 text-white flex items-center justify-center`}
+            >
+              <Volume2 className="w-5 h-5" aria-hidden="true" />
+            </button>
+            <p id={questionId} className="text-xl sm:text-2xl font-black underline decoration-dotted decoration-stone-300 underline-offset-8">
+              {exercise.pregunta}
+            </p>
+          </div>
+        )}
+        {writtenField('Tu traducción', 'Escribe la traducción')}
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={!userAnswer.trim()} />}
+      </div>
+    );
+  }
+
+  // ==================== 5. COMPLETAR ESPACIOS ====================
   if (exercise.tipo === 'fill_blanks') {
     const parts = exercise.pregunta.split('___');
     const blanks = parts.length - 1;
-    const incomplete = Object.keys(fillBlanks).length < blanks || Object.values(fillBlanks).some((v) => !v.trim());
+    const incomplete = Array.from({ length: blanks }, (_, i) => fillBlanks[i] || '').some((v) => !v.trim());
+    const setBlank = (i) => (value) => setFillBlanks((prev) => ({ ...prev, [i]: typeof value === 'function' ? value(prev[i] || '') : value }));
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6">Completa los espacios en blanco</h2>
-        <p className="bg-stone-50 p-6 rounded-xl mb-6 text-lg border-2 border-stone-200 leading-loose">
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(<p className="text-lg sm:text-xl font-bold">Escribe la palabra que falta</p>)}
+        <p className="rounded-2xl border-2 border-stone-200 bg-white p-5 sm:p-6 mb-4 text-xl leading-[2.6] font-semibold">
           {parts.map((part, index) => (
             <span key={index}>
               {part}
               {index < blanks && (
                 <input
+                  ref={(el) => {
+                    blankRefs.current[index] = el;
+                  }}
                   type="text"
                   aria-label={`Espacio ${index + 1} de ${blanks}`}
                   autoComplete="off"
@@ -337,216 +543,236 @@ const ExerciseTypes = ({ exercise, onAnswer, onSkip, answered = false, languageL
                   spellCheck={false}
                   value={fillBlanks[index] || ''}
                   disabled={answered}
-                  onChange={(e) => setFillBlanks({ ...fillBlanks, [index]: e.target.value })}
-                  onKeyDown={handleKeyDown}
-                  className="inline-block mx-2 px-3 py-1.5 border-b-2 border-green-700 bg-white focus:outline-none focus:ring-2 focus:ring-green-700 min-w-[120px] rounded-lg"
+                  onFocus={() => {
+                    lastBlank.current = index;
+                  }}
+                  onChange={(e) => setBlank(index)(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (index < blanks - 1) blankRefs.current[index + 1]?.focus();
+                      else handleSubmit();
+                    }
+                  }}
+                  size={Math.max(6, (fillBlanks[index] || '').length + 2)}
+                  className={`inline-block mx-1.5 px-3 py-0.5 rounded-xl border-2 border-b-4 bg-stone-50 text-center font-bold focus:outline-none focus:bg-white ${theme.text} border-stone-300 focus:border-stone-500`}
                 />
               )}
             </span>
           ))}
         </p>
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={incomplete} />}
+        {!answered && (
+          <LetterKeys
+            keys={letterKeys}
+            onKey={(k) => {
+              const i = lastBlank.current;
+              insertAtCursor(blankRefs.current[i], fillBlanks[i] || '', setBlank(i), k);
+            }}
+          />
+        )}
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={incomplete} />}
       </div>
     );
   }
 
-  // 5. EMPAREJAR
+  // ==================== 6. EMPAREJAR ====================
+  // Se toca una ficha de cada columna: si son pareja se quedan verdes, si no, tiemblan.
+  // Al completar todas las parejas, el ejercicio se corrige solo.
   if (exercise.tipo === 'matching') {
-    const opciones = safeJsonParse(exercise.opciones, {});
-    let leftItems = opciones.columna_izquierda || [];
-    let rightItems = opciones.columna_derecha || [];
-    if (leftItems.length === 0) {
-      const correct = safeJsonParse(exercise.respuesta_correcta, {});
-      leftItems = Object.keys(correct);
-      rightItems = Object.values(correct);
-    }
-    rightItems = shuffled.right || rightItems;
+    const leftItems = shuffled.left || [];
+    const rightItems = shuffled.right || [];
+    const pairs = shuffled.pairs || {};
+    const usedRight = Object.values(matched);
+    const pairsText = Object.keys(pairs)
+      .map((key) => `${key} = ${pairs[key]}`)
+      .join('; ');
 
-    const isRightMatched = (rightItem) => Object.values(matchingPairs).includes(rightItem);
-    const allMatched = Object.keys(matchingPairs).length === leftItems.length;
+    const tap = (side, value) => {
+      if (answered || wrongPair) return;
+      if (side === 'L' ? matched[value] : usedRight.includes(value)) return;
+      if (!pick || pick.side === side) {
+        playTap();
+        setPick(pick?.side === side && pick.value === value ? null : { side, value });
+        return;
+      }
+      const L = side === 'L' ? value : pick.value;
+      const R = side === 'R' ? value : pick.value;
+      setPick(null);
+      if (pairs[L] === R) {
+        playMatch();
+        const next = { ...matched, [L]: R };
+        setMatched(next);
+        if (Object.keys(next).length === leftItems.length) {
+          const errors = errorsRef.current;
+          setTimeout(
+            () => answer(true, pairsText, { respuesta: errors === 0 ? 'sin errores' : `${errors} ${errors === 1 ? 'error' : 'errores'}` }),
+            450
+          );
+        }
+      } else {
+        playWrong();
+        errorsRef.current += 1;
+        setWrongPair({ L, R });
+        setTimeout(() => setWrongPair(null), 600);
+      }
+    };
+    numberRef.current = (i) => {
+      if (i < leftItems.length) tap('L', leftItems[i]);
+      else if (rightItems[i - leftItems.length] !== undefined) tap('R', rightItems[i - leftItems.length]);
+    };
+
+    const stateOf = (side, value) => {
+      const done = side === 'L' ? !!matched[value] : usedRight.includes(value);
+      if (done) return answered ? 'right' : 'done';
+      if (wrongPair && wrongPair[side] === value) return 'wrong';
+      if (pick?.side === side && pick.value === value) return 'selected';
+      return 'idle';
+    };
+
+    const column = (side, items, title, offset) => (
+      <div className="space-y-3">
+        <h3 className="text-center text-sm font-black uppercase tracking-wider text-stone-500">{title}</h3>
+        {items.map((item, index) => {
+          const state = stateOf(side, item);
+          return (
+            <button
+              key={item}
+              data-opcion
+              type="button"
+              onClick={() => tap(side, item)}
+              aria-pressed={state === 'selected'}
+              disabled={answered || state === 'done'}
+              lang={side === 'L' ? language?.lang : undefined}
+              className={`${tileClass(state, theme)} justify-center !text-center anim-entra`}
+              style={{ '--i': index + (side === 'R' ? 2 : 0) }}
+            >
+              <KeyHint n={(offset + index + 1) % 10} state={state} />
+              <span className="flex-1 text-base sm:text-lg">{item}</span>
+              {state === 'done' && <Check className="w-5 h-5 text-green-600" strokeWidth={3} aria-hidden="true" />}
+            </button>
+          );
+        })}
+      </div>
+    );
 
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-2">{exercise.pregunta}</h2>
-        <p className="text-stone-600 mb-6">Elige una palabra de la izquierda y luego su pareja de la derecha</p>
-
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6">
-          <div className="space-y-3">
-            <h3 className="font-bold text-stone-700 text-center mb-2">{languageLabel}</h3>
-            {leftItems.map((item, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => setSelectedLeft(item)}
-                aria-pressed={selectedLeft === item}
-                disabled={answered || !!matchingPairs[item]}
-                className={`w-full p-4 rounded-xl border-2 toque text-left ${
-                  matchingPairs[item]
-                    ? 'bg-green-50 border-green-700 text-green-900'
-                    : selectedLeft === item
-                      ? 'bg-stone-100 border-stone-900'
-                      : 'bg-white border-stone-300 hover:border-stone-500'
-                }`}
-              >
-                <span className="font-semibold">{item}</span>
-                {matchingPairs[item] && <span className="block text-sm text-green-800 anim-despliega">= {matchingPairs[item]}</span>}
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="font-bold text-stone-700 text-center mb-2">Español</h3>
-            {rightItems.map((item, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => {
-                  if (!selectedLeft) return;
-                  setMatchingPairs((prev) => ({ ...prev, [selectedLeft]: item }));
-                  setSelectedLeft(null);
-                }}
-                disabled={answered || isRightMatched(item) || !selectedLeft}
-                className={`w-full p-4 rounded-xl border-2 toque text-left ${
-                  isRightMatched(item)
-                    ? 'bg-green-50 border-green-700 text-green-900'
-                    : selectedLeft
-                      ? 'bg-white border-orange-700 hover:bg-orange-50'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 cursor-not-allowed'
-                }`}
-              >
-                <span className="font-semibold">{item}</span>
-              </button>
-            ))}
-          </div>
+      <div className="max-w-3xl mx-auto py-2">
+        {prompt(<p className="text-lg sm:text-xl font-bold">{exercise.pregunta || 'Toca las parejas'}</p>)}
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          {column('L', leftItems, languageLabel, 0)}
+          {column('R', rightItems, 'Español', leftItems.length)}
         </div>
-
-        <div className="flex flex-wrap items-center gap-4 mb-4">
-          {!answered && (
-            <ResetButton
-              onClick={() => {
-                setMatchingPairs({});
-                setSelectedLeft(null);
-              }}
+        <div className="mt-6 flex items-center gap-3" aria-live="polite">
+          <div className="flex-1 h-3 rounded-full bg-stone-200 overflow-hidden" aria-hidden="true">
+            <div
+              className={`barra h-full w-full rounded-full ${theme.solid}`}
+              style={{ transform: `scaleX(${leftItems.length ? Object.keys(matched).length / leftItems.length : 0})` }}
             />
-          )}
-          <span className="text-stone-600" aria-live="polite">
-            Emparejadas: {Object.keys(matchingPairs).length} de {leftItems.length}
+          </div>
+          <span className="text-sm font-bold text-stone-600 tabular-nums">
+            {Object.keys(matched).length} de {leftItems.length} parejas
           </span>
         </div>
-
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={!allMatched} />}
       </div>
     );
   }
 
-  // 6. ORDENAR PALABRAS
+  // ==================== 7. ORDENAR PALABRAS ====================
+  // Las fichas vuelan de la reserva a la línea de respuesta (y de vuelta al tocarlas)
   if (exercise.tipo === 'word_order' || exercise.tipo === 'drag_words') {
     const words = shuffled.words || [];
-    const availableWords = words.filter((w) => !selectedWords.includes(w));
+    const add = (i) => {
+      if (answered || order.includes(i)) return;
+      playTap();
+      setOrder((o) => [...o, i]);
+    };
+    const remove = (i) => {
+      if (answered) return;
+      playTap();
+      setOrder((o) => o.filter((x) => x !== i));
+    };
+    numberRef.current = (n) => {
+      if (n < words.length) add(n);
+    };
+    backRef.current = () => order.length && remove(order[order.length - 1]);
+    const chip = 'ficha min-h-12 px-4 rounded-xl text-lg font-bold';
+    const spring = { type: 'spring', bounce: 0.2, duration: 0.4 };
 
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6">{exercise.pregunta}</h2>
+      <div className="max-w-2xl mx-auto py-2">
+        {prompt(<p className="text-lg sm:text-xl font-bold">{exercise.pregunta}</p>)}
 
-        <p className="text-stone-600 mb-2" id={`${questionId}-respuesta`}>Tu respuesta</p>
         <div
-          className="p-4 bg-stone-50 rounded-xl border-2 border-dashed border-stone-300 min-h-[80px] flex flex-wrap gap-2 items-center mb-6"
-          aria-labelledby={`${questionId}-respuesta`}
+          className="min-h-[7.5rem] flex flex-wrap content-start gap-2 py-2 mb-8"
+          style={{ backgroundImage: 'repeating-linear-gradient(to bottom, transparent 0 58px, #e7e5e4 58px 60px)' }}
+          aria-label="Tu respuesta"
           aria-live="polite"
+          lang={language?.lang}
         >
-          {selectedWords.length === 0 ? (
-            <span className="text-stone-600">Toca las palabras en orden</span>
-          ) : (
-            selectedWords.map((word, index) => (
-              <button
-                key={index}
-                type="button"
-                disabled={answered}
-                onClick={() => setSelectedWords(selectedWords.filter((_, i) => i !== index))}
-                aria-label={`Quitar ${word}`}
-                className="anim-pop inline-flex items-center gap-1.5 px-4 min-h-11 bg-green-700 text-white rounded-lg hover:bg-green-800 toque font-semibold"
-              >
-                {word}
-                <X className="w-4 h-4" aria-hidden="true" />
-              </button>
-            ))
-          )}
-        </div>
-
-        <p className="text-stone-600 mb-2">Palabras disponibles</p>
-        <div className="flex flex-wrap gap-2 mb-6">
-          {availableWords.map((word, index) => (
-            <button
-              key={index}
+          {order.map((i) => (
+            <m.button
+              key={i}
+              layoutId={answered ? undefined : `ficha-${exercise.id}-${i}`}
+              transition={spring}
               type="button"
               disabled={answered}
-              onClick={() => setSelectedWords([...selectedWords, word])}
-              className="px-4 min-h-11 bg-white border-2 border-stone-300 rounded-lg hover:border-green-700 toque font-semibold"
+              onClick={() => remove(i)}
+              aria-label={`Quitar ${words[i]}`}
+              className={`${chip} border-stone-300 bg-white text-stone-800`}
             >
-              {word}
-            </button>
+              {words[i]}
+            </m.button>
           ))}
         </div>
 
-        {!answered && (
-          <div className="mb-4">
-            <ResetButton onClick={() => setSelectedWords([])} />
+        <div className="flex flex-wrap justify-center gap-2" lang={language?.lang}>
+          {words.map((word, i) =>
+            order.includes(i) ? (
+              <span key={i} className={`${chip} border-stone-200 bg-stone-200 text-transparent select-none`} aria-hidden="true">
+                {word}
+              </span>
+            ) : (
+              <m.button
+                key={i}
+                layoutId={answered ? undefined : `ficha-${exercise.id}-${i}`}
+                transition={spring}
+                type="button"
+                data-opcion
+                disabled={answered}
+                onClick={() => add(i)}
+                className={`${chip} border-stone-300 bg-white text-stone-800 hover:bg-stone-50`}
+              >
+                {word}
+              </m.button>
+            )
+          )}
+        </div>
+
+        {!answered && order.length > 0 && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setOrder([])}
+              className="inline-flex items-center gap-2 px-4 min-h-11 rounded-xl text-stone-600 hover:bg-stone-100 font-bold toque"
+            >
+              <Delete className="w-4 h-4" aria-hidden="true" />
+              Borrar todo
+            </button>
           </div>
         )}
-
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={selectedWords.length === 0} />}
+        {!answered && <CheckBar onCheck={handleSubmit} disabled={order.length === 0} />}
       </div>
     );
   }
 
-  // 7. TRADUCIR
-  if (exercise.tipo === 'translate') {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6">Traduce la siguiente palabra o frase</h2>
-        <div className="p-6 bg-stone-50 rounded-xl mb-6 text-center border-2 border-stone-200">
-          <p id={questionId} className="text-2xl font-bold">{exercise.pregunta}</p>
-          <button
-            type="button"
-            onClick={() => speakWord(exercise.pregunta)}
-            aria-label={`Escuchar ${exercise.pregunta}`}
-            className="mt-3 w-11 h-11 inline-flex items-center justify-center text-green-800 hover:bg-green-50 rounded-full toque"
-          >
-            <Volume2 className="w-6 h-6" aria-hidden="true" />
-          </button>
-        </div>
-        <label htmlFor={`${questionId}-traduccion`} className="block font-bold mb-2">
-          Tu traducción
-        </label>
-        <input
-          id={`${questionId}-traduccion`}
-          type="text"
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          value={userAnswer}
-          disabled={answered}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className={`${textInputClass} mb-6`}
-        />
-        {!answered && <VerifyButton onClick={handleSubmit} disabled={!userAnswer.trim()} />}
-      </div>
-    );
-  }
-
-  // TIPO NO SOPORTADO
+  // ==================== TIPO NO SOPORTADO ====================
   return (
     <div className="p-6">
       <p className="bg-red-50 border border-red-300 rounded-xl p-6 text-red-800 font-bold mb-4" role="alert">
         Este tipo de ejercicio todavía no se puede mostrar ({exercise.tipo}).
       </p>
       {onSkip && (
-        <button
-          type="button"
-          onClick={onSkip}
-          className="w-full min-h-12 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque"
-        >
+        <button type="button" onClick={onSkip} className="w-full min-h-12 border-2 border-stone-300 rounded-xl font-bold hover:bg-stone-50 toque">
           Saltar este ejercicio
         </button>
       )}

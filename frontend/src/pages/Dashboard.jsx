@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle, Sparkles, Award, ChevronDown, Play, UserX, AlertCircle, RefreshCw, XCircle } from 'lucide-react';
+import { LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle, Sparkles, Award, ChevronDown, Play, UserX, AlertCircle, RefreshCw, XCircle, Gamepad2, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 
@@ -14,6 +14,8 @@ import MantineShell from '../ui/MantineShell';
 import { CountUp } from '../ui/lazyBits';
 import ConsentDialog from '../components/ConsentDialog';
 import LearningPath from '../components/LearningPath';
+import Mascot from '../components/Mascot';
+import { Practice, preloadOn } from '../routes';
 import { LANGUAGES, languageStyle } from '../languages';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
@@ -197,6 +199,12 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                   <span className="hidden lg:inline">Diccionario</span>
                 </Link>
               </Tooltip>
+              <Tooltip label="Juegos" withArrow openDelay={300} transitionProps={{ transition: 'pop', duration: 150 }}>
+                <Link to={`/practica?idioma=${selectedLanguage}`} className={navLink} aria-label="Juegos de práctica" {...preloadOn(Practice)}>
+                  <Gamepad2 className="w-5 h-5" aria-hidden="true" />
+                  <span className="hidden lg:inline">Juegos</span>
+                </Link>
+              </Tooltip>
               <Tooltip label="Cultura" withArrow openDelay={300} transitionProps={{ transition: 'pop', duration: 150 }}>
                 <Link to="/culture" className={navLink} aria-label="Cultura">
                   <Sparkles className="w-5 h-5" aria-hidden="true" />
@@ -237,7 +245,9 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
       <main className="container mx-auto py-8 max-w-7xl">
         {/* ==================== SALUDO ==================== */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center gap-4 sm:gap-6">
+          <Mascot size="w-20 sm:w-28" eager />
+          <div className="min-w-0">
           <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">
             {isGuest ? (
               <span className="texto-degradado">¡Bienvenido!</span>
@@ -254,6 +264,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                 ? 'Empieza con la primera lección de la Unidad 1.'
                 : `Llevas ${completedLessons} ${completedLessons === 1 ? 'lección completada' : 'lecciones completadas'}.`}
           </p>
+          </div>
         </div>
 
         {/* ==================== QUÉ INCLUYE EL MODO INVITADO ==================== */}
@@ -396,6 +407,22 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
             <LearningPath units={units} langId={selectedLanguage} isGuest={isGuest} isLessonCompleted={isLessonCompleted} />
           )}
         </section>
+
+        {/* ==================== JUEGOS ==================== */}
+        <Link
+          to={`/practica?idioma=${selectedLanguage}`}
+          {...preloadOn(Practice)}
+          className="ficha tarjeta-viva mt-8 flex items-center gap-4 sm:gap-6 rounded-3xl border-amber-300 bg-gradient-to-br from-amber-50 to-orange-100 p-5 sm:p-6 hover:border-amber-400"
+        >
+          <span className="w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-md" aria-hidden="true">
+            <Gamepad2 className="w-9 h-9 text-white" />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-xl sm:text-2xl font-black">Practica jugando</span>
+            <span className="block text-stone-700">Parejas relámpago y tarjetas con las palabras que ya aprendiste.</span>
+          </span>
+          <ArrowRight className="w-7 h-7 text-orange-700 shrink-0" aria-hidden="true" />
+        </Link>
 
         {/* ==================== CIERRE ==================== */}
         {!isGuest && completedLessons > 0 && (

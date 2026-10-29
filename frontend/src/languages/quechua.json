@@ -13,6 +13,7 @@
     "licencia": "CC-BY-NC-4.0",
     "respaldo": "es-PE"
   },
+  "teclado": ["'", "ñ"],
   "frases": {
     "saludo": "Rimaykullayki",
     "felicitacion": "¡Allin rurasqayki!",

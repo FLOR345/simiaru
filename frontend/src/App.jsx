@@ -11,7 +11,7 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 // responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
 const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
 import Home from './pages/Home';
-import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher } from './routes';
+import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice } from './routes';
 import { startTelemetry } from './services/telemetry';
 import OfflineBanner from './components/OfflineBanner';
 
@@ -160,6 +160,14 @@ function App() {
               <Profile user={user} setUser={setUser} />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/practica"
+          element={
+            <ProtectedRoute auth={auth}>
+              <Practice user={user} isGuest={isGuest} />
+            </ProtectedRoute>
+          }
         />
         <Route path="/dictionary" element={<Dictionary />} />
         <Route path="/aula" element={<Classroom setUser={setUser} setIsGuest={setIsGuest} />} />

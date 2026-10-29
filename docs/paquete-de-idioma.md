@@ -20,6 +20,7 @@ cp -r languages/plantilla languages/<id>
 | `variedad`, `region` | Variedad dialectal que se enseña y dónde se habla |
 | `color` | `verde`, `azul`, `terracota` o `morado` |
 | `voz.modelo` | Modelo MMS de Meta para la voz (`facebook/mms-tts-<iso>`), si existe |
+| `teclado` | Letras que no están en todos los teclados (apóstrofo de las glotalizadas, ñ, vocales largas); aparecen como botones al escribir |
 | `frases` | Saludo, felicitación y ánimo que aparecen en las lecciones |
 | `normalizador.reglas` | Reglas de variación de escritura aceptadas como “correcto con variante” |
 

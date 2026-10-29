@@ -135,6 +135,6 @@ try {
 
 // Registrar la lengua en el frontend (un archivo .json en src/languages)
 const target = path.resolve(here, '../../frontend/src/languages', `${pack.id}.json`);
-const { id, nombre, nombreNativo, iso639_3, variedad, region, descripcion, color, lang, voz, frases, normalizador } = pack;
-fs.writeFileSync(target, `${JSON.stringify({ id, nombre, nombreNativo, iso639_3, variedad, region, descripcion, color, lang, voz, frases, normalizador }, null, 2)}\n`);
+const { id, nombre, nombreNativo, iso639_3, variedad, region, descripcion, color, lang, voz, teclado, frases, normalizador } = pack;
+fs.writeFileSync(target, `${JSON.stringify({ id, nombre, nombreNativo, iso639_3, variedad, region, descripcion, color, lang, voz, teclado, frases, normalizador }, null, 2)}\n`);
 console.log(`✅ Lengua registrada en ${path.relative(process.cwd(), target)} (vuelve a compilar el frontend)`);

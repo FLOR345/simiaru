@@ -5,7 +5,8 @@ import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { api } from '../services/api';
 import ExerciseTypes from '../components/lessons/ExerciseTypes';
-import { Volume2, VolumeX, X, Check, ArrowRight, Star, Trophy, AlertCircle, RefreshCw, UserX, Flame, Zap, Target, Clock, RotateCcw } from 'lucide-react';
+import Mascot from '../components/Mascot';
+import { Volume2, VolumeX, X, Check, ArrowRight, Star, AlertCircle, RefreshCw, UserX, Flame, Zap, Target, Clock, RotateCcw } from 'lucide-react';
 import { getLanguage, languageStyle } from '../languages';
 import { PHENOMENON_LABELS } from '../utils/normalizer';
 import { track, flush } from '../services/telemetry';
@@ -120,6 +121,7 @@ const LessonView = ({ user, isGuest }) => {
   const [saveState, setSaveState] = useState('idle');
   const [serverResult, setServerResult] = useState(null);
   const [sound, setSound] = useState(soundEnabled);
+  const [xpGain, setXpGain] = useState(null); // { amount, key } para el +XP que sube
 
   const savedRef = useRef(false);
   const continueRef = useRef(null);
@@ -236,7 +238,9 @@ const LessonView = ({ user, isGuest }) => {
       const nextCombo = combo + 1;
       setCombo(nextCombo);
       setBestCombo((b) => Math.max(b, nextCombo));
-      setXp((v) => v + (review ? XP_REVIEW : resultado === 'variante' ? XP_VARIANT : XP_CORRECT));
+      const gained = review ? XP_REVIEW : resultado === 'variante' ? XP_VARIANT : XP_CORRECT;
+      setXp((v) => v + gained);
+      setXpGain({ amount: gained, key: Date.now() });
     } else {
       playWrong();
       setCombo(0);
@@ -314,9 +318,9 @@ const LessonView = ({ user, isGuest }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
-        <div className="text-center" role="status">
-          <div className="w-14 h-14 border-4 border-stone-200 border-t-green-700 rounded-full animate-spin motion-reduce:animate-none mx-auto" aria-hidden="true" />
-          <p className="text-stone-700 font-semibold mt-4">Cargando lección…</p>
+        <div className="flex flex-col items-center" role="status">
+          <Mascot mood="think" size="w-28" eager />
+          <p className="text-stone-700 font-bold mt-4">Cargando lección…</p>
         </div>
       </div>
     );
@@ -360,21 +364,21 @@ const LessonView = ({ user, isGuest }) => {
         <span className="burbuja burbuja-morada" aria-hidden="true" />
         <main className="container mx-auto px-4 max-w-2xl">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8 text-center anim-entra">
-            <div className="relative w-24 h-24 mx-auto mb-6" aria-hidden="true">
+            <div className="relative w-36 mx-auto mb-4" aria-hidden="true">
               {passed &&
                 CONFETTI.map((piece, i) => (
                   <span key={i} className="papelito" style={{ '--x': piece.x, '--y': piece.y, '--r': piece.r, '--i': i, background: piece.color }} />
                 ))}
-              <div className={`anim-pop relative w-24 h-24 rounded-full flex items-center justify-center ${passed ? theme.solid : 'bg-orange-700'}`} style={{ '--i': 2 }}>
-                <Trophy className="w-12 h-12 text-white" />
-              </div>
+              <Mascot mood={passed ? 'cheer' : 'happy'} size="w-36" eager />
             </div>
 
             <h1 className="text-3xl font-black mb-2 anim-entra" style={{ '--i': 3 }}>
               {passed ? <span className="texto-degradado texto-vivo">¡Lección completada!</span> : '¡Buen intento!'}
             </h1>
             <p className="text-stone-600 mb-6 anim-entra" style={{ '--i': 4 }}>
-              {passed ? `${language.frases?.felicitacion ?? '¡Bien hecho!'} (¡Bien hecho!)` : `Con ${PASS_PERCENT}% o más se considera aprobada. Puedes repetirla cuando quieras.`}
+              {passed
+                ? `${language.frases?.felicitacion ?? '¡Bien hecho!'} (¡Bien hecho!)`
+                : `${language.frases?.animo ?? '¡Ánimo!'} (¡Ánimo!) Con ${PASS_PERCENT}% o más se considera aprobada. Puedes repetirla cuando quieras.`}
             </p>
 
             {/* Tarjetas de resultados, como al final de una lección de Duolingo */}
@@ -481,6 +485,19 @@ const LessonView = ({ user, isGuest }) => {
         </header>
 
         <main className="container mx-auto py-8 max-w-4xl">
+          <Mascot
+            className="mb-6"
+            size="w-20 sm:w-24"
+            eager
+            say={
+              <p className="font-semibold">
+                <span className="font-black" lang={language.lang}>
+                  ¡{(language.frases?.saludo ?? 'Hola').replace(/[¡!]/g, '')}!
+                </span>{' '}
+                Hoy conocerás {vocabulary.length} palabras. Toca el parlante para escucharlas y la estrella cuando ya te sepas una.
+              </p>
+            }
+          />
           {lesson.contenido_teorico && (
             <section className="bg-white rounded-2xl border border-stone-200 p-6 mb-6 anim-entra" aria-labelledby="teoria-titulo">
               <h2 id="teoria-titulo" className="font-bold mb-2">Qué aprenderás</h2>
@@ -574,7 +591,7 @@ const LessonView = ({ user, isGuest }) => {
       : null;
 
   return (
-    <div className="min-h-screen bg-white text-stone-900 pb-48">
+    <div className="min-h-screen bg-white text-stone-900 pb-48 overflow-x-clip">
       {/* Barra superior: cerrar, avance y racha de aciertos */}
       <header className="sticky top-0 z-20 bg-white/95 backdrop-blur">
         <div className="container mx-auto max-w-3xl py-4 flex items-center gap-3 sm:gap-4">
@@ -589,7 +606,10 @@ const LessonView = ({ user, isGuest }) => {
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div className={`barra h-full w-full rounded-full bg-gradient-to-r ${theme.gradient}`} style={{ transform: `scaleX(${progress})` }} />
+            <div className="relative h-full w-full origin-left barra overflow-hidden rounded-full" style={{ transform: `scaleX(${progress})` }}>
+              <div className={`h-full w-full rounded-full bg-gradient-to-r ${theme.gradient}`} />
+              {progress > 0.05 && <span className="barra-brillo" aria-hidden="true" />}
+            </div>
           </div>
           <AnimatePresence>
             {combo >= 2 && (
@@ -608,9 +628,14 @@ const LessonView = ({ user, isGuest }) => {
               </m.p>
             )}
           </AnimatePresence>
-          <p className="hidden sm:flex items-center gap-1 font-black text-amber-600 tabular-nums" title="XP de esta lección">
+          <p className="relative hidden sm:flex items-center gap-1 font-black text-amber-600 tabular-nums" title="XP de esta lección">
             <Zap className="w-5 h-5 fill-amber-400" aria-hidden="true" />
             {xp}
+            {xpGain && (
+              <span key={xpGain.key} className="anim-xp absolute -top-5 right-0 text-sm font-black text-amber-500" aria-hidden="true">
+                +{xpGain.amount}
+              </span>
+            )}
           </p>
           <button
             type="button"
@@ -648,6 +673,8 @@ const LessonView = ({ user, isGuest }) => {
               answered={!!feedback}
               languageLabel={language.nombre}
               languageId={lesson.idioma}
+              mood={feedback ? (feedback.correct ? (feedback.combo >= 3 ? 'cheer' : 'happy') : 'sad') : 'idle'}
+              beat={feedback ? 1 : 0}
             />
           </m.div>
         </AnimatePresence>

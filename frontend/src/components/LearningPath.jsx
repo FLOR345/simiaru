@@ -8,6 +8,7 @@ import { Tooltip } from '@mantine/core';
 import * as m from 'motion/react-m';
 import { useReducedMotion } from 'motion/react';
 import { API_URL } from '../config.js';
+import Mascot from './Mascot';
 import { languageStyle } from '../languages';
 import { LessonView, preloadOn } from '../routes';
 
@@ -73,6 +74,12 @@ const LessonNode = ({ lesson, state, offset, styleSet, isFirstAvailable, reduceM
         )}
       </Tooltip>
       <span className="mt-3 max-w-[9rem] text-center text-sm font-bold text-stone-700 leading-tight">{lesson.titulo}</span>
+      {/* La llamita espera junto a la lección que toca */}
+      {isFirstAvailable && (
+        <div className={`pointer-events-none absolute bottom-6 ${offset > 0 ? 'right-full -mr-2' : 'left-full -ml-2'} w-20 sm:w-24`}>
+          <Mascot size="w-20 sm:w-24" />
+        </div>
+      )}
     </li>
   );
 };

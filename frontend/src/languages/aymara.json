@@ -13,6 +13,7 @@
     "licencia": "CC-BY-NC-4.0",
     "respaldo": "es-BO"
   },
+  "teclado": ["'", "ñ", "ä", "ï", "ü"],
   "frases": {
     "saludo": "Kamisaraki",
     "felicitacion": "¡Wali luratawa!",

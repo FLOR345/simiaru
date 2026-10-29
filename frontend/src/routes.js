@@ -25,3 +25,4 @@ export const preloadOn = (Screen) => ({
 });
 export const Classroom = lazyWithPreload(() => import('./pages/Classroom'));
 export const Teacher = lazyWithPreload(() => import('./pages/Teacher'));
+export const Practice = lazyWithPreload(() => import('./pages/Practice'));

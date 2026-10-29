@@ -49,3 +49,7 @@ export const playWrong = () => play([[220, 0, 0.18, 'triangle', 0.14], [196, 0.1
 // Lección terminada: arpegio
 export const playComplete = () =>
   play([[523.3, 0, 0.15], [659.3, 0.12, 0.15], [784, 0.24, 0.15], [1046.5, 0.36, 0.4]]);
+// Toque suave al elegir una opción o una ficha
+export const playTap = () => play([[660, 0, 0.05, 'sine', 0.05]]);
+// Pareja encontrada: una nota corta y brillante
+export const playMatch = () => play([[880, 0, 0.08, 'sine', 0.08], [1174.7, 0.06, 0.12, 'sine', 0.07]]);
