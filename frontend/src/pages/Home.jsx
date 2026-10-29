@@ -11,17 +11,22 @@ import { CountUp, SpotlightCard, TiltedCard, BlurText } from '../ui/lazyBits';
 import Magnet from '../components/reactbits/Magnet';
 import ShinyText from '../components/reactbits/ShinyText';
 import StarBorder from '../components/reactbits/StarBorder';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.webp';
+import llamaHero from '../assets/llama/bienvenida-sticker.webp';
 import { LlamaImage } from '../components/Mascot';
 import LlamaGallery from '../components/LlamaGallery';
-import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
-import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
-import fotoTari from '../assets/fotos/tari-aymara.jpg';
-import fotoSikuris from '../assets/fotos/sikuris-puno.jpg';
-import fotoPapas from '../assets/fotos/papas-nativas.jpg';
-import fotoLlamas from '../assets/fotos/llamas-litografia.jpg';
+import fotoTiticaca from '../assets/fotos/titicaca-amanecer.webp';
+import fotoPuno from '../assets/fotos/puno-titicaca.webp';
+import fotoTari from '../assets/fotos/tari-aymara.webp';
+import fotoSikuris from '../assets/fotos/sikuris-puno.webp';
+import fotoPapas from '../assets/fotos/papas-nativas.webp';
+import fotoLlamas from '../assets/fotos/llamas-litografia.webp';
 import videoLago from '../assets/video/titicaca-timelapse.webm';
-import posterLago from '../assets/video/titicaca-timelapse.jpg';
+import miniTari from '../assets/fotos/tari-aymara-sm.webp';
+import miniPapas from '../assets/fotos/papas-nativas-sm.webp';
+import miniSikuris from '../assets/fotos/sikuris-puno-sm.webp';
+import posterLago from '../assets/video/titicaca-timelapse.webp';
+import RotatingText from '../components/reactbits/RotatingText';
 
 // Paleta con significado (ver PRODUCT.md):
 // - verde = quechua y acción principal, azul lago = aymara, terracota = probar sin cuenta
@@ -428,7 +433,7 @@ const Home = ({ enableGuestMode }) => {
         <div className="container mx-auto py-3 sm:py-4">
           <div className="flex justify-between items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="" width="253" height="299" className="h-10 sm:h-12 w-auto" />
+              <img src={logo} alt="" width="160" height="160" className="h-10 sm:h-12 w-auto" />
               <span className="text-xl sm:text-2xl font-black texto-degradado">SimiAru</span>
             </Link>
 
@@ -566,6 +571,17 @@ const Home = ({ enableGuestMode }) => {
                     <br />
                     <span className="texto-degradado texto-vivo">Quechua y Aymara</span>
                   </h1>
+                  {/* Rotating Text (React Bits): la forma de aprender cambia sola */}
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-2xl sm:text-3xl font-black text-stone-800">
+                    <span>con</span>
+                    <RotatingText
+                      texts={['juegos', 'canciones', 'cuentos', 'adivinanzas', 'tu llamita']}
+                      effect="flip"
+                      rotationInterval={2200}
+                      staggerDuration={0.025}
+                      mainClassName="px-3 py-1 rounded-2xl bg-gradient-to-r from-green-600 via-sky-600 to-purple-600 text-white shadow-lg overflow-hidden"
+                    />
+                  </p>
                   <p className="text-xl sm:text-2xl text-stone-600 leading-relaxed max-w-xl">
                     Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
                   </p>
@@ -651,10 +667,10 @@ const Home = ({ enableGuestMode }) => {
                 <div className="relative z-10 mx-auto max-w-xs sm:max-w-sm bg-white rounded-[2rem] border border-white shadow-2xl px-8 pt-8 pb-7 text-center">
                   {/* Motion: la llama entra con un rebote y luego "respira" arriba y abajo */}
                   <m.img
-                    src={logo}
-                    alt="Mascota de SimiAru: una llama con chullo y chalina andina"
-                    width="253"
-                    height="299"
+                    src={llamaHero}
+                    alt="Mascota de SimiAru: una llamita con su chalina andina de colores, saludando"
+                    width="560"
+                    height="560"
                     fetchpriority="high"
                     className="w-52 sm:w-60 lg:w-64 h-auto mx-auto"
                     initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
@@ -707,9 +723,9 @@ const Home = ({ enableGuestMode }) => {
               <p className="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
                 Aprende las palabras del{' '}
                 <span className="whitespace-nowrap">lago<MiniaturaLago className={miniatura} />,</span> del{' '}
-                <span className="whitespace-nowrap">tejido<img className={miniatura} src={fotoTari} alt="" width="900" height="1599" loading="lazy" />,</span> de la{' '}
-                <span className="whitespace-nowrap">chacra<img className={miniatura} src={fotoPapas} alt="" width="1300" height="747" loading="lazy" /></span> y de la{' '}
-                <span className="whitespace-nowrap">fiesta<img className={miniatura} src={fotoSikuris} alt="" width="1100" height="875" loading="lazy" />,</span> en quechua y en aymara
+                <span className="whitespace-nowrap">tejido<img className={miniatura} src={miniTari} alt="" width="900" height="1599" loading="lazy" />,</span> de la{' '}
+                <span className="whitespace-nowrap">chacra<img className={miniatura} src={miniPapas} alt="" width="1300" height="747" loading="lazy" /></span> y de la{' '}
+                <span className="whitespace-nowrap">fiesta<img className={miniatura} src={miniSikuris} alt="" width="1100" height="875" loading="lazy" />,</span> en quechua y en aymara
               </p>
             </Reveal>
             <PalabraViva />
@@ -1077,7 +1093,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <img src={logo} alt="" width="253" height="299" loading="lazy" decoding="async" className="h-12 w-auto rounded-lg" />
+                <img src={logo} alt="" width="160" height="160" loading="lazy" decoding="async" className="h-12 w-auto rounded-lg" />
                 <span className="text-2xl font-extrabold">SimiAru</span>
               </div>
               <p className="text-stone-400 leading-relaxed">

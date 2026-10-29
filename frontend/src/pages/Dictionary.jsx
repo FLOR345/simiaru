@@ -30,6 +30,8 @@ import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { speak } from '../utils/speech';
 import { playTap } from '../utils/sounds';
 import Mascot from '../components/Mascot';
+import Decor from '../components/Decor';
+import GradientText from '../components/reactbits/GradientText';
 
 // Apóstrofos del teclado del celular (’ ´) se buscan como el apóstrofo simple de la base
 const cleanQuery = (text) => text.replace(/[’‘´`ʼ]/g, "'").trim();
@@ -280,7 +282,9 @@ const Dictionary = () => {
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
           <div className="mr-auto min-w-0">
-            <h1 className="text-xl sm:text-2xl font-black">Diccionario</h1>
+            <h1 className="text-xl sm:text-2xl font-black">
+              <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={7}>Diccionario</GradientText>
+            </h1>
             <p className="text-sm text-stone-600 truncate">
               {stats.totalWords || 0} palabras · {categories.length} categorías
             </p>
@@ -304,13 +308,15 @@ const Dictionary = () => {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-7xl py-8 relative">
+      <main className="container mx-auto max-w-7xl py-8 relative isolate">
+        <Decor palette="frio" />
         <div className="grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] items-start">
           {/* ==================== COLUMNA LATERAL ==================== */}
           <aside className="space-y-5 lg:sticky lg:top-24 order-2 lg:order-1">
             <div className="hidden lg:block">
               <Mascot
                 pose="buscando"
+                sticker
                 bubble="top"
                 size="w-40"
                 eager

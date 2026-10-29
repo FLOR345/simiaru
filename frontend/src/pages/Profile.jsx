@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar, Download, Trash2, School, ArrowRight } from 'lucide-react';
 import axios from 'axios';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.webp';
 import { API_URL } from '../config.js';
 import { getLevel } from '../utils/levels.js';
 import { RingProgress } from '@mantine/core';
@@ -299,7 +299,7 @@ const Profile = ({ user, setUser }) => {
           <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 toque">
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
-          <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
+          <img src={logo} alt="" width="160" height="160" className="h-10 w-auto" />
           <h1 className="text-xl sm:text-2xl font-bold">Tu perfil</h1>
         </div>
       </header>

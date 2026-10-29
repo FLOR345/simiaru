@@ -40,7 +40,7 @@ const LlamaGallery = () => {
                 className={`block mx-auto w-28 sm:w-36 aspect-square origin-bottom llama ${on ? 'llama-salta' : 'transition-transform duration-300 group-hover:-translate-y-2 group-hover:rotate-2'}`}
                 aria-hidden="true"
               >
-                <LlamaImage pose={pose} />
+                <LlamaImage pose={pose} sticker sizes="9rem" />
               </span>
               <span className="mt-3 block text-lg font-black">{title}</span>
               <span className={`block text-sm text-stone-600 transition-all duration-300 ${on ? 'opacity-100 max-h-24 mt-1' : 'opacity-0 max-h-0 sm:opacity-100 sm:max-h-24 sm:mt-1'}`}>{text}</span>

@@ -3,7 +3,7 @@
 // - El contenido de la API (unidades, lecciones, diccionario, cultura): primero la red, y si no hay,
 //   la última copia guardada. Así una lección abierta una vez se puede repetir sin internet.
 // - Lo que escribe datos (POST, PUT, DELETE) nunca se cachea: lo guarda la app y lo envía al volver la conexión.
-const VERSION = 'simiaru-v1';
+const VERSION = 'simiaru-v2';
 const APP_CACHE = `${VERSION}-app`;
 const API_CACHE = `${VERSION}-api`;
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png'];

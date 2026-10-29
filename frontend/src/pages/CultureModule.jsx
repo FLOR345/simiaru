@@ -7,6 +7,8 @@ import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playCorrect, playWrong } from '../utils/sounds';
 import { speak } from '../utils/speech';
 import Mascot from '../components/Mascot';
+import Decor from '../components/Decor';
+import GradientText from '../components/reactbits/GradientText';
 
 const TYPES = [
   { value: 'adivinanza', label: 'Adivinanzas', singular: 'adivinanza', pose: 'pensando', Icon: Lightbulb, color: 'from-amber-400 to-orange-600', hint: '¿Adivinas qué es? Escribe tu respuesta y descúbrela.' },
@@ -566,7 +568,9 @@ const CultureModule = ({ user }) => {
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
           <div className="mr-auto min-w-0">
-            <h1 className="text-xl sm:text-2xl font-black">Cultura viva</h1>
+            <h1 className="text-xl sm:text-2xl font-black">
+              <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={7}>Cultura viva</GradientText>
+            </h1>
             <p className="text-sm text-stone-600 truncate">Adivinanzas, proverbios, canciones y cuentos andinos</p>
           </div>
           <div className="flex rounded-full bg-stone-100 p-1" role="group" aria-label="Idioma">
@@ -588,7 +592,8 @@ const CultureModule = ({ user }) => {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-7xl py-8 relative">
+      <main className="container mx-auto max-w-7xl py-8 relative isolate">
+        <Decor palette="frio" />
         <div className="grid gap-8 lg:grid-cols-[19rem_minmax(0,1fr)] items-start">
           {/* ==================== COLUMNA LATERAL ==================== */}
           <aside className="space-y-5 lg:sticky lg:top-24">
@@ -596,6 +601,7 @@ const CultureModule = ({ user }) => {
               <Mascot
                 mood={mood.mood}
                 pose={mood.mood === 'idle' ? type.pose : undefined}
+                sticker
                 beat={mood.beat}
                 bubble="top"
                 size="w-44"

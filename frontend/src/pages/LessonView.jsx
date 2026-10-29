@@ -13,6 +13,8 @@ import { PHENOMENON_LABELS } from '../utils/normalizer';
 import { track, flush } from '../services/telemetry';
 import { queueProgress } from '../services/offlineSync';
 import { playCorrect, playWrong, playComplete, soundEnabled, setSoundEnabled } from '../utils/sounds';
+import GradientText from '../components/reactbits/GradientText';
+import Decor from '../components/Decor';
 
 const PASS_PERCENT = 80;
 const XP_CORRECT = 10;
@@ -372,14 +374,14 @@ const LessonView = ({ user, isGuest }) => {
                 CONFETTI.map((piece, i) => (
                   <span key={i} className="papelito" style={{ '--x': piece.x, '--y': piece.y, '--r': piece.r, '--i': i, background: piece.color }} />
                 ))}
-              <Mascot mood={passed ? 'cheer' : 'happy'} pose={percentage === 100 ? 'logro' : passed ? 'celebrando' : 'reintentar'} size="w-40" eager />
+              <Mascot mood={passed ? 'cheer' : 'happy'} pose={percentage === 100 ? 'logro' : passed ? 'celebrando' : 'reintentar'} sticker size="w-40" eager />
             </div>
             <div className="mb-4">
               <Stars count={percentage === 100 ? 3 : percentage >= PASS_PERCENT ? 2 : percentage >= 50 ? 1 : 0} />
             </div>
 
             <h1 className="text-3xl font-black mb-2 anim-entra" style={{ '--i': 3 }}>
-              {passed ? <span className="texto-degradado texto-vivo">¡Lección completada!</span> : '¡Buen intento!'}
+              {passed ? <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={5} glow={0.35}>¡Lección completada!</GradientText> : '¡Buen intento!'}
             </h1>
             <p className="text-stone-600 mb-6 anim-entra" style={{ '--i': 4 }}>
               {passed
@@ -501,12 +503,14 @@ const LessonView = ({ user, isGuest }) => {
           </div>
         </header>
 
-        <main className="container mx-auto py-8 max-w-7xl">
+        <main className="relative isolate container mx-auto py-8 max-w-7xl">
+          <Decor sparks={false} />
           <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
             {/* Columna fija: la llamita, qué se aprende, avance y el botón de empezar */}
             <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
               <Mascot
                 pose="leyendo"
+                sticker
                 bubble="top"
                 size="w-36 sm:w-44"
                 eager

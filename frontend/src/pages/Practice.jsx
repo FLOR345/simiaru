@@ -9,6 +9,10 @@ import { playTap, playMatch, playWrong, playComplete, playCorrect } from '../uti
 import { speak } from '../utils/speech';
 import Mascot, { LlamaImage } from '../components/Mascot';
 import { Burst, FloatText, Confetti, Countdown, Stars } from '../components/GameFx';
+import Counter from '../components/reactbits/Counter';
+import GlareHover from '../components/reactbits/GlareHover';
+import ShinyText from '../components/reactbits/ShinyText';
+import Decor from '../components/Decor';
 
 // ==================== Juegos de práctica ====================
 // Repasan las palabras de las lecciones que la persona ya completó (o de la Unidad 1 si aún no hay).
@@ -111,7 +115,7 @@ const useMood = (restPose) => {
 const GameFrame = ({ llama, say, children }) => (
   <div className="grid gap-6 lg:gap-10 lg:grid-cols-[16rem_minmax(0,1fr)] items-start">
     <aside className="hidden lg:flex lg:sticky lg:top-24 flex-col items-center">
-      <Mascot mood={llama.mood} pose={llama.pose} beat={llama.beat} bubble="top" size="w-48" eager say={say} />
+      <Mascot mood={llama.mood} pose={llama.pose} beat={llama.beat} sticker bubble="top" size="w-48" eager say={say} />
     </aside>
     <div className="lg:hidden">
       <Mascot mood={llama.mood} pose={llama.pose} beat={llama.beat} size="w-16" eager say={<div className="text-sm">{say}</div>} />
@@ -129,6 +133,7 @@ const ResultScreen = ({ stars, record, title, big, unit, note, language, onAgain
         <Mascot
           mood={great ? 'cheer' : stars >= 2 ? 'happy' : 'idle'}
           pose={record ? 'logro' : great ? 'celebrando' : stars >= 2 ? 'alegre' : 'reintentar'}
+          sticker
           bubble="top"
           size="w-44"
           className="mx-auto"
@@ -143,7 +148,7 @@ const ResultScreen = ({ stars, record, title, big, unit, note, language, onAgain
       <p className="text-stone-600 font-semibold">{unit}</p>
       {record && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 font-black text-amber-800 anim-pop">
-          <Trophy className="w-5 h-5" aria-hidden="true" /> ¡Nuevo récord!
+          <Trophy className="w-5 h-5" aria-hidden="true" /> <ShinyText text="¡Nuevo récord!" color="#92400e" shineColor="#fde68a" speed={2} />
         </p>
       )}
       {note && <p className="mt-2 text-sm font-bold text-amber-700">{note}</p>}
@@ -386,9 +391,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
       <div className="flex items-center justify-between mb-4">
         <p className="relative font-black text-xl flex items-center gap-2">
           <Zap className="w-6 h-6 text-amber-500 fill-amber-400" aria-hidden="true" />
-          <span key={score} className="tabular-nums anim-pop">
-            {score}
-          </span>{' '}
+          <Counter value={score} fontSize={24} fontWeight={900} intro={false} duration={0.5} />{' '}
           parejas
           <FloatText trigger={scoreFx} className="text-amber-500 text-lg">
             +1
@@ -731,9 +734,7 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
           {found.length} de {pairs} parejas
         </p>
         <p className="font-bold text-stone-600 tabular-nums">
-          <span key={moves} className="inline-block anim-pop">
-            {moves}
-          </span>{' '}
+          <Counter value={moves} fontSize={16} fontWeight={800} intro={false} duration={0.45} />{' '}
           intentos{best ? ` · récord ${best}` : ''}
         </p>
       </div>
@@ -1094,7 +1095,8 @@ const Practice = ({ user, isGuest }) => {
         </div>
       </header>
 
-      <main className="container mx-auto max-w-7xl py-8 relative">
+      <main className="container mx-auto max-w-7xl py-8 relative isolate">
+        <Decor />
         {state.loading ? (
           <div className="flex flex-col items-center py-16" role="status">
             <Mascot mood="think" pose="esperando" size="w-36" eager />
@@ -1128,6 +1130,7 @@ const Practice = ({ user, isGuest }) => {
               <Mascot
                 eager
                 pose="bienvenida"
+                sticker
                 bubble="top"
                 size="w-40 sm:w-48"
                 say={
@@ -1159,7 +1162,15 @@ const Practice = ({ user, isGuest }) => {
               {GAMES.map(({ id, Icon, pose, title, text, color, shadow, best }, i) => {
                 const value = best ? readBest(bestKey(id, idioma)) : 0;
                 return (
-                  <li key={id} className="anim-entra" style={{ '--i': i }}>
+                  <m.li
+                    key={id}
+                    initial={{ opacity: 0, y: 30, scale: 0.94 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: 'spring', bounce: 0.35, duration: 0.6, delay: i * 0.08 }}
+                    whileHover={{ y: -6, rotate: i % 2 ? 1 : -1 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <GlareHover width="100%" height="100%" borderRadius="1.5rem" borderColor="transparent" glareOpacity={0.55} glareSize={40} className="w-full h-full">
                     <button
                       type="button"
                       onClick={() => {
@@ -1171,7 +1182,7 @@ const Practice = ({ user, isGuest }) => {
                       <span className={`pointer-events-none absolute -right-12 -top-12 w-48 h-48 rounded-full bg-gradient-to-br ${color} opacity-15 transition-transform duration-300 group-hover:scale-125`} aria-hidden="true" />
                       {/* La llamita asoma por la esquina y sube al pasar el mouse */}
                       <span className="pointer-events-none absolute -bottom-3 -right-2 w-32 sm:w-36 aspect-square transition-transform duration-300 ease-out group-hover:-translate-y-3 group-hover:rotate-3" aria-hidden="true">
-                        <LlamaImage pose={pose} />
+                        <LlamaImage pose={pose} sticker />
                       </span>
                       <span className={`relative mb-5 w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110`} aria-hidden="true">
                         <Icon className="w-8 h-8 text-white" />
@@ -1189,7 +1200,8 @@ const Practice = ({ user, isGuest }) => {
                       </span>
                       <span className={`relative mt-4 inline-flex items-center rounded-full px-5 py-2 text-sm font-black text-white bg-gradient-to-r ${color} shadow-md transition-transform group-hover:scale-105`}>Jugar</span>
                     </button>
-                  </li>
+                    </GlareHover>
+                  </m.li>
                 );
               })}
             </ul>

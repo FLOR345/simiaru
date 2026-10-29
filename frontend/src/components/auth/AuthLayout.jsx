@@ -2,6 +2,8 @@
 // Siguen la paleta de la portada: neutros cálidos (stone), verde = acción principal.
 import { Link } from 'react-router-dom';
 import { LlamaImage } from '../Mascot';
+import Decor from '../Decor';
+import GradientText from '../reactbits/GradientText';
 
 export const AuthLayout = ({ title, subtitle, children, footer, pose = 'bienvenida' }) => (
   // Mismo fondo de la portada: degradado suave con burbujas de color difuminadas
@@ -9,15 +11,18 @@ export const AuthLayout = ({ title, subtitle, children, footer, pose = 'bienveni
     <span className="burbuja burbuja-verde" aria-hidden="true" />
     <span className="burbuja burbuja-azul" aria-hidden="true" />
     <span className="burbuja burbuja-morada" aria-hidden="true" />
+    <Decor />
     <main className="w-full max-w-md anim-entra">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8">
         <div className="text-center mb-8">
           <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-3">
             <span className="block w-32 aspect-square llama llama-reposo" aria-hidden="true">
-              <LlamaImage pose={pose} eager />
+              <LlamaImage pose={pose} sticker eager sizes="8rem" />
             </span>
           </Link>
-          <h1 className="text-3xl font-black texto-degradado">{title}</h1>
+          <h1 className="text-3xl font-black">
+            <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={6}>{title}</GradientText>
+          </h1>
           <p className="text-stone-600 mt-2">{subtitle}</p>
         </div>
         {children}

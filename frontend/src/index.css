@@ -650,3 +650,56 @@ dialog.modal {
     animation: solo-aparece 150ms ease backwards;
   }
 }
+
+/* ==================== Adornos ==================== */
+/* Brillo que cruza los botones dorados de vez en cuando */
+@keyframes brillo-nodo {
+  0%, 70% { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(220%) skewX(-20deg); }
+}
+.brillo-nodo {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  animation: brillo-nodo 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Franja de tejido andino (zigzag de colores, como la chalina de la llamita) */
+.tejido-andino {
+  background:
+    linear-gradient(135deg, transparent 33%, #f43f5e 33% 50%, transparent 50% 83%, #f43f5e 83%) 0 0 / 16px 100%,
+    linear-gradient(225deg, transparent 33%, #14b8a6 33% 50%, transparent 50% 83%, #14b8a6 83%) 0 0 / 16px 100%,
+    linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6, #14b8a6, #22c55e);
+}
+
+/* Destellos que titilan */
+@keyframes destello {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+.destello { animation: destello 2.8s ease-in-out infinite; }
+
+/* Manchas de color difuminadas que se mueven despacio (fondo) */
+@keyframes deriva {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(6%, -8%) scale(1.08); }
+  66% { transform: translate(-5%, 6%) scale(0.95); }
+}
+.mancha {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.45;
+  animation: deriva 22s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brillo-nodo,
+  .destello,
+  .mancha {
+    animation: none;
+  }
+}

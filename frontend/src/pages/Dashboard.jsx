@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle, Sparkles, Award, ChevronDown, Play, UserX, AlertCircle, RefreshCw, XCircle, Gamepad2, ArrowRight } from 'lucide-react';
 import axios from 'axios';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.webp';
 
 // URL del backend
 import { API_URL } from '../config.js';
@@ -17,6 +17,8 @@ import LearningPath from '../components/LearningPath';
 import Mascot from '../components/Mascot';
 import { Practice, preloadOn } from '../routes';
 import { LANGUAGES, languageStyle } from '../languages';
+import GradientText from '../components/reactbits/GradientText';
+import Decor from '../components/Decor';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 // Idiomas desde los paquetes de src/languages: una lengua nueva con contenido aparece sola en el selector
@@ -188,7 +190,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         <div className="container mx-auto py-3">
           <div className="flex justify-between items-center gap-3">
             <Link to="/dashboard" className="flex items-center gap-3" aria-label="SimiAru, ir al panel">
-              <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
+              <img src={logo} alt="" width="160" height="160" className="h-10 w-auto" />
               <span className="text-2xl font-black texto-degradado hidden md:block">SimiAru</span>
             </Link>
 
@@ -244,13 +246,14 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         </div>
       </header>
 
-      <main className="container mx-auto py-8 max-w-7xl">
+      <main className="relative isolate container mx-auto py-8 max-w-7xl">
+        <Decor />
         {/* ==================== SALUDO + ESTADÍSTICAS ==================== */}
         {/* Izquierda: la llamita saluda en grande. Derecha: racha y puntos arriba, progreso y nivel abajo */}
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] items-stretch mb-8">
           <section className="relative overflow-hidden rounded-[2rem] bg-white/80 backdrop-blur border border-white shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 anim-entra" aria-labelledby="saludo-titulo">
             <span className="pointer-events-none absolute -right-16 -top-16 w-56 h-56 rounded-full bg-gradient-to-br from-green-200/60 to-blue-200/40 blur-2xl" aria-hidden="true" />
-            <Mascot pose="bienvenida" size="w-40 sm:w-48 lg:w-52" eager className="shrink-0 relative" />
+            <Mascot pose="bienvenida" sticker size="w-40 sm:w-48 lg:w-56" eager className="shrink-0 relative" />
             <div className="relative min-w-0 text-center sm:text-left">
               <h1 id="saludo-titulo" className="text-[clamp(2rem,2.8vw,2.75rem)] font-black tracking-tight leading-tight mb-3">
                 {isGuest ? (
@@ -259,7 +262,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                   <>
                     <span className="whitespace-nowrap">¡Rimaykullayki,</span>
                     <br />
-                    <span className="texto-degradado texto-vivo">{firstName(displayUser?.nombre)}</span>!
+                    <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={6} className="align-baseline">{firstName(displayUser?.nombre)}</GradientText>!
                   </>
                 )}
               </h1>
@@ -401,7 +404,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
           {loading ? (
             <div className="text-center py-16" role="status">
-              <div className="w-14 h-14 mx-auto mb-6 border-4 border-stone-200 border-t-green-700 rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              <Mascot mood="think" pose="esperando" sticker size="w-32" className="justify-center mb-4" />
               <p className="text-lg font-semibold text-stone-700">Cargando tus unidades…</p>
               <p className="text-sm text-stone-600 mt-1">La primera vez puede tardar hasta un minuto mientras el servidor se activa.</p>
             </div>
