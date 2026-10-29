@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mountain, Heart, BookOpen, Globe, Trophy, Zap, Target, CheckCircle, ArrowRight, Play, Shield, UserX, Github, Menu, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../config';
+import { preloadOn, Register, Login, Dashboard, Dictionary } from '../routes';
 import logo from '../assets/logo.jpg';
 import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
 import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
@@ -413,20 +414,20 @@ const Home = ({ enableGuestMode }) => {
               {/* En escritorio: invitado e inicio de sesión a la vista; en celular y tablet van en el menú */}
               <button
                 type="button"
-                onClick={handleGuestMode}
+                onClick={handleGuestMode} {...preloadOn(Dashboard)}
                 className="hidden lg:flex items-center gap-2 px-5 py-2.5 whitespace-nowrap text-stone-700 font-semibold hover:text-orange-800 hover:bg-orange-50 rounded-full toque"
               >
                 <UserX className="w-4 h-4" />
                 Probar sin cuenta
               </button>
               <Link
-                to="/login"
+                to="/login" {...preloadOn(Login)}
                 className="hidden lg:block px-6 py-2.5 whitespace-nowrap text-stone-700 font-bold hover:text-green-800 transition-colors"
               >
                 Iniciar sesión
               </Link>
               <Link
-                to="/register"
+                to="/register" {...preloadOn(Register)}
                 className="min-h-11 px-4 py-2.5 text-sm sm:px-7 sm:py-3 sm:text-base whitespace-nowrap bg-green-700 hover:bg-green-800 text-white font-bold rounded-full toque flex items-center gap-2"
               >
                 Empezar gratis
@@ -472,14 +473,14 @@ const Home = ({ enableGuestMode }) => {
               <div className="grid grid-cols-2 gap-3 pt-3">
                 <button
                   type="button"
-                  onClick={handleGuestMode}
+                  onClick={handleGuestMode} {...preloadOn(Dashboard)}
                   className="toque min-h-12 px-3 flex items-center justify-center gap-2 border-2 border-orange-700 text-orange-800 text-sm font-bold whitespace-nowrap rounded-xl"
                 >
                   <UserX className="w-4 h-4" />
                   Probar sin cuenta
                 </button>
                 <Link
-                  to="/login"
+                  to="/login" {...preloadOn(Login)}
                   className="toque min-h-12 px-3 flex items-center justify-center border-2 border-stone-300 text-stone-800 text-sm font-bold whitespace-nowrap rounded-xl"
                 >
                   Iniciar sesión
@@ -513,7 +514,7 @@ const Home = ({ enableGuestMode }) => {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
-                    to="/register"
+                    to="/register" {...preloadOn(Register)}
                     className="group px-9 py-4 bg-green-700 hover:bg-green-800 text-white font-bold rounded-2xl toque text-center text-lg flex items-center justify-center gap-3"
                   >
                     Empezar gratis
@@ -521,7 +522,7 @@ const Home = ({ enableGuestMode }) => {
                   </Link>
                   <button
                     type="button"
-                    onClick={handleGuestMode}
+                    onClick={handleGuestMode} {...preloadOn(Dashboard)}
                     className="px-9 py-4 bg-white border-2 border-orange-700 text-orange-800 font-bold rounded-2xl hover:bg-orange-50 toque text-center text-lg flex items-center justify-center gap-3"
                   >
                     <UserX className="w-6 h-6" />
@@ -662,7 +663,7 @@ const Home = ({ enableGuestMode }) => {
                 </p>
                 <button
                   type="button"
-                  onClick={handleGuestMode}
+                  onClick={handleGuestMode} {...preloadOn(Dashboard)}
                   className="toque min-h-11 flex items-center gap-2 text-orange-800 font-bold text-sm hover:text-orange-900"
                 >
                   <Play className="w-5 h-5" />
@@ -754,12 +755,12 @@ const Home = ({ enableGuestMode }) => {
                         ))}
                       </ul>
                       <div className="flex gap-3 mt-8">
-                        <Link to="/register" className={`px-6 py-3 bg-white ${lang.primaryText} font-bold rounded-xl hover:bg-stone-100 toque`}>
+                        <Link to="/register" {...preloadOn(Register)} className={`px-6 py-3 bg-white ${lang.primaryText} font-bold rounded-xl hover:bg-stone-100 toque`}>
                           Empezar <span aria-hidden="true">→</span>
                         </Link>
                         <button
                           type="button"
-                          onClick={handleGuestMode}
+                          onClick={handleGuestMode} {...preloadOn(Dashboard)}
                           className={`px-6 py-3 ${lang.secondaryBtn} text-white font-bold rounded-xl toque flex items-center gap-2`}
                         >
                           <UserX className="w-4 h-4" />
@@ -850,14 +851,14 @@ const Home = ({ enableGuestMode }) => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
                 <Link
-                  to="/register"
+                  to="/register" {...preloadOn(Register)}
                   className="px-10 py-5 bg-white text-green-800 font-bold rounded-2xl hover:bg-green-50 toque text-xl"
                 >
                   Empezar gratis
                 </Link>
                 <button
                   type="button"
-                  onClick={handleGuestMode}
+                  onClick={handleGuestMode} {...preloadOn(Dashboard)}
                   className="px-10 py-5 border-2 border-white text-white font-bold rounded-2xl hover:bg-green-700 toque text-xl flex items-center gap-3"
                 >
                   <UserX className="w-6 h-6" />
@@ -907,9 +908,9 @@ const Home = ({ enableGuestMode }) => {
               <ul>
                 <li><a href="#languages" className={footerLink}>Quechua y aymara</a></li>
                 <li><a href="#how-it-works" className={footerLink}>Cómo funciona</a></li>
-                <li><Link to="/dictionary" className={footerLink}>Diccionario</Link></li>
+                <li><Link to="/dictionary" {...preloadOn(Dictionary)} className={footerLink}>Diccionario</Link></li>
                 <li>
-                  <button type="button" onClick={handleGuestMode} className={footerLink}>
+                  <button type="button" onClick={handleGuestMode} {...preloadOn(Dashboard)} className={footerLink}>
                     Probar sin cuenta
                   </button>
                 </li>

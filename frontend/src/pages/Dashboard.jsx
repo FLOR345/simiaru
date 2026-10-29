@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle, Sparkles, Award, ChevronDown, Play, UserX, AlertCircle, RefreshCw, XCircle } from 'lucide-react';
 import axios from 'axios';
@@ -412,13 +412,17 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const requested = useRef(false);
+  const [opened, setOpened] = useState(false);
 
   // Los invitados solo pueden acceder a la Unidad 1 (index === 0)
   const isLockedForGuest = isGuest && index > 0;
   const panelId = `unidad-${unit.id}-lecciones`;
 
+  // Se piden una sola vez: al acercar el mouse o enfocar (precarga) o al abrir la unidad
   const loadLessons = async () => {
-    if (lessons.length > 0 || isLockedForGuest) return;
+    if (requested.current || isLockedForGuest) return;
+    requested.current = true;
     setLoading(true);
     setError(false);
     try {
@@ -428,6 +432,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
       setLessons(data.lessons);
     } catch (err) {
       console.error('Error loading lessons:', err);
+      requested.current = false; // permite reintentar
       setError(true);
     } finally {
       setLoading(false);
@@ -437,6 +442,7 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
   const handleToggle = () => {
     if (isLockedForGuest) return;
     if (!expanded) loadLessons();
+    setOpened(true);
     setExpanded(!expanded);
   };
 
@@ -463,7 +469,8 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
             Regístrate gratis para acceder a esta unidad
           </span>
         )}
-        {!isLockedForGuest && lessons.length > 0 && (
+        {/* El avance aparece tras abrir la unidad, no con la precarga: así la tarjeta no crece bajo el mouse */}
+        {!isLockedForGuest && opened && lessons.length > 0 && (
           <span className="block mt-3">
             <span className="flex items-center justify-between text-sm font-semibold text-stone-600 mb-1.5">
               <span>
@@ -494,6 +501,8 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
         <button
           type="button"
           onClick={handleToggle}
+          onPointerEnter={loadLessons}
+          onFocus={loadLessons}
           aria-expanded={expanded}
           aria-controls={panelId}
           className="w-full text-left flex items-center gap-4 sm:gap-6 p-5 sm:p-6"

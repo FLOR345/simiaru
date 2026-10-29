@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Home from './pages/Home';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import Dashboard from './pages/Dashboard';
-import LessonView from './pages/LessonView';
-import Profile from './pages/Profile';
-import Dictionary from './pages/Dictionary';
-import CultureModule from './pages/CultureModule';
+import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule } from './routes';
+
+const LoadingScreen = () => (
+  <div className="min-h-screen flex items-center justify-center text-white" role="status">
+    Cargando...
+  </div>
+);
 
 // URL del backend
 import { API_URL } from './config.js';
@@ -17,7 +17,7 @@ import { API_URL } from './config.js';
 // y React vuelve a montar la pantalla entera (eso provocaba un bucle de peticiones).
 const ProtectedRoute = ({ children, auth, guestAllowed = true }) => {
   if (auth.loading) {
-    return <div className="min-h-screen flex items-center justify-center text-white">Cargando...</div>;
+    return <LoadingScreen />;
   }
 
   // Si hay usuario O es invitado (y está permitido), dar acceso
@@ -80,9 +80,27 @@ function App() {
   }, []);
 
   const auth = { loading, user, isGuest };
+  const hasSession = Boolean(user) || isGuest;
+
+  // Con sesión, lo más probable es ir al panel y a una lección:
+  // se descargan cuando el navegador está libre, para que abran sin espera
+  useEffect(() => {
+    if (loading || !hasSession) return undefined;
+    const preload = () => {
+      Dashboard.preload();
+      LessonView.preload();
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(preload, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(preload, 1500);
+    return () => clearTimeout(id);
+  }, [loading, hasSession]);
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path="/" element={<Home enableGuestMode={() => setIsGuest(true)} />} />
         <Route path="/login" element={<Login setUser={setUser} setIsGuest={setIsGuest} />} />
@@ -122,6 +140,7 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
