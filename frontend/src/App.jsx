@@ -126,10 +126,10 @@ function App() {
     <MotionConfig reducedMotion="user">
     <BrowserRouter>
       {/* Avisos de toda la app (progreso guardado, insignias, favoritos, perfil).
-          Arriba al centro: nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
+          Arriba a la derecha (debajo del encabezado): nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
       <OfflineBanner />
       <Suspense fallback={null}>
-        <Toaster position="top-center" richColors closeButton duration={4000} toastOptions={{ style: { fontFamily: 'inherit' } }} />
+        <Toaster position="top-right" richColors closeButton expand visibleToasts={4} offset={80} duration={4500} toastOptions={{ style: { fontFamily: 'inherit', borderRadius: '1rem' } }} />
       </Suspense>
       <ClickSpark sparkColor="#16a34a" sparkCount={10} sparkRadius={26} sparkSize={12} duration={450}>
       <Suspense fallback={<LoadingScreen />}>

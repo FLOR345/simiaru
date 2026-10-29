@@ -45,7 +45,9 @@ export const register = async (req, res) => {
       user: {
         id: newUser.id,
         nombre: newUser.nombre,
-        email: newUser.email
+        email: newUser.email,
+        consentimiento_datos: null,
+        es_cuenta_aula: false
       }
     });
   } catch (error) {
@@ -95,7 +97,10 @@ export const login = async (req, res) => {
         idioma_objetivo: user.idioma_objetivo,
         puntos_totales: user.puntos_totales,
         nivel_actual: user.nivel_actual,
-        racha_actual: user.racha_actual
+        racha_actual: user.racha_actual,
+        // La pregunta de datos de aprendizaje aparece apenas se entra (null = aún no respondida)
+        consentimiento_datos: user.consentimiento_datos ?? null,
+        es_cuenta_aula: user.es_cuenta_aula ?? false
       }
     });
   } catch (error) {

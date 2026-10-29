@@ -106,7 +106,8 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     return progress.some((p) => p.leccion_id === lessonId && p.completado);
   };
 
-  const completedLessons = progress.filter((p) => p.completado).length;
+  // Solo las lecciones del idioma elegido (el progreso trae las de todas las lenguas)
+  const completedLessons = progress.filter((p) => p.completado && (!p.idioma || p.idioma === selectedLanguage)).length;
   const totalLessons = units.reduce((acc, unit) => acc + (unit.lecciones_count || 0), 0);
   const overallProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
@@ -244,27 +245,67 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       </header>
 
       <main className="container mx-auto py-8 max-w-7xl">
-        {/* ==================== SALUDO ==================== */}
-        <div className="mb-8 flex items-center gap-4 sm:gap-6">
-          <Mascot size="w-20 sm:w-28" eager />
-          <div className="min-w-0">
-          <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">
-            {isGuest ? (
-              <span className="texto-degradado">¡Bienvenido!</span>
-            ) : (
-              <>
-                ¡Rimaykullayki, <span className="texto-degradado texto-vivo">{firstName(displayUser?.nombre)}</span>!
-              </>
-            )}
-          </h1>
-          <p className="text-lg sm:text-xl text-stone-600">
-            {isGuest
-              ? 'Explora la Unidad 1 gratis. Regístrate para guardar tu progreso.'
-              : completedLessons === 0
-                ? 'Empieza con la primera lección de la Unidad 1.'
-                : `Llevas ${completedLessons} ${completedLessons === 1 ? 'lección completada' : 'lecciones completadas'}.`}
-          </p>
-          </div>
+        {/* ==================== SALUDO + ESTADÍSTICAS ==================== */}
+        {/* Izquierda: la llamita saluda en grande. Derecha: racha y puntos arriba, progreso y nivel abajo */}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] items-stretch mb-8">
+          <section className="relative overflow-hidden rounded-[2rem] bg-white/80 backdrop-blur border border-white shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 anim-entra" aria-labelledby="saludo-titulo">
+            <span className="pointer-events-none absolute -right-16 -top-16 w-56 h-56 rounded-full bg-gradient-to-br from-green-200/60 to-blue-200/40 blur-2xl" aria-hidden="true" />
+            <Mascot size="w-40 sm:w-48 lg:w-52" eager className="shrink-0 relative" />
+            <div className="relative min-w-0 text-center sm:text-left">
+              <h1 id="saludo-titulo" className="text-[clamp(2rem,2.8vw,2.75rem)] font-black tracking-tight leading-tight mb-3">
+                {isGuest ? (
+                  <span className="texto-degradado">¡Bienvenido!</span>
+                ) : (
+                  <>
+                    <span className="whitespace-nowrap">¡Rimaykullayki,</span>
+                    <br />
+                    <span className="texto-degradado texto-vivo">{firstName(displayUser?.nombre)}</span>!
+                  </>
+                )}
+              </h1>
+              <p className="text-lg sm:text-xl text-stone-700 mb-5">
+                {isGuest
+                  ? 'Explora la Unidad 1 gratis. Regístrate para guardar tu progreso.'
+                  : completedLessons === 0
+                    ? 'Empieza con la primera lección de la Unidad 1. ¡Yo te acompaño!'
+                    : `Llevas ${completedLessons} ${completedLessons === 1 ? 'lección completada' : 'lecciones completadas'}. ¡Sigamos!`}
+              </p>
+              <div className="flex flex-wrap justify-center sm:justify-start gap-3">
+                <a href="#ruta-titulo" className="ficha inline-flex items-center gap-2 min-h-12 px-6 rounded-2xl border-green-800 bg-green-600 hover:bg-green-500 text-white font-black">
+                  <Play className="w-5 h-5 fill-white" aria-hidden="true" />
+                  {completedLessons === 0 ? 'Empezar' : 'Continuar'}
+                </a>
+                <Link
+                  to={`/practica?idioma=${selectedLanguage}`}
+                  {...preloadOn(Practice)}
+                  className="ficha inline-flex items-center gap-2 min-h-12 px-6 rounded-2xl border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-black"
+                >
+                  <Gamepad2 className="w-5 h-5" aria-hidden="true" />
+                  Jugar
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          <ul className="grid grid-cols-2 gap-4 sm:gap-5">
+            {stats.map(({ Icon, card, icon, label, value, count, detail }, i) => (
+              <li key={label} className={`tarjeta-viva anim-entra bg-gradient-to-br ${isGuest ? "from-white to-stone-100" : card} rounded-3xl border border-white shadow-sm p-5 sm:p-6 flex flex-col justify-between`} style={{ "--i": i + 1 }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${isGuest ? "from-stone-300 to-stone-400" : icon}`} aria-hidden="true">
+                    <Icon className="w-5 h-5 text-white" />
+                  </span>
+                  <span className="text-sm sm:text-base font-bold text-stone-700">{label}</span>
+                </div>
+                <div>
+                  <p className="text-[clamp(1.5rem,7vw,2.25rem)] sm:text-5xl font-black mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">
+                    {/* Count Up: los números suben al aparecer */}
+                    {typeof count === "number" ? <CountUp to={count} separator="," duration={1.4} delay={i * 0.1} /> : value}
+                  </p>
+                  <p className="text-sm text-stone-600">{detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* ==================== QUÉ INCLUYE EL MODO INVITADO ==================== */}
@@ -304,25 +345,6 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
             </div>
           </section>
         )}
-
-        {/* ==================== ESTADÍSTICAS ==================== */}
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {stats.map(({ Icon, card, icon, label, value, count, detail }, i) => (
-            <li key={label} className={`tarjeta-viva anim-entra bg-gradient-to-br ${isGuest ? "from-white to-stone-100" : card} rounded-3xl border border-white shadow-sm p-5 sm:p-6`} style={{ "--i": i }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${isGuest ? "from-stone-300 to-stone-400" : icon}`} aria-hidden="true">
-                  <Icon className="w-5 h-5 text-white" />
-                </span>
-                <span className="text-sm font-bold text-stone-600">{label}</span>
-              </div>
-              <p className="text-[clamp(1.25rem,6vw,1.875rem)] sm:text-4xl font-extrabold mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">
-                {/* Count Up: los números suben al aparecer */}
-                {typeof count === "number" ? <CountUp to={count} separator="," duration={1.4} delay={i * 0.1} /> : value}
-              </p>
-              <p className="text-sm text-stone-600">{detail}</p>
-            </li>
-          ))}
-        </ul>
 
         {/* ==================== IDIOMA ==================== */}
         <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-8" aria-labelledby="idioma-titulo">

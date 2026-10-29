@@ -44,9 +44,10 @@ export const getProgress = async (req, res) => {
     
     // Incluye el título de la lección para mostrar el historial con nombres
     const result = await pool.query(
-      `SELECT p.*, l.titulo AS leccion_titulo
+      `SELECT p.*, l.titulo AS leccion_titulo, u.idioma
        FROM progreso_usuario p
        LEFT JOIN lecciones l ON l.id = p.leccion_id
+       LEFT JOIN unidades u ON u.id = l.unidad_id
        WHERE p.usuario_id = $1
        ORDER BY p.fecha_completado DESC NULLS LAST`,
       [userId]

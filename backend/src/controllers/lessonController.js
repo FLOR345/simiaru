@@ -1,5 +1,6 @@
 import { pool } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { isKnownLanguage } from '../utils/languages.js';
 
 /**
  * Obtiene todas las unidades de un idioma específico
@@ -14,9 +15,9 @@ export const getUnits = async (req, res, next) => {
       throw new AppError('El parámetro "idioma" es requerido', 400);
     }
 
-    const validLanguages = ['quechua', 'aymara'];
-    if (!validLanguages.includes(idioma.toLowerCase())) {
-      throw new AppError(`Idioma no soportado: ${idioma}. Idiomas válidos: quechua, aymara`, 400);
+    // Cualquier lengua cargada con un paquete de idioma (no una lista fija)
+    if (!(await isKnownLanguage(idioma.toLowerCase()))) {
+      throw new AppError(`Idioma no soportado: ${idioma}`, 400);
     }
 
     const result = await pool.query(
@@ -27,7 +28,8 @@ export const getUnits = async (req, res, next) => {
         descripcion, 
         idioma, 
         orden,
-        icono_url
+        icono_url,
+        (SELECT COUNT(*)::int FROM lecciones l WHERE l.unidad_id = unidades.id) AS lecciones_count
       FROM unidades 
       WHERE idioma = $1 
       ORDER BY orden ASC`,

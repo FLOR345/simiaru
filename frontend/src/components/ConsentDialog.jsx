@@ -5,6 +5,7 @@ import { ShieldCheck, Download, Trash2, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../services/api';
 import { clearQueue, flush } from '../services/telemetry';
+import { LlamaImage } from './Mascot';
 
 const POINTS = [
   [EyeOff, 'Con un seudónimo', 'Nunca se exporta tu nombre ni tu correo: solo un código que no te identifica.'],
@@ -64,9 +65,14 @@ const ConsentDialog = ({ user, setUser }) => {
       className="modal w-[calc(100%-2rem)] max-w-lg rounded-3xl p-0 backdrop:bg-stone-900/60 text-stone-900"
     >
       <div className="p-6 sm:p-8">
-        <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center shadow-lg mb-5" aria-hidden="true">
-          <ShieldCheck className="w-8 h-8 text-white" />
-        </span>
+        <div className="flex items-end gap-3 mb-5" aria-hidden="true">
+          <div className="w-24 llama llama-salta">
+            <LlamaImage eager />
+          </div>
+          <span className="mb-2 w-12 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center shadow-lg anim-pop">
+            <ShieldCheck className="w-7 h-7 text-white" />
+          </span>
+        </div>
         <h2 id="consentimiento-titulo" className="text-2xl font-black mb-2">
           ¿Ayudas a investigar el quechua y el aymara?
         </h2>

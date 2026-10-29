@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* El reinicio de márgenes y rellenos lo hace Tailwind (preflight). Un "* { margin: 0; padding: 0 }" aquí
+   anulaba el centrado de <dialog> y el relleno de las notificaciones de Sonner. */
 
 /* ==================== Movimiento: tokens compartidos ====================
    Una sola familia de curvas para toda la app (Emil Kowalski):

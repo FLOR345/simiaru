@@ -107,6 +107,8 @@ const LessonView = ({ user, isGuest }) => {
   const [loadError, setLoadError] = useState(false);
   const [showVocab, setShowVocab] = useState(true);
   const [learnedWords, setLearnedWords] = useState([]);
+  const [hideMeanings, setHideMeanings] = useState(false); // práctica: ocultar los significados
+  const [revealed, setRevealed] = useState([]);
 
   // Cola de la lección: los ejercicios y, al final, los que se fallaron (repaso)
   const [queue, setQueue] = useState([]);
@@ -466,116 +468,159 @@ const LessonView = ({ user, isGuest }) => {
   if (showVocab) {
     const learnedPercent = vocabulary.length > 0 ? Math.round((learnedWords.length / vocabulary.length) * 100) : 0;
     const hasRealAudio = vocabulary.some((w) => w.audio_url);
+    const startButton =
+      total > 0 ? (
+        <button type="button" onClick={startExercises} className="w-full min-h-14 boton-degradado font-black text-lg rounded-2xl shadow-lg flex items-center justify-center gap-3">
+          ¡Empezar! ({total} ejercicios)
+          <ArrowRight className="w-6 h-6" aria-hidden="true" />
+        </button>
+      ) : (
+        <p className="text-center text-stone-700">Esta lección todavía no tiene ejercicios.</p>
+      );
     return (
-      <div className="min-h-screen bg-stone-50 text-stone-900">
-        <header className={`bg-gradient-to-br ${theme.gradient} text-white`}>
-          <div className="container mx-auto py-6 max-w-4xl">
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-stone-100 text-stone-900">
+        <header className={`relative overflow-hidden bg-gradient-to-br ${theme.gradient} text-white`}>
+          <span className="pointer-events-none absolute -right-24 -top-24 w-80 h-80 rounded-full bg-white/10" aria-hidden="true" />
+          <span className="pointer-events-none absolute right-40 -bottom-32 w-64 h-64 rounded-full bg-white/10" aria-hidden="true" />
+          <div className="container relative mx-auto py-6 max-w-7xl">
             <button type="button" onClick={leaveLesson} className={`mb-4 inline-flex items-center gap-2 min-h-11 font-semibold ${theme.headerSoft} hover:text-white`}>
               <X className="w-5 h-5" aria-hidden="true" />
               Volver al panel
             </button>
             <p className={`${theme.headerSoft} font-semibold`}>{language.nombre}</p>
             <div className="flex flex-wrap items-end justify-between gap-2">
-              <h1 className="text-3xl font-black">{lesson.titulo}</h1>
+              <h1 className="text-3xl sm:text-4xl font-black">{lesson.titulo}</h1>
               <p className={theme.headerSoft}>
-                <span className="text-2xl font-bold text-white">{vocabulary.length}</span> palabras
+                <span className="text-3xl font-black text-white">{vocabulary.length}</span> palabras · {total} ejercicios
               </p>
             </div>
           </div>
         </header>
 
-        <main className="container mx-auto py-8 max-w-4xl">
-          <Mascot
-            className="mb-6"
-            size="w-20 sm:w-24"
-            eager
-            say={
-              <p className="font-semibold">
-                <span className="font-black" lang={language.lang}>
-                  ¡{(language.frases?.saludo ?? 'Hola').replace(/[¡!]/g, '')}!
-                </span>{' '}
-                Hoy conocerás {vocabulary.length} palabras. Toca el parlante para escucharlas y la estrella cuando ya te sepas una.
-              </p>
-            }
-          />
-          {lesson.contenido_teorico && (
-            <section className="bg-white rounded-2xl border border-stone-200 p-6 mb-6 anim-entra" aria-labelledby="teoria-titulo">
-              <h2 id="teoria-titulo" className="font-bold mb-2">Qué aprenderás</h2>
-              <p className="text-stone-700 leading-relaxed">{lesson.contenido_teorico}</p>
-            </section>
-          )}
+        <main className="container mx-auto py-8 max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+            {/* Columna fija: la llamita, qué se aprende, avance y el botón de empezar */}
+            <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
+              <Mascot
+                bubble="top"
+                size="w-32 sm:w-36"
+                eager
+                say={
+                  <p className="font-semibold">
+                    <span className="font-black" lang={language.lang}>
+                      ¡{(language.frases?.saludo ?? 'Hola').replace(/[¡!]/g, '')}!
+                    </span>{' '}
+                    Hoy conocerás {vocabulary.length} palabras. Toca el parlante para escucharlas y la estrella cuando ya te sepas una.
+                  </p>
+                }
+              />
+              {lesson.contenido_teorico && (
+                <section className="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm anim-entra" aria-labelledby="teoria-titulo">
+                  <h2 id="teoria-titulo" className="font-black mb-2 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-400" aria-hidden="true" />
+                    Qué aprenderás
+                  </h2>
+                  <p className="text-stone-700 leading-relaxed">{lesson.contenido_teorico}</p>
+                </section>
+              )}
 
-          <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-6 flex items-center justify-between gap-4">
-            <p className="flex items-center gap-3 font-semibold text-stone-700">
-              <Star className="w-6 h-6 text-amber-600" aria-hidden="true" />
-              {learnedWords.length} de {vocabulary.length} palabras marcadas como aprendidas
-            </p>
-            <div className="w-32 h-3 bg-stone-200 rounded-full overflow-hidden shrink-0" aria-hidden="true">
-              <div className={`barra h-full w-full ${theme.solid}`} style={{ transform: `scaleX(${learnedPercent / 100})` }} />
-            </div>
+              <section className="bg-white rounded-3xl border border-stone-200 p-5 shadow-sm" aria-label="Palabras aprendidas">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <p className="font-bold text-stone-700">Palabras que ya sabes</p>
+                  <p className="font-black tabular-nums">
+                    {learnedWords.length}
+                    <span className="text-stone-500 font-bold">/{vocabulary.length}</span>
+                  </p>
+                </div>
+                <div className="h-3 bg-stone-200 rounded-full overflow-hidden" aria-hidden="true">
+                  <div className={`barra h-full w-full bg-gradient-to-r ${theme.gradient}`} style={{ transform: `scaleX(${learnedPercent / 100})` }} />
+                </div>
+                <label className="mt-4 flex items-center justify-between gap-3 cursor-pointer select-none">
+                  <span>
+                    <span className="block font-bold">Pon a prueba tu memoria</span>
+                    <span className="block text-sm text-stone-600">Oculta los significados y toca cada tarjeta para verlos</span>
+                  </span>
+                  <input type="checkbox" className="sr-only peer" checked={hideMeanings} onChange={(e) => setHideMeanings(e.target.checked)} />
+                  <span
+                    className={`relative w-12 h-7 shrink-0 rounded-full transition-colors peer-focus-visible:ring-4 peer-focus-visible:ring-stone-300 ${hideMeanings ? theme.solid : 'bg-stone-300'}`}
+                    aria-hidden="true"
+                  >
+                    <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${hideMeanings ? 'translate-x-5' : ''}`} />
+                  </span>
+                </label>
+              </section>
+
+              <p className="text-sm text-stone-600">
+                {hasRealAudio
+                  ? 'Las palabras con audio usan una voz sintética entrenada en la lengua (modelo MMS). Las demás usan la voz del navegador.'
+                  : 'La pronunciación usa por ahora la voz sintetizada del navegador, que no distingue glotalizadas ni aspiradas.'}
+              </p>
+              <div className="hidden lg:block">{startButton}</div>
+            </aside>
+
+            {/* Tarjetas de vocabulario en cuadrícula */}
+            <ol className="grid gap-3 sm:grid-cols-2 content-start mb-28 lg:mb-8">
+              {vocabulary.map((word, index) => {
+                const learned = learnedWords.includes(word.id);
+                const hidden = hideMeanings && !revealed.includes(word.id);
+                return (
+                  <li
+                    key={word.id}
+                    className={`anim-entra relative bg-white rounded-2xl border-2 tarjeta-viva ${learned ? `${theme.border} ${theme.soft}` : 'border-stone-200'}`}
+                    style={{ '--i': Math.min(index, 12) }}
+                  >
+                    <div className="flex items-center gap-3 p-4">
+                      <span className={`w-10 h-10 bg-gradient-to-br ${theme.gradient} rounded-xl flex items-center justify-center text-white font-black shrink-0 shadow-md`} aria-hidden="true">
+                        {index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={!hideMeanings}
+                        onClick={() => setRevealed((r) => (r.includes(word.id) ? r.filter((x) => x !== word.id) : [...r, word.id]))}
+                        className="flex-1 min-w-0 text-left disabled:cursor-default"
+                        aria-label={hideMeanings ? `${word.palabra_objetivo}: ${hidden ? 'mostrar significado' : word.palabra_espanol}` : undefined}
+                      >
+                        <span className="block text-lg sm:text-xl font-black break-words" lang={language.lang}>
+                          {word.palabra_objetivo}
+                        </span>
+                        {hidden ? (
+                          <span className="mt-1 inline-block rounded-lg bg-stone-200 px-3 py-0.5 text-sm font-bold text-stone-500">Toca para ver</span>
+                        ) : (
+                          <span className={`block text-stone-700 ${hideMeanings ? 'anim-pop' : ''}`}>{word.palabra_espanol}</span>
+                        )}
+                        {word.ejemplo_uso && !hidden && <span className="block text-sm text-stone-600 mt-1 italic">“{word.ejemplo_uso}”</span>}
+                      </button>
+                      <div className="flex flex-col sm:flex-row items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            playWord(word.audio_url, word.palabra_objetivo, fallbackLang);
+                            track('audio_played', { idioma: lesson.idioma, leccion_id: Number(lessonId), vocabulario_id: word.id, metadatos: { fuente: word.audio_url ? 'mms' : 'navegador' } });
+                          }}
+                          aria-label={`Escuchar ${word.palabra_objetivo}`}
+                          className={`ficha w-11 h-11 flex items-center justify-center ${theme.solid} border-black/20 text-white rounded-xl`}
+                        >
+                          <Volume2 className="w-5 h-5" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleLearnedWord(word)}
+                          aria-pressed={learned}
+                          aria-label={`Marcar ${word.palabra_objetivo} como aprendida`}
+                          className={`ficha w-11 h-11 flex items-center justify-center rounded-xl ${learned ? 'bg-amber-400 border-amber-600 text-white' : 'bg-white border-stone-300 text-stone-500 hover:bg-stone-50'}`}
+                        >
+                          <Star key={learned ? 'si' : 'no'} className={`w-5 h-5 ${learned ? 'fill-white anim-latido' : ''}`} aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <p className="text-sm text-stone-600 mb-4">
-            {hasRealAudio
-              ? 'Las palabras con audio usan una voz sintética entrenada en la lengua (modelo MMS). Las demás usan la voz del navegador.'
-              : 'La pronunciación usa por ahora la voz sintetizada del navegador, que no distingue glotalizadas ni aspiradas.'}
-          </p>
-
-          <ol className="space-y-3 mb-28">
-            {vocabulary.map((word, index) => {
-              const learned = learnedWords.includes(word.id);
-              return (
-                <li key={word.id} className={`anim-entra bg-white rounded-2xl border border-stone-200 tarjeta-viva ${learned ? `ring-2 ${theme.ring}` : ''}`} style={{ '--i': Math.min(index, 10) }}>
-                  <div className="flex items-center gap-4 p-4">
-                    <span className={`w-11 h-11 bg-gradient-to-br ${theme.gradient} rounded-xl flex items-center justify-center text-white font-bold shrink-0 shadow-md`} aria-hidden="true">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xl font-bold" lang={language.lang}>
-                        {word.palabra_objetivo}
-                      </p>
-                      <p className="text-stone-700">{word.palabra_espanol}</p>
-                      {word.ejemplo_uso && <p className="text-sm text-stone-600 mt-1 italic">“{word.ejemplo_uso}”</p>}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          playWord(word.audio_url, word.palabra_objetivo, fallbackLang);
-                          track('audio_played', { idioma: lesson.idioma, leccion_id: Number(lessonId), vocabulario_id: word.id, metadatos: { fuente: word.audio_url ? 'mms' : 'navegador' } });
-                        }}
-                        aria-label={`Escuchar ${word.palabra_objetivo}`}
-                        className={`w-11 h-11 flex items-center justify-center ${theme.solid} ${theme.hover} text-white rounded-full toque`}
-                      >
-                        <Volume2 className="w-5 h-5" aria-hidden="true" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toggleLearnedWord(word)}
-                        aria-pressed={learned}
-                        aria-label={`Marcar ${word.palabra_objetivo} como aprendida`}
-                        className={`w-11 h-11 flex items-center justify-center rounded-full toque ${learned ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
-                      >
-                        <Star key={learned ? 'si' : 'no'} className={`w-5 h-5 ${learned ? 'fill-white anim-latido' : ''}`} aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-
-          <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t border-stone-200 p-4">
-            <div className="container mx-auto max-w-4xl">
-              {total > 0 ? (
-                <button type="button" onClick={startExercises} className="w-full min-h-14 boton-degradado font-black text-lg rounded-2xl shadow-lg flex items-center justify-center gap-3">
-                  ¡Empezar! ({total} ejercicios)
-                  <ArrowRight className="w-6 h-6" aria-hidden="true" />
-                </button>
-              ) : (
-                <p className="text-center text-stone-700">Esta lección todavía no tiene ejercicios.</p>
-              )}
-            </div>
+          <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur border-t border-stone-200 p-4 z-10">
+            <div className="container mx-auto">{startButton}</div>
           </div>
         </main>
       </div>
