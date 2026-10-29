@@ -14,26 +14,16 @@ import MantineShell from '../ui/MantineShell';
 import { CountUp } from '../ui/lazyBits';
 import ConsentDialog from '../components/ConsentDialog';
 import LearningPath from '../components/LearningPath';
+import { LANGUAGES, languageStyle } from '../languages';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
-const LANGUAGE_STYLE = {
-  quechua: {
-    label: 'Quechua',
-    region: 'Variedad Cusco-Collao, la de Puno',
-    accent: 'text-green-700',
-    selected: 'border-green-700 bg-green-50',
-    badge: 'bg-green-700',
-    bar: 'bg-green-700',
-  },
-  aymara: {
-    label: 'Aymara',
-    region: 'Aymara central del altiplano puneño',
-    accent: 'text-blue-800',
-    selected: 'border-blue-800 bg-blue-50',
-    badge: 'bg-blue-800',
-    bar: 'bg-blue-800',
-  },
-};
+// Idiomas desde los paquetes de src/languages: una lengua nueva con contenido aparece sola en el selector
+const LANGUAGE_STYLE = Object.fromEntries(
+  LANGUAGES.map((pack) => {
+    const style = languageStyle(pack.id);
+    return [pack.id, { label: pack.nombre, region: `${pack.variedad} · ${pack.region}`, accent: style.text, bar: style.solid, hex: style.hex }];
+  })
+);
 
 // Saludo con el primer nombre: el nombre completo vive en el perfil
 const firstName = (nombre) => String(nombre || '').trim().split(/\s+/)[0] || 'amigo';
@@ -335,7 +325,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
             radius="xl"
             value={selectedLanguage}
             onChange={setSelectedLanguage}
-            color={selectedLanguage === 'aymara' ? '#1e40af' : '#15803d'}
+            color={LANGUAGE_STYLE[selectedLanguage]?.hex}
             transitionDuration={250}
             transitionTimingFunction="cubic-bezier(0.23, 1, 0.32, 1)"
             aria-label="Idioma"
@@ -369,7 +359,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                   thickness={10}
                   roundCaps
                   rootColor="#e7e5e4"
-                  sections={[{ value: overallProgress, color: selectedLanguage === 'aymara' ? '#1e40af' : '#15803d' }]}
+                  sections={[{ value: overallProgress, color: LANGUAGE_STYLE[selectedLanguage]?.hex }]}
                   label={<p className="text-center text-xl font-black tabular-nums">{overallProgress}%</p>}
                 />
               </div>

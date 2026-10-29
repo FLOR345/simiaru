@@ -3,6 +3,7 @@ import passport from 'passport';
 import { register, login, getProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { validate, schemas } from '../middleware/validation.js';
+import { isKnownLanguage } from '../utils/languages.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { pool } from '../config/database.js';  // <-- AGREGAR ESTO
@@ -60,8 +61,8 @@ router.put('/profile', protect, async (req, res) => {
     if (nombre.length < 1 || nombre.length > 80) {
       return res.status(400).json({ message: 'El nombre debe tener entre 1 y 80 caracteres' });
     }
-    if (!['quechua', 'aymara'].includes(idioma_objetivo)) {
-      return res.status(400).json({ message: 'Elige quechua o aymara' });
+    if (!(await isKnownLanguage(idioma_objetivo))) {
+      return res.status(400).json({ message: 'Elige un idioma disponible' });
     }
 
     await pool.query(

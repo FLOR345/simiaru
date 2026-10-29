@@ -1,0 +1,27 @@
+{
+  "fuente": {
+    "referencia": "COMPLETAR: diccionario, gramática o corpus del que sale el contenido",
+    "licencia": "COMPLETAR: licencia que permite redistribuirlo (por ejemplo CC BY 4.0)",
+    "revisado_por": "COMPLETAR: hablante(s) que revisaron el contenido"
+  },
+  "unidades": [
+    {
+      "nombre": "COMPLETAR (por ejemplo: Saludos)",
+      "descripcion": "COMPLETAR",
+      "lecciones": [
+        {
+          "titulo": "COMPLETAR",
+          "contenido_teorico": "COMPLETAR",
+          "vocabulario": [
+            { "palabra_objetivo": "COMPLETAR", "palabra_espanol": "COMPLETAR", "categoria": "saludos", "ejemplo_uso": "COMPLETAR" }
+          ],
+          "ejercicios": [
+            { "tipo": "multiple_choice", "pregunta": "COMPLETAR: ¿Cómo se dice 'hola'?", "opciones": ["COMPLETAR", "COMPLETAR", "COMPLETAR"], "respuesta_correcta": "COMPLETAR" },
+            { "tipo": "translate", "pregunta": "COMPLETAR: Escribe 'gracias'", "respuesta_correcta": "COMPLETAR" },
+            { "tipo": "true_false", "pregunta": "COMPLETAR: 'X' significa 'Y'", "respuesta_correcta": "true" }
+          ]
+        }
+      ]
+    }
+  ]
+}

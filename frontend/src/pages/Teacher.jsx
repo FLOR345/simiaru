@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Users, Copy, Download, RefreshCw, School, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../services/api';
-import { LANGUAGES } from '../languages';
+import { LANGUAGES, getLanguage } from '../languages';
 
 const formatDate = (value) => (value ? new Date(value).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) : '—');
 
@@ -52,7 +52,7 @@ const ClassroomCard = ({ aula }) => {
         <div className="flex-1 min-w-0">
           <h3 className="text-xl font-black">{aula.nombre}</h3>
           <p className="text-stone-600 text-sm">
-            {aula.idioma === 'aymara' ? 'Aymara' : 'Quechua'} · {aula.estudiantes} {aula.estudiantes === 1 ? 'estudiante' : 'estudiantes'}
+            {getLanguage(aula.idioma).nombre} · {aula.estudiantes} {aula.estudiantes === 1 ? 'estudiante' : 'estudiantes'}
           </p>
         </div>
         <button type="button" onClick={copy} className="inline-flex items-center gap-2 min-h-11 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 font-black tracking-widest toque" aria-label={`Copiar código del aula ${aula.codigo}`}>
@@ -206,7 +206,7 @@ const Teacher = () => {
               onChange={(e) => setIdioma(e.target.value)}
               className="w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl bg-white focus:ring-2 focus:ring-green-700 focus:outline-none"
             >
-              {LANGUAGES.filter((l) => ['quechua', 'aymara'].includes(l.id)).map((l) => (
+              {LANGUAGES.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.nombre}
                 </option>

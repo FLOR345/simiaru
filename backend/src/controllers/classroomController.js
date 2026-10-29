@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { pool } from '../config/database.js';
 import { generateToken } from '../utils/jwt.js';
 import { EXPORT_COLUMNS, toCsv } from './researchController.js';
+import { isKnownLanguage } from '../utils/languages.js';
 
 // Sin letras ni números que se confundan al dictarlos (0/O, 1/I/L)
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -35,6 +36,7 @@ export const createClassroom = async (req, res, next) => {
   try {
     const me = await pool.query('SELECT es_cuenta_aula FROM usuarios WHERE id = $1', [req.user.id]);
     if (me.rows[0]?.es_cuenta_aula) return res.status(403).json({ message: 'Las cuentas de estudiante no pueden crear aulas' });
+    if (!(await isKnownLanguage(req.body.idioma))) return res.status(400).json({ message: 'Ese idioma no tiene contenido cargado' });
 
     let codigo;
     for (let i = 0; i < 5; i += 1) {

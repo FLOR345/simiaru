@@ -69,7 +69,7 @@ export const schemas = {
   },
   classroom: {
     nombre: { type: 'string', min: 1, max: 80 },
-    idioma: { type: 'oneOf', values: ['quechua', 'aymara'] },
+    idioma: { type: 'string', min: 2, max: 20 },
   },
   joinClassroom: {
     codigo: { type: 'string', min: 6, max: 12 },

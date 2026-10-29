@@ -1,0 +1,27 @@
+{
+  "id": "COMPLETAR_id_en_minusculas",
+  "nombre": "COMPLETAR (por ejemplo: Asháninka)",
+  "nombreNativo": "COMPLETAR",
+  "iso639_3": "COMPLETAR (código de tres letras, por ejemplo: cni)",
+  "variedad": "COMPLETAR",
+  "region": "COMPLETAR",
+  "descripcion": "COMPLETAR: una o dos oraciones sobre la lengua y la variedad que se enseña.",
+  "color": "terracota",
+  "lang": "COMPLETAR (código BCP-47 de dos o tres letras)",
+  "voz": {
+    "modelo": "COMPLETAR (por ejemplo: facebook/mms-tts-cni, si existe; si no, déjalo vacío)",
+    "licencia": "CC-BY-NC-4.0",
+    "respaldo": "es-PE"
+  },
+  "frases": {
+    "saludo": "COMPLETAR",
+    "felicitacion": "COMPLETAR",
+    "animo": "COMPLETAR"
+  },
+  "normalizador": {
+    "nota": "COMPLETAR: qué variación de escritura se acepta como correcta y por qué.",
+    "reglas": [
+      { "patron": "COMPLETAR_expresion_regular", "reemplazo": "COMPLETAR", "fenomeno": "grafia" }
+    ]
+  }
+}
