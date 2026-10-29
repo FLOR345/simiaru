@@ -12,6 +12,8 @@ import Magnet from '../components/reactbits/Magnet';
 import ShinyText from '../components/reactbits/ShinyText';
 import StarBorder from '../components/reactbits/StarBorder';
 import logo from '../assets/logo.jpg';
+import { LlamaImage } from '../components/Mascot';
+import LlamaGallery from '../components/LlamaGallery';
 import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
 import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
 import fotoTari from '../assets/fotos/tari-aymara.jpg';
@@ -81,6 +83,8 @@ const CARD_COLORS = [
   { card: 'from-amber-50 to-orange-100/60', deco: 'bg-orange-600/10', icon: 'from-orange-600 to-orange-800', tag: 'text-orange-800', spot: '#f97316' },
   { card: 'from-pink-50 to-rose-100/60', deco: 'bg-rose-600/10', icon: 'from-rose-600 to-pink-700', tag: 'text-rose-800', spot: '#f43f5e' },
 ];
+
+const STEP_POSES = ['bienvenida', 'escribiendo', 'leyendo'];
 
 const STEPS = [
   ['Elige tu idioma', 'Comienza con Quechua o Aymara, con vocabulario y contenido cultural de fuentes documentadas'],
@@ -726,7 +730,10 @@ const Home = ({ enableGuestMode }) => {
               {STEPS.map(([title, text], i) => (
                 <li key={title} className="text-center group">
                   {/* Círculo en degradado con un resplandor detrás (primera versión) */}
-                  <div className="relative mb-8">
+                  <div className="relative mx-auto mb-2 w-40 aspect-square transition-transform duration-300 ease-out motion-safe:group-hover:-translate-y-2" aria-hidden="true">
+                    <LlamaImage pose={STEP_POSES[i]} />
+                  </div>
+                  <div className="relative mb-8 -mt-6">
                     <div
                       className={`relative z-10 w-20 h-20 bg-gradient-to-br ${STEP_COLORS[i].circle} rounded-full flex items-center justify-center mx-auto text-white text-3xl font-black shadow-xl transition-transform duration-300 ease-out motion-safe:group-hover:scale-110`}
                     >
@@ -751,6 +758,19 @@ const Home = ({ enableGuestMode }) => {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        {/* ==================== LA LLAMITA ==================== */}
+        <section id="llamita" className="py-24 bg-gradient-to-b from-white via-green-50/40 to-white overflow-hidden">
+          <div className="container mx-auto">
+            <Reveal className="text-center mb-14 space-y-4">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                Tu compañera de <span className="texto-degradado-corto">aprendizaje</span>
+              </h2>
+              <p className="text-xl text-stone-600 max-w-3xl mx-auto">Una llamita con su chalina de colores te acompaña en cada lección. Tócala para conocerla.</p>
+            </Reveal>
+            <LlamaGallery />
           </div>
         </section>
 
@@ -1003,8 +1023,17 @@ const Home = ({ enableGuestMode }) => {
         <section className="relative isolate overflow-hidden py-24 bg-gradient-to-br from-green-700 via-blue-700 to-purple-700">
           <span className="burbuja -z-10 bg-white opacity-15 top-[-6rem] left-[-6rem]" aria-hidden="true" />
           <span className="burbuja -z-10 bg-white opacity-10 bottom-[-8rem] right-[-6rem] [animation-delay:-6s]" aria-hidden="true" />
+          <div className="pointer-events-none absolute bottom-0 left-[4%] hidden lg:block w-56 xl:w-64 aspect-square anim-flotar" aria-hidden="true">
+            <LlamaImage pose="celebrando" />
+          </div>
+          <div className="pointer-events-none absolute bottom-0 right-[4%] hidden lg:block w-48 xl:w-56 aspect-square anim-flotar [animation-delay:-2s]" aria-hidden="true">
+            <LlamaImage pose="bienvenida" />
+          </div>
           <div className="container mx-auto text-center">
             <div className="max-w-4xl mx-auto space-y-8">
+              <div className="mx-auto w-32 aspect-square lg:hidden" aria-hidden="true">
+                <LlamaImage pose="celebrando" />
+              </div>
               <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
                 Empieza con la <span className="text-yellow-300">Unidad 1</span>
               </h2>

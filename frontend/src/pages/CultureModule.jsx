@@ -9,10 +9,10 @@ import { speak } from '../utils/speech';
 import Mascot from '../components/Mascot';
 
 const TYPES = [
-  { value: 'adivinanza', label: 'Adivinanzas', singular: 'adivinanza', Icon: Lightbulb, color: 'from-amber-400 to-orange-600', hint: '¿Adivinas qué es? Escribe tu respuesta y descúbrela.' },
-  { value: 'proverbio', label: 'Proverbios', singular: 'proverbio', Icon: Quote, color: 'from-purple-500 to-indigo-700', hint: 'Lee el proverbio, piensa qué enseña y luego descubre su significado.' },
-  { value: 'cancion', label: 'Canciones', singular: 'canción', Icon: Music, color: 'from-pink-500 to-rose-700', hint: 'Cada verso con su traducción al lado. ¡Anímate a cantarla!' },
-  { value: 'cuento', label: 'Cuentos', singular: 'cuento', Icon: BookOpen, color: 'from-green-500 to-teal-700', hint: 'Elige un cuento y léelo con la traducción a tu lado.' },
+  { value: 'adivinanza', label: 'Adivinanzas', singular: 'adivinanza', pose: 'pensando', Icon: Lightbulb, color: 'from-amber-400 to-orange-600', hint: '¿Adivinas qué es? Escribe tu respuesta y descúbrela.' },
+  { value: 'proverbio', label: 'Proverbios', singular: 'proverbio', pose: 'leyendo', Icon: Quote, color: 'from-purple-500 to-indigo-700', hint: 'Lee el proverbio, piensa qué enseña y luego descubre su significado.' },
+  { value: 'cancion', label: 'Canciones', singular: 'canción', pose: 'hablando', Icon: Music, color: 'from-pink-500 to-rose-700', hint: 'Cada verso con su traducción al lado. ¡Anímate a cantarla!' },
+  { value: 'cuento', label: 'Cuentos', singular: 'cuento', pose: 'leyendo', Icon: BookOpen, color: 'from-green-500 to-teal-700', hint: 'Elige un cuento y léelo con la traducción a tu lado.' },
 ];
 
 const FAVORITES_KEY = 'cultureFavorites';
@@ -355,6 +355,12 @@ const CultureModule = ({ user }) => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [mood, setMood] = useState({ mood: 'idle', beat: 0 });
+  // Tras celebrar o lamentarse, la llamita vuelve a su pose de la sección
+  useEffect(() => {
+    if (mood.mood === 'idle') return undefined;
+    const t = setTimeout(() => setMood((m0) => ({ ...m0, mood: 'idle' })), 1800);
+    return () => clearTimeout(t);
+  }, [mood]);
   const [solved, setSolved] = useState(0);
   const storyHeadingRef = useRef(null);
   const highlightRef = useRef(null);
@@ -480,7 +486,7 @@ const CultureModule = ({ user }) => {
     if (content.length === 0) {
       return (
         <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
-          <Mascot mood="think" size="w-24" className="justify-center mb-3" />
+          <Mascot pose="descansando" size="w-32" className="justify-center mb-3" />
           <h2 className="text-xl font-bold mb-2">
             Todavía no hay {type.label.toLowerCase()} en {language.nombre.toLowerCase()}
           </h2>
@@ -589,9 +595,10 @@ const CultureModule = ({ user }) => {
             <div className="hidden lg:block">
               <Mascot
                 mood={mood.mood}
+                pose={mood.mood === 'idle' ? type.pose : undefined}
                 beat={mood.beat}
                 bubble="top"
-                size="w-36"
+                size="w-44"
                 eager
                 say={
                   <p className="font-semibold">

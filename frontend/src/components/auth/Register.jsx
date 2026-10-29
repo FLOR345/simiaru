@@ -58,6 +58,7 @@ const Register = ({ setUser }) => {
   return (
     <AuthLayout
       title="Crea tu cuenta"
+      pose="escribiendo"
       subtitle="Guarda tu progreso, tus rachas y tus insignias"
       footer={
         <div className="mt-6 text-center">

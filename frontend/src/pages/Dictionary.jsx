@@ -310,8 +310,9 @@ const Dictionary = () => {
           <aside className="space-y-5 lg:sticky lg:top-24 order-2 lg:order-1">
             <div className="hidden lg:block">
               <Mascot
+                pose="buscando"
                 bubble="top"
-                size="w-36"
+                size="w-40"
                 eager
                 say={
                   <p className="font-semibold">
@@ -335,7 +336,7 @@ const Dictionary = () => {
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
                   {categories.map((group) => {
                     const Icon = CATEGORY_ICONS[group.key] ?? Tag;
                     const isSelected = selectedCategory?.key === group.key;
@@ -350,7 +351,7 @@ const Dictionary = () => {
                         }`}
                       >
                         <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                        <span className="flex-1 min-w-0 capitalize font-bold text-sm leading-tight break-words">{group.key}</span>
+                        <span className="flex-1 min-w-0 capitalize font-bold text-sm leading-tight truncate lg:whitespace-normal">{group.key}</span>
                         <span className="text-xs font-bold text-stone-500 tabular-nums">{group.count}</span>
                       </button>
                     );
@@ -436,7 +437,7 @@ const Dictionary = () => {
                     ))}
                   </ul>
                 ) : (
-                  <EmptyState icon={Heart} title="Aún no tienes favoritas" text="Toca el corazón de cualquier palabra para guardarla aquí y repasarla cuando quieras." />
+                  <EmptyState pose="carino" icon={Heart} title="Aún no tienes favoritas" text="Toca el corazón de cualquier palabra para guardarla aquí y repasarla cuando quieras." />
                 )
               ) : loading ? (
                 <ul className="grid gap-4 md:grid-cols-2" aria-label="Buscando…">
@@ -473,7 +474,7 @@ const Dictionary = () => {
                 </div>
               ) : hasQuery ? (
                 <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
-                  <Mascot mood="think" size="w-24" className="justify-center mb-3" />
+                  <Mascot mood="think" pose="pensando" size="w-28" className="justify-center mb-3" />
                   <h2 className="text-xl font-bold mb-2">Sin resultados para “{searchTerm.trim()}”</h2>
                   <p className="text-stone-600 mb-5">Prueba con otra palabra, en español o en {language.nombre.toLowerCase()}, o elige una categoría.</p>
                   <button type="button" onClick={clearSearch} className="px-6 min-h-11 border-2 border-stone-300 font-bold rounded-xl hover:bg-stone-50 toque">
@@ -505,7 +506,7 @@ const Dictionary = () => {
                       ))}
                     </ul>
                   ) : (
-                    <EmptyState icon={BookOpen} title={`Explora el vocabulario de ${language.nombre.toLowerCase()}`} text="Busca una palabra o elige una categoría para empezar." />
+                    <EmptyState pose="leyendo" icon={BookOpen} title={`Explora el vocabulario de ${language.nombre.toLowerCase()}`} text="Busca una palabra o elige una categoría para empezar." />
                   )}
                 </div>
               )}
@@ -517,9 +518,9 @@ const Dictionary = () => {
   );
 };
 
-const EmptyState = ({ icon: Icon, title, text }) => (
+const EmptyState = ({ pose, icon: Icon, title, text }) => (
   <div className="bg-white/90 rounded-3xl border border-white shadow-sm p-10 text-center">
-    <Icon className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />
+    {pose ? <Mascot pose={pose} size="w-32" className="justify-center mb-3" /> : <Icon className="w-10 h-10 text-stone-400 mx-auto mb-3" aria-hidden="true" />}
     <h2 className="text-xl font-bold mb-2">{title}</h2>
     <p className="text-stone-600">{text}</p>
   </div>

@@ -53,3 +53,8 @@ export const playComplete = () =>
 export const playTap = () => play([[660, 0, 0.05, 'sine', 0.05]]);
 // Pareja encontrada: una nota corta y brillante
 export const playMatch = () => play([[880, 0, 0.08, 'sine', 0.08], [1174.7, 0.06, 0.12, 'sine', 0.07]]);
+// Cuenta regresiva: un tic por número y una nota alta para "¡Ya!"
+export const playTick = () => play([[523.3, 0, 0.09, 'square', 0.05]]);
+export const playGo = () => play([[784, 0, 0.1, 'square', 0.06], [1046.5, 0.08, 0.22, 'square', 0.06]]);
+// Cada estrella del resultado sube un poco más de tono
+export const playStar = (i = 0) => play([[880 * Math.pow(1.26, i), 0, 0.16, 'sine', 0.09]]);

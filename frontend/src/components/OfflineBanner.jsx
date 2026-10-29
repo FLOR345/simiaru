@@ -1,6 +1,7 @@
 // Aviso discreto cuando no hay conexión, y sincronización del progreso guardado al volver.
 import { useEffect, useState } from 'react';
 import { WifiOff } from 'lucide-react';
+import { LlamaImage } from './Mascot';
 import { toast } from 'sonner';
 import { syncProgress } from '../services/offlineSync';
 import { flush } from '../services/telemetry';
@@ -28,7 +29,10 @@ const OfflineBanner = () => {
 
   if (online) return null;
   return (
-    <div role="status" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 anim-entra flex items-center gap-2 px-4 py-2.5 rounded-full bg-stone-900 text-white text-sm font-semibold shadow-xl max-w-[calc(100%-2rem)]">
+    <div role="status" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 anim-entra flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-stone-900 text-white text-sm font-semibold shadow-xl max-w-[calc(100%-2rem)]">
+      <span className="w-10 aspect-square shrink-0" aria-hidden="true">
+        <LlamaImage pose="descansando" />
+      </span>
       <WifiOff className="w-4 h-4 shrink-0" aria-hidden="true" />
       Sin conexión: puedes repetir las lecciones que ya abriste
     </div>

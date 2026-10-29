@@ -6,6 +6,7 @@ import * as m from 'motion/react-m';
 import { api } from '../services/api';
 import ExerciseTypes from '../components/lessons/ExerciseTypes';
 import Mascot from '../components/Mascot';
+import { Stars } from '../components/GameFx';
 import { Volume2, VolumeX, X, Check, ArrowRight, Star, AlertCircle, RefreshCw, UserX, Flame, Zap, Target, Clock, RotateCcw } from 'lucide-react';
 import { getLanguage, languageStyle } from '../languages';
 import { PHENOMENON_LABELS } from '../utils/normalizer';
@@ -321,7 +322,7 @@ const LessonView = ({ user, isGuest }) => {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
         <div className="flex flex-col items-center" role="status">
-          <Mascot mood="think" size="w-28" eager />
+          <Mascot mood="think" pose="esperando" size="w-32" eager />
           <p className="text-stone-700 font-bold mt-4">Cargando lección…</p>
         </div>
       </div>
@@ -366,12 +367,15 @@ const LessonView = ({ user, isGuest }) => {
         <span className="burbuja burbuja-morada" aria-hidden="true" />
         <main className="container mx-auto px-4 max-w-2xl">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8 text-center anim-entra">
-            <div className="relative w-36 mx-auto mb-4" aria-hidden="true">
+            <div className="relative w-40 mx-auto mb-2" aria-hidden="true">
               {passed &&
                 CONFETTI.map((piece, i) => (
                   <span key={i} className="papelito" style={{ '--x': piece.x, '--y': piece.y, '--r': piece.r, '--i': i, background: piece.color }} />
                 ))}
-              <Mascot mood={passed ? 'cheer' : 'happy'} size="w-36" eager />
+              <Mascot mood={passed ? 'cheer' : 'happy'} pose={percentage === 100 ? 'logro' : passed ? 'celebrando' : 'reintentar'} size="w-40" eager />
+            </div>
+            <div className="mb-4">
+              <Stars count={percentage === 100 ? 3 : percentage >= PASS_PERCENT ? 2 : percentage >= 50 ? 1 : 0} />
             </div>
 
             <h1 className="text-3xl font-black mb-2 anim-entra" style={{ '--i': 3 }}>
@@ -502,8 +506,9 @@ const LessonView = ({ user, isGuest }) => {
             {/* Columna fija: la llamita, qué se aprende, avance y el botón de empezar */}
             <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
               <Mascot
+                pose="leyendo"
                 bubble="top"
-                size="w-32 sm:w-36"
+                size="w-36 sm:w-44"
                 eager
                 say={
                   <p className="font-semibold">

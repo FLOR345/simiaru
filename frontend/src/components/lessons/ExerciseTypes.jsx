@@ -60,6 +60,18 @@ const insertAtCursor = (el, value, setValue, ch) => {
   });
 };
 
+// Qué hace la llamita mientras respondes cada tipo de ejercicio
+const TYPE_POSES = {
+  multiple_choice: 'pensando',
+  true_false: 'sorprendida',
+  listen_write: 'escuchando',
+  translate: 'escribiendo',
+  fill_blanks: 'escribiendo',
+  matching: 'buscando',
+  word_order: 'pensando',
+  drag_words: 'pensando',
+};
+
 const TYPE_LABELS = {
   multiple_choice: 'Elige la respuesta',
   true_false: '¿Verdadero o falso?',
@@ -349,7 +361,7 @@ const ExerciseTypes = ({
   const prompt = (content) => (
     <div className="mb-6 sm:mb-8">
       <p className={`mb-3 text-sm font-black uppercase tracking-wider ${theme.text}`}>{label}</p>
-      <Mascot mood={mood} beat={beat} say={content} size="w-20 sm:w-28" eager />
+      <Mascot mood={mood} pose={mood === 'idle' ? TYPE_POSES[exercise.tipo] : undefined} beat={beat} say={content} size="w-20 sm:w-28" eager />
     </div>
   );
 

@@ -77,7 +77,7 @@ const LessonNode = ({ lesson, state, offset, styleSet, isFirstAvailable, reduceM
       {/* La llamita espera junto a la lección que toca */}
       {isFirstAvailable && (
         <div className={`pointer-events-none absolute bottom-6 ${offset > 0 ? 'right-full -mr-2' : 'left-full -ml-2'} w-20 sm:w-24`}>
-          <Mascot size="w-20 sm:w-24" />
+          <Mascot pose="ayuda" size="w-20 sm:w-24" />
         </div>
       )}
     </li>

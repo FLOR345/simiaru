@@ -81,7 +81,7 @@ const Classroom = ({ setUser, setIsGuest }) => {
   // Paso final: mostrar el código personal antes de entrar
   if (joined) {
     return (
-      <AuthLayout title="¡Ya estás en el aula!" subtitle={`${joined.aula.nombre} · ${joined.aula.idioma === 'aymara' ? 'Aymara' : 'Quechua'}`}>
+      <AuthLayout pose="celebrando" title="¡Ya estás en el aula!" subtitle={`${joined.aula.nombre} · ${joined.aula.idioma === 'aymara' ? 'Aymara' : 'Quechua'}`}>
         <div className="text-center">
           <p className="text-stone-700 mb-3">Este es tu código de estudiante. Guárdalo: lo necesitas para entrar desde otro celular o computadora.</p>
           <p className="anim-pop text-3xl sm:text-4xl font-black tracking-widest bg-stone-50 border-2 border-dashed border-stone-300 rounded-2xl py-5 mb-4 tabular-nums" aria-live="polite">
@@ -103,6 +103,7 @@ const Classroom = ({ setUser, setIsGuest }) => {
 
   return (
     <AuthLayout
+      pose="hablando"
       title="Modo aula"
       subtitle="Para estudiantes de un curso: sin correo ni datos personales"
       footer={

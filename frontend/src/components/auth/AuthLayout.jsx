@@ -1,9 +1,9 @@
 // Piezas compartidas por las pantallas de inicio de sesión y registro.
 // Siguen la paleta de la portada: neutros cálidos (stone), verde = acción principal.
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo.jpg';
+import { LlamaImage } from '../Mascot';
 
-export const AuthLayout = ({ title, subtitle, children, footer }) => (
+export const AuthLayout = ({ title, subtitle, children, footer, pose = 'bienvenida' }) => (
   // Mismo fondo de la portada: degradado suave con burbujas de color difuminadas
   <div className="fondo-burbujas min-h-screen flex items-center justify-center px-4 py-12 text-stone-900">
     <span className="burbuja burbuja-verde" aria-hidden="true" />
@@ -12,8 +12,10 @@ export const AuthLayout = ({ title, subtitle, children, footer }) => (
     <main className="w-full max-w-md anim-entra">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8">
         <div className="text-center mb-8">
-          <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-5">
-            <img src={logo} alt="" width="253" height="299" className="h-20 w-auto" />
+          <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-3">
+            <span className="block w-32 aspect-square llama llama-reposo" aria-hidden="true">
+              <LlamaImage pose={pose} eager />
+            </span>
           </Link>
           <h1 className="text-3xl font-black texto-degradado">{title}</h1>
           <p className="text-stone-600 mt-2">{subtitle}</p>

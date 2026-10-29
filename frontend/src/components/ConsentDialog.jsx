@@ -66,8 +66,8 @@ const ConsentDialog = ({ user, setUser }) => {
     >
       <div className="p-6 sm:p-8">
         <div className="flex items-end gap-3 mb-5" aria-hidden="true">
-          <div className="w-24 llama llama-salta">
-            <LlamaImage eager />
+          <div className="w-28 aspect-square llama llama-salta">
+            <LlamaImage pose="ayuda" eager />
           </div>
           <span className="mb-2 w-12 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center shadow-lg anim-pop">
             <ShieldCheck className="w-7 h-7 text-white" />

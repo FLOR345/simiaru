@@ -12,13 +12,17 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
 import Home from './pages/Home';
 import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice } from './routes';
+import { LlamaImage } from './components/Mascot';
 import { startTelemetry } from './services/telemetry';
 import OfflineBanner from './components/OfflineBanner';
 
 // Pantalla de espera: mismo fondo claro que la app y solo visible si la carga pasa de 0,3 s
 // (las cargas rápidas no muestran un destello de "Cargando")
 const LoadingScreen = () => (
-  <div className="min-h-screen flex items-center justify-center bg-stone-50 text-stone-600" role="status">
+  <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-stone-50 text-stone-600" role="status">
+    <span className="block w-32 aspect-square llama llama-piensa" aria-hidden="true">
+      <LlamaImage pose="esperando" eager />
+    </span>
     <span className="espera flex items-center gap-3 font-semibold">
       <span className="espera-punto" aria-hidden="true" />
       Cargando…

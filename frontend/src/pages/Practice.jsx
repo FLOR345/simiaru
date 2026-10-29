@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, useMotionValue, useTransform } from 'motion/react';
 import * as m from 'motion/react-m';
-import { ArrowLeft, Zap, Layers, Volume2, Timer, Trophy, RotateCcw, Check, X, RefreshCw, Hand, Brain, Ear, Heart, Snail } from 'lucide-react';
+import { ArrowLeft, Zap, Layers, Volume2, Timer, Trophy, RotateCcw, Check, X, RefreshCw, Hand, Brain, Ear, Heart, Snail, Flame } from 'lucide-react';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playMatch, playWrong, playComplete, playCorrect } from '../utils/sounds';
 import { speak } from '../utils/speech';
 import Mascot, { LlamaImage } from '../components/Mascot';
+import { Burst, FloatText, Confetti, Countdown, Stars } from '../components/GameFx';
 
 // ==================== Juegos de práctica ====================
 // Repasan las palabras de las lecciones que la persona ya completó (o de la Unidad 1 si aún no hay).
@@ -93,57 +94,82 @@ const loadWords = async (idioma, isGuest) => {
 const primaryBtn = 'ficha min-h-14 px-8 rounded-2xl border-green-800 bg-green-600 hover:bg-green-500 text-white text-lg font-black uppercase tracking-wide inline-flex items-center justify-center gap-2';
 const secondaryBtn = 'ficha min-h-14 px-8 rounded-2xl border-stone-300 bg-white font-bold text-stone-700 hover:bg-stone-50';
 
-// Marco de cada juego: la llamita reacciona a un lado y el tablero ocupa el resto
-const GameFrame = ({ mood, beat, say, children }) => (
-  <div className="grid gap-6 lg:gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] items-start">
+// La llamita reacciona: cada reacción tiene un ánimo (cómo se mueve) y una pose (qué hace)
+const useMood = (restPose) => {
+  const [state, setState] = useState({ mood: 'idle', pose: restPose, beat: 0 });
+  const react = useCallback((mood, pose) => setState((s) => ({ mood, pose: pose ?? s.pose, beat: s.beat + 1 })), []);
+  // Tras celebrar o lamentarse, vuelve a su pose de juego
+  useEffect(() => {
+    if (state.beat === 0) return undefined;
+    const t = setTimeout(() => setState((s) => ({ ...s, mood: 'idle', pose: restPose })), 1500);
+    return () => clearTimeout(t);
+  }, [state.beat, restPose]);
+  return [state, react];
+};
+
+// Marco de cada juego: la llamita reacciona al lado (en el celular, arriba y pequeña)
+const GameFrame = ({ llama, say, children }) => (
+  <div className="grid gap-6 lg:gap-10 lg:grid-cols-[16rem_minmax(0,1fr)] items-start">
     <aside className="hidden lg:flex lg:sticky lg:top-24 flex-col items-center">
-      <Mascot mood={mood} beat={beat} bubble="top" size="w-44" eager say={say} />
+      <Mascot mood={llama.mood} pose={llama.pose} beat={llama.beat} bubble="top" size="w-48" eager say={say} />
     </aside>
+    <div className="lg:hidden">
+      <Mascot mood={llama.mood} pose={llama.pose} beat={llama.beat} size="w-16" eager say={<div className="text-sm">{say}</div>} />
+    </div>
     <div className="min-w-0">{children}</div>
   </div>
 );
 
-const useMood = () => {
-  const [mood, setMood] = useState({ mood: 'idle', beat: 0 });
-  const react = useCallback((value) => setMood((m0) => ({ mood: value, beat: m0.beat + 1 })), []);
-  return [mood, react];
+const ResultScreen = ({ stars, record, title, big, unit, note, language, onAgain, onExit, againLabel = 'Otra vez', children }) => {
+  const great = stars >= 3 || record;
+  return (
+    <div className="max-w-xl mx-auto text-center py-6">
+      <div className="relative">
+        {great && <Confetti />}
+        <Mascot
+          mood={great ? 'cheer' : stars >= 2 ? 'happy' : 'idle'}
+          pose={record ? 'logro' : great ? 'celebrando' : stars >= 2 ? 'alegre' : 'reintentar'}
+          bubble="top"
+          size="w-44"
+          className="mx-auto"
+          eager
+          say={<p className="font-black text-xl">{title ?? (great ? language.frases?.felicitacion ?? '¡Muy bien!' : stars >= 2 ? '¡Bien hecho!' : language.frases?.animo ?? '¡Ánimo!')}</p>}
+        />
+      </div>
+      <div className="mt-5">
+        <Stars count={stars} />
+      </div>
+      <p className="mt-4 text-6xl font-black tabular-nums anim-pop">{big}</p>
+      <p className="text-stone-600 font-semibold">{unit}</p>
+      {record && (
+        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-1.5 font-black text-amber-800 anim-pop">
+          <Trophy className="w-5 h-5" aria-hidden="true" /> ¡Nuevo récord!
+        </p>
+      )}
+      {note && <p className="mt-2 text-sm font-bold text-amber-700">{note}</p>}
+      {children}
+      <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+        <button type="button" onClick={onAgain} className={primaryBtn}>
+          <RotateCcw className="w-5 h-5" aria-hidden="true" /> {againLabel}
+        </button>
+        <button type="button" onClick={onExit} className={secondaryBtn}>
+          Elegir otro juego
+        </button>
+      </div>
+    </div>
+  );
 };
 
-const ResultScreen = ({ great, title, big, unit, note, language, onAgain, onExit, againLabel = 'Otra vez', children }) => (
+const StartScreen = ({ pose, text, best, bestLabel, onStart, onExit }) => (
   <div className="max-w-xl mx-auto text-center py-6">
-    <Mascot
-      mood={great ? 'cheer' : 'happy'}
-      bubble="top"
-      size="w-36"
-      className="mx-auto"
-      eager
-      say={<p className="font-black text-xl">{title ?? (great ? language.frases?.felicitacion ?? '¡Muy bien!' : language.frases?.animo ?? '¡Ánimo!')}</p>}
-    />
-    <p className="mt-6 text-6xl font-black tabular-nums">{big}</p>
-    <p className="text-stone-600 font-semibold">{unit}</p>
-    {note && <p className="mt-2 text-sm font-bold text-amber-700">{note}</p>}
-    {children}
-    <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
-      <button type="button" onClick={onAgain} className={primaryBtn}>
-        <RotateCcw className="w-5 h-5" aria-hidden="true" /> {againLabel}
-      </button>
-      <button type="button" onClick={onExit} className={secondaryBtn}>
-        Elegir otro juego
-      </button>
-    </div>
-  </div>
-);
-
-const StartScreen = ({ text, best, bestLabel, onStart, onExit }) => (
-  <div className="max-w-xl mx-auto text-center py-6">
-    <Mascot bubble="top" size="w-36" className="mx-auto" eager say={<p className="font-semibold max-w-sm">{text}</p>} />
+    <Mascot pose={pose} bubble="top" size="w-44" className="mx-auto" eager say={<p className="font-semibold max-w-sm">{text}</p>} />
     {best > 0 && (
       <p className="mt-4 inline-flex items-center gap-2 font-bold text-amber-700">
         <Trophy className="w-5 h-5" aria-hidden="true" /> {bestLabel}
       </p>
     )}
     <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
-      <button type="button" onClick={onStart} className={primaryBtn}>
+      <button type="button" onClick={onStart} className={primaryBtn} autoFocus>
         ¡Jugar!
       </button>
       <button type="button" onClick={onExit} className={secondaryBtn}>
@@ -159,17 +185,19 @@ const BONUS_EVERY = 5;
 const BONUS_SECONDS = 3;
 
 const tile = (state, theme) => {
-  const base = 'ficha w-full min-h-14 sm:min-h-16 rounded-2xl px-3 py-2 flex items-center justify-center gap-2 text-center font-bold text-base sm:text-lg disabled:cursor-default';
-  if (state === 'selected') return `${base} ${theme.border} ${theme.soft} ${theme.text}`;
-  if (state === 'flash') return `${base} border-green-600 bg-green-100 text-green-900 anim-pop`;
+  const base = 'ficha relative w-full min-h-14 sm:min-h-16 rounded-2xl px-3 py-2 flex items-center justify-center gap-2 text-center font-bold text-base sm:text-lg disabled:cursor-default';
+  if (state === 'selected') return `${base} ${theme.border} ${theme.soft} ${theme.text} -translate-y-0.5 shadow-md`;
+  if (state === 'flash') return `${base} border-green-600 bg-green-100 text-green-900 anim-pop anim-brilla`;
   if (state === 'wrong') return `${base} border-red-500 bg-red-50 text-red-900 anim-sacude`;
-  return `${base} border-stone-300 bg-white text-stone-800 hover:bg-stone-50`;
+  return `${base} border-stone-300 bg-white text-stone-800 hover:bg-stone-50 hover:-translate-y-0.5`;
 };
+
+const pairStars = (score) => (score >= 15 ? 3 : score >= 8 ? 2 : score >= 1 ? 1 : 0);
 
 const PairsGame = ({ words, language, theme, idioma, onExit }) => {
   const key = bestKey('parejas', idioma);
   const rows = Math.min(5, words.length);
-  const [status, setStatus] = useState('ready'); // ready | playing | over
+  const [status, setStatus] = useState('ready'); // ready | countdown | playing | over
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
   const [pick, setPick] = useState(null);
@@ -179,9 +207,11 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
   const [combo, setCombo] = useState(0);
   const [timeLeft, setTimeLeft] = useState(DURATION);
   const [bonus, setBonus] = useState(null);
+  const [scoreFx, setScoreFx] = useState(null);
+  const [shake, setShake] = useState(0);
   const [best, setBest] = useState(() => readBest(key));
   const [record, setRecord] = useState(false);
-  const [mood, react] = useMood();
+  const [llama, react] = useMood('hablando');
   const endAt = useRef(0);
   const pool = useRef([]);
   const scoreRef = useRef(0);
@@ -191,7 +221,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
     return pool.current.shift();
   };
 
-  const start = () => {
+  const begin = () => {
     pool.current = shuffle(words);
     const first = pool.current.splice(0, rows);
     setLeft(first);
@@ -247,12 +277,14 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
       setCombo(nextCombo);
       setScore((s) => s + 1);
       scoreRef.current += 1;
-      react(nextCombo % BONUS_EVERY === 0 ? 'cheer' : 'happy');
-      if (nextCombo % BONUS_EVERY === 0) {
+      setScoreFx(Date.now());
+      const isBonus = nextCombo % BONUS_EVERY === 0;
+      react(isBonus ? 'cheer' : 'happy', isBonus ? 'celebrando' : 'alegre');
+      if (isBonus) {
         endAt.current += BONUS_SECONDS * 1000;
         setBonus(Date.now());
       }
-      setFlash({ L: li, R: ri });
+      setFlash({ L: li, R: ri, at: Date.now() });
       setTimeout(() => {
         // Las fichas no se pueden tocar durante el destello, así que left/right siguen vigentes
         const fresh = nextWord(left.filter((_, i) => i !== li));
@@ -266,11 +298,12 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
         setLeft(nl);
         setRight(nr);
         setFlash(null);
-      }, 260);
+      }, 320);
     } else {
       playWrong();
       setCombo(0);
-      react('sad');
+      setShake(Date.now());
+      react('sad', 'reintentar');
       setWrong({ L: li, R: ri });
       setTimeout(() => setWrong(null), 500);
     }
@@ -299,6 +332,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
   if (status === 'ready') {
     return (
       <StartScreen
+        pose="hablando"
         text={
           <>
             Une cada palabra con su significado antes de que se acabe el tiempo. Cada {BONUS_EVERY} seguidas te dan <strong>+{BONUS_SECONDS} s</strong>.
@@ -306,65 +340,73 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
         }
         best={best}
         bestLabel={`Tu récord: ${best} parejas`}
-        onStart={start}
+        onStart={() => setStatus('countdown')}
         onExit={onExit}
       />
     );
   }
 
+  if (status === 'countdown') return <Countdown onDone={begin} />;
+
   if (status === 'over') {
     return (
       <ResultScreen
-        great={record || score >= 10}
-        title={record ? '¡Nuevo récord!' : undefined}
+        stars={pairStars(score)}
+        record={record}
         big={score}
         unit={`parejas en ${DURATION} segundos`}
         note={!record && best > 0 ? `Récord: ${best}` : null}
         language={language}
-        onAgain={start}
+        onAgain={() => setStatus('countdown')}
         onExit={onExit}
       />
     );
   }
 
   const fraction = Math.min(1, timeLeft / DURATION);
+  const hurry = timeLeft < 10;
   return (
-    <GameFrame mood={mood.mood} beat={mood.beat} say={<p className="font-black">{combo >= 2 ? `¡${combo} seguidas!` : '¡Rápido, rápido!'}</p>}>
+    <GameFrame llama={llama} say={<p className="font-black">{combo >= 2 ? `¡${combo} seguidas!` : hurry ? '¡Queda poco!' : '¡Rápido, rápido!'}</p>}>
       <div className="flex items-center gap-3 mb-6">
-        <Timer className={`w-6 h-6 shrink-0 ${timeLeft < 10 ? 'text-red-600 anim-latido' : 'text-stone-500'}`} aria-hidden="true" />
-        <div className="relative flex-1 h-4 rounded-full bg-stone-200 overflow-hidden" role="timer" aria-label={`Quedan ${Math.ceil(timeLeft)} segundos`}>
+        <Timer className={`w-6 h-6 shrink-0 ${hurry ? 'text-red-600 anim-latido' : 'text-stone-500'}`} aria-hidden="true" />
+        <div className={`relative flex-1 h-5 rounded-full bg-stone-200 overflow-hidden ${hurry ? 'ring-2 ring-red-300' : ''}`} role="timer" aria-label={`Quedan ${Math.ceil(timeLeft)} segundos`}>
           <div
-            className={`h-full w-full origin-left rounded-full ${timeLeft < 10 ? 'bg-red-500' : 'bg-gradient-to-r from-amber-400 to-orange-500'}`}
+            className={`h-full w-full origin-left rounded-full ${hurry ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-gradient-to-r from-amber-400 to-orange-500'}`}
             style={{ transform: `scaleX(${fraction})`, transition: 'transform 100ms linear' }}
           />
         </div>
-        <span className="relative w-12 text-right font-black tabular-nums">
+        <span className={`relative w-14 text-right text-xl font-black tabular-nums ${hurry ? 'text-red-600' : ''}`}>
           {Math.ceil(timeLeft)}s
-          {bonus && (
-            <span key={bonus} className="anim-xp absolute -top-5 right-0 text-sm text-green-600" aria-hidden="true">
-              +{BONUS_SECONDS}s
-            </span>
-          )}
+          <FloatText trigger={bonus} className="text-green-600 text-base">
+            +{BONUS_SECONDS}s
+          </FloatText>
         </span>
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <p className="font-black text-lg flex items-center gap-2">
-          <Zap className="w-5 h-5 text-amber-500 fill-amber-400" aria-hidden="true" />
-          <span className="tabular-nums">{score}</span> parejas
+        <p className="relative font-black text-xl flex items-center gap-2">
+          <Zap className="w-6 h-6 text-amber-500 fill-amber-400" aria-hidden="true" />
+          <span key={score} className="tabular-nums anim-pop">
+            {score}
+          </span>{' '}
+          parejas
+          <FloatText trigger={scoreFx} className="text-amber-500 text-lg">
+            +1
+          </FloatText>
         </p>
         {combo >= 2 && (
-          <p key={combo} className="anim-pop font-black text-orange-600 lg:hidden">
-            ¡{combo} seguidas!
+          <p key={combo} className="anim-pop font-black text-orange-600 flex items-center gap-1" style={{ fontSize: `${Math.min(1 + combo * 0.06, 1.6)}rem` }}>
+            <Flame className="w-6 h-6 fill-orange-500" aria-hidden="true" />×{combo}
           </p>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-5">
+      <div key={shake} className={`grid grid-cols-2 gap-3 sm:gap-5 ${shake ? 'anim-tiembla' : ''}`}>
         <div className="space-y-3" lang={language.lang}>
           {left.map((w, i) => (
             <button key={`${w?.id}-${i}`} type="button" onClick={() => tap('L', i)} className={tile(stateOf('L', i), theme)} aria-pressed={stateOf('L', i) === 'selected'}>
               {w?.target}
+              {flash?.L === i && <Burst trigger={flash.at} />}
             </button>
           ))}
         </div>
@@ -372,6 +414,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
           {right.map((w, i) => (
             <button key={`${w?.id}-${i}`} type="button" onClick={() => tap('R', i)} className={tile(stateOf('R', i), theme)} aria-pressed={stateOf('R', i) === 'selected'}>
               {w?.spanish}
+              {flash?.R === i && <Burst trigger={flash.at} />}
             </button>
           ))}
         </div>
@@ -397,6 +440,7 @@ const FlashCard = ({ word, language, theme, flipped, onFlip, onDecide }) => {
       drag="x"
       dragSnapToOrigin
       dragElastic={0.8}
+      whileDrag={{ scale: 1.03 }}
       onDragEnd={(_, info) => {
         if (info.offset.x > SWIPE) onDecide(true);
         else if (info.offset.x < -SWIPE) onDecide(false);
@@ -424,13 +468,14 @@ const FlashCard = ({ word, language, theme, flipped, onFlip, onDecide }) => {
           transition={{ type: 'spring', bounce: 0.2, duration: 0.55 }}
         >
           <span
-            className={`absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-[2rem] bg-gradient-to-br ${theme.gradient} p-6 text-white shadow-2xl [backface-visibility:hidden]`}
+            className={`absolute inset-0 flex flex-col items-center justify-center gap-4 overflow-hidden rounded-[2rem] bg-gradient-to-br ${theme.gradient} p-6 text-white shadow-2xl [backface-visibility:hidden]`}
           >
-            <span className="text-sm font-black uppercase tracking-widest opacity-80">{language.nombre}</span>
-            <span className="text-4xl sm:text-5xl font-black text-center break-words" lang={language.lang}>
+            <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_20px)]" aria-hidden="true" />
+            <span className="relative text-sm font-black uppercase tracking-widest opacity-80">{language.nombre}</span>
+            <span className="relative text-4xl sm:text-5xl font-black text-center break-words" lang={language.lang}>
               {word.target}
             </span>
-            <span className="text-sm font-semibold opacity-80 flex items-center gap-1">
+            <span className="relative text-sm font-semibold opacity-80 flex items-center gap-1">
               <Hand className="w-4 h-4" aria-hidden="true" /> Toca para voltear
             </span>
           </span>
@@ -456,7 +501,7 @@ const CardsGame = ({ words, language, theme, onExit }) => {
   const [known, setKnown] = useState(0);
   const [review, setReview] = useState([]);
   const [dir, setDir] = useState(1);
-  const [mood, react] = useMood();
+  const [llama, react] = useMood('leyendo');
   const total = Math.min(12, words.length);
   const done = index >= deck.length;
   const card = deck[index];
@@ -473,7 +518,7 @@ const CardsGame = ({ words, language, theme, onExit }) => {
     (knew) => {
       if (!card) return;
       setDir(knew ? 1 : -1);
-      react(knew ? 'happy' : 'think');
+      react(knew ? 'happy' : 'think', knew ? 'alegre' : 'pensando');
       if (knew) {
         playCorrect();
         if (!card.repeat) setKnown((k) => k + 1);
@@ -517,8 +562,9 @@ const CardsGame = ({ words, language, theme, onExit }) => {
   }, [done, flip, decide]);
 
   if (done) {
+    const ratio = known / Math.max(1, total);
     return (
-      <ResultScreen great={known >= total * 0.8} big={`${known}/${total}`} unit="palabras que ya te sabías" language={language} onAgain={restart} onExit={onExit} againLabel="Otro mazo">
+      <ResultScreen stars={ratio >= 0.9 ? 3 : ratio >= 0.6 ? 2 : 1} big={`${known}/${total}`} unit="palabras que ya te sabías" language={language} onAgain={restart} onExit={onExit} againLabel="Otro mazo">
         {review.length > 0 && (
           <section className="mt-6 text-left bg-orange-50 border border-orange-200 rounded-2xl p-4" aria-labelledby="tarjetas-repasar">
             <h2 id="tarjetas-repasar" className="font-bold text-orange-900 mb-2 flex items-center gap-2">
@@ -538,11 +584,11 @@ const CardsGame = ({ words, language, theme, onExit }) => {
   }
 
   return (
-    <GameFrame mood={mood.mood} beat={mood.beat} say={<p className="font-semibold">Arrastra a la <strong>derecha</strong> si la sabes y a la <strong>izquierda</strong> para repasar.</p>}>
+    <GameFrame llama={llama} say={<p className="font-semibold">Arrastra a la <strong>derecha</strong> si la sabes y a la <strong>izquierda</strong> para repasar.</p>}>
       <div className="max-w-md mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-3 rounded-full bg-stone-200 overflow-hidden" aria-hidden="true">
-            <div className={`barra h-full w-full rounded-full ${theme.solid}`} style={{ transform: `scaleX(${index / deck.length})` }} />
+            <div className={`barra h-full w-full rounded-full bg-gradient-to-r ${theme.gradient}`} style={{ transform: `scaleX(${index / deck.length})` }} />
           </div>
           <span className="text-sm font-bold text-stone-600 tabular-nums">
             {Math.min(index + 1, deck.length)} / {deck.length}
@@ -550,14 +596,15 @@ const CardsGame = ({ words, language, theme, onExit }) => {
         </div>
 
         <div className="relative mx-auto h-80 sm:h-96 w-full" data-tarjeta>
-          {/* La siguiente tarjeta asoma detrás, como un mazo */}
-          {deck[index + 1] && <div className="absolute inset-x-4 -bottom-3 top-3 rounded-[2rem] bg-stone-200" aria-hidden="true" />}
+          {/* Las siguientes tarjetas asoman detrás, como un mazo */}
+          {deck[index + 2] && <div className="absolute inset-x-8 -bottom-5 top-6 rounded-[2rem] bg-stone-200/70 rotate-2" aria-hidden="true" />}
+          {deck[index + 1] && <div className="absolute inset-x-4 -bottom-3 top-3 rounded-[2rem] bg-stone-300/80 -rotate-1" aria-hidden="true" />}
           <AnimatePresence custom={dir} initial={false}>
             <FlashCard key={`${card.id}-${index}`} word={card} language={language} theme={theme} flipped={flipped} onFlip={flip} onDecide={decide} />
           </AnimatePresence>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-3 sm:gap-4">
+        <div className="mt-10 flex items-center justify-center gap-3 sm:gap-4">
           <button
             type="button"
             onClick={() => decide(false)}
@@ -605,11 +652,12 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
   const [cards, setCards] = useState(build);
   const [open, setOpen] = useState([]); // uids volteadas ahora (máx. 2)
   const [found, setFound] = useState([]); // ids encontrados
+  const [justFound, setJustFound] = useState(null);
   const [moves, setMoves] = useState(0);
   const [miss, setMiss] = useState(null);
   const [best, setBest] = useState(() => readBest(key));
   const [record, setRecord] = useState(false);
-  const [mood, react] = useMood();
+  const [llama, react] = useMood('pensando');
   const pairs = cards.length / 2;
   const done = found.length === pairs && pairs > 0;
 
@@ -633,10 +681,11 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
     const [a, b] = next.map((u) => cards.find((c) => c.uid === u));
     if (a.id === b.id) {
       playMatch();
-      react('happy');
       const nowFound = [...found, a.id];
+      react(nowFound.length === pairs ? 'cheer' : 'happy', nowFound.length === pairs ? 'celebrando' : 'alegre');
       setTimeout(() => {
         setFound(nowFound);
+        setJustFound({ id: a.id, at: Date.now() });
         setOpen([]);
         if (nowFound.length === pairs) {
           playComplete();
@@ -650,7 +699,7 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
       }, 350);
     } else {
       playWrong();
-      react('sad');
+      react('sad', 'reintentar');
       setMiss(next);
       setTimeout(() => {
         setOpen([]);
@@ -662,8 +711,8 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
   if (done) {
     return (
       <ResultScreen
-        great={moves <= pairs + 3}
-        title={record ? '¡Nuevo récord!' : undefined}
+        stars={moves <= pairs + 2 ? 3 : moves <= pairs + 5 ? 2 : 1}
+        record={record}
         big={moves}
         unit={`intentos para encontrar ${pairs} parejas`}
         note={!record && best ? `Récord: ${best} intentos` : null}
@@ -675,14 +724,17 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
   }
 
   return (
-    <GameFrame mood={mood.mood} beat={mood.beat} say={<p className="font-semibold">Encuentra cada palabra y su significado. ¡Recuerda dónde estaban!</p>}>
-      <div className="flex items-center justify-between mb-5">
+    <GameFrame llama={llama} say={<p className="font-semibold">Encuentra cada palabra y su significado. ¡Recuerda dónde estaban!</p>}>
+      <div className="flex items-center justify-between mb-5 max-w-3xl mx-auto">
         <p className="font-black text-lg flex items-center gap-2">
           <Brain className="w-5 h-5 text-purple-600" aria-hidden="true" />
           {found.length} de {pairs} parejas
         </p>
         <p className="font-bold text-stone-600 tabular-nums">
-          {moves} intentos{best ? ` · récord ${best}` : ''}
+          <span key={moves} className="inline-block anim-pop">
+            {moves}
+          </span>{' '}
+          intentos{best ? ` · récord ${best}` : ''}
         </p>
       </div>
       <ul className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
@@ -690,35 +742,38 @@ const MemoryGame = ({ words, language, theme, idioma, onExit }) => {
           const isFound = found.includes(card.id);
           const isOpen = isFound || open.includes(card.uid);
           const isMiss = miss?.includes(card.uid);
+          const glow = justFound?.id === card.id;
           return (
-            <li key={card.uid} className="aspect-[4/5] [perspective:900px] anim-entra" style={{ '--i': i }}>
+            <li key={card.uid} className="relative aspect-[4/5] [perspective:900px] anim-entra" style={{ '--i': i }}>
               <m.button
                 type="button"
                 onClick={() => flip(card)}
                 disabled={isFound}
                 aria-label={isOpen ? card.text : `Tarjeta ${i + 1}, boca abajo`}
-                className="relative h-full w-full [transform-style:preserve-3d] disabled:cursor-default"
-                animate={{ rotateY: isOpen ? 180 : 0 }}
+                className="relative h-full w-full [transform-style:preserve-3d] disabled:cursor-default transition-transform duration-150 hover:-translate-y-1 disabled:hover:translate-y-0"
+                animate={{ rotateY: isOpen ? 180 : 0, scale: isFound ? 0.96 : 1 }}
                 transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
               >
                 {/* Dorso: un tejido de colores con la llamita */}
                 <span className={`absolute inset-0 rounded-2xl border-4 border-white shadow-md bg-gradient-to-br ${theme.gradient} flex items-center justify-center overflow-hidden [backface-visibility:hidden]`}>
                   <span className="absolute inset-0 opacity-25 [background:repeating-linear-gradient(45deg,#fff_0_6px,transparent_6px_18px)]" aria-hidden="true" />
-                  <span className="relative w-1/2 opacity-90" aria-hidden="true">
-                    <LlamaImage />
+                  <span className="relative w-3/5 aspect-square opacity-95" aria-hidden="true">
+                    <LlamaImage pose="sorprendida" />
                   </span>
                 </span>
                 {/* Frente */}
                 <span
                   className={`absolute inset-0 rounded-2xl border-4 p-2 flex flex-col items-center justify-center text-center font-black break-words text-sm sm:text-lg [backface-visibility:hidden] [transform:rotateY(180deg)] ${
-                    isFound ? 'border-green-500 bg-green-50 text-green-900' : isMiss ? 'border-red-400 bg-red-50 text-red-900 anim-sacude' : 'border-stone-200 bg-white text-stone-900'
+                    isFound ? `border-green-500 bg-green-50 text-green-900 ${glow ? 'anim-brilla' : ''}` : isMiss ? 'border-red-400 bg-red-50 text-red-900 anim-sacude' : 'border-stone-200 bg-white text-stone-900'
                   }`}
                   lang={card.side === 't' ? language.lang : undefined}
                 >
                   <span className="text-[10px] sm:text-xs uppercase tracking-wider text-stone-500 mb-1">{card.side === 't' ? language.nombre : 'Español'}</span>
                   {card.text}
+                  {isFound && <Check className="mt-1 w-5 h-5 text-green-600" strokeWidth={3} aria-hidden="true" />}
                 </span>
               </m.button>
+              {glow && <Burst trigger={justFound.at} count={12} distance={60} />}
             </li>
           );
         })}
@@ -738,25 +793,38 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
     shuffle(words)
       .slice(0, Math.min(ROUNDS, words.length))
       .map((w) => ({ word: w, options: shuffle([w, ...shuffle(words.filter((o) => o.id !== w.id)).slice(0, 3)]) }));
+  const [status, setStatus] = useState('countdown');
   const [rounds, setRounds] = useState(makeRounds);
   const [index, setIndex] = useState(0);
   const [lives, setLives] = useState(LIVES);
+  const [lostAt, setLostAt] = useState(null);
   const [score, setScore] = useState(0);
+  const [results, setResults] = useState([]); // true/false por ronda
   const [chosen, setChosen] = useState(null);
+  const [playing, setPlaying] = useState(false);
   const [best, setBest] = useState(() => readBest(key));
-  const [mood, react] = useMood();
+  const [record, setRecord] = useState(false);
+  const [llama, react] = useMood('escuchando');
   const round = rounds[index];
-  const over = lives === 0 || index >= rounds.length;
+  const over = status === 'playing' && (lives === 0 || index >= rounds.length);
 
-  const play = useCallback((slow = false) => round && speak(round.word.target, { url: round.word.audio, lang: language.voz?.respaldo, slow }), [round, language]);
+  const play = useCallback(
+    (slow = false) => {
+      if (!round) return;
+      setPlaying(true);
+      speak(round.word.target, { url: round.word.audio, lang: language.voz?.respaldo, slow });
+      setTimeout(() => setPlaying(false), slow ? 2200 : 1400);
+    },
+    [round, language]
+  );
 
   // Cada ronda suena sola al aparecer
   useEffect(() => {
-    if (over || chosen) return undefined;
+    if (status !== 'playing' || over || chosen) return undefined;
     const t = setTimeout(() => play(), 400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, over]);
+  }, [index, status, over]);
 
   useEffect(() => {
     if (!over) return;
@@ -764,21 +832,25 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
     if (score > best) {
       writeBest(key, score);
       setBest(score);
+      setRecord(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [over]);
 
   const choose = (opt) => {
     if (chosen) return;
-    setChosen(opt);
-    if (opt.id === round.word.id) {
+    setChosen({ ...opt, at: Date.now() });
+    const ok = opt.id === round.word.id;
+    setResults((r) => [...r, ok]);
+    if (ok) {
       playCorrect();
-      react('happy');
+      react('happy', 'celebrando');
       setScore((s) => s + 1);
     } else {
       playWrong();
-      react('sad');
+      react('sad', 'reintentar');
       setLives((l) => l - 1);
+      setLostAt(Date.now());
     }
   };
   const next = () => {
@@ -787,7 +859,7 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
   };
 
   useEffect(() => {
-    if (over) return undefined;
+    if (status !== 'playing' || over) return undefined;
     const onKey = (e) => {
       const n = Number(e.key);
       if (!chosen && n >= 1 && n <= 4 && round?.options[n - 1]) choose(round.options[n - 1]);
@@ -808,17 +880,24 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
     setIndex(0);
     setLives(LIVES);
     setScore(0);
+    setResults([]);
     setChosen(null);
+    setRecord(false);
+    setStatus('countdown');
   };
 
+  if (status === 'countdown') return <Countdown onDone={() => setStatus('playing')} />;
+
   if (over) {
+    const ratio = score / Math.max(1, rounds.length);
     return (
       <ResultScreen
-        great={score >= rounds.length * 0.8}
+        stars={ratio >= 0.9 ? 3 : ratio >= 0.6 ? 2 : ratio >= 0.3 ? 1 : 0}
+        record={record}
         title={lives === 0 ? '¡Se acabaron las vidas!' : undefined}
         big={`${score}/${rounds.length}`}
         unit="palabras reconocidas al oído"
-        note={best ? `Récord: ${best}` : null}
+        note={!record && best ? `Récord: ${best}` : null}
         language={language}
         onAgain={restart}
         onExit={onExit}
@@ -827,15 +906,27 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
   }
 
   return (
-    <GameFrame mood={mood.mood} beat={mood.beat} say={<p className="font-semibold">Escucha con atención y elige la palabra que suena.</p>}>
+    <GameFrame llama={llama} say={<p className="font-semibold">Escucha con atención y elige la palabra que suena.</p>}>
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <p className="font-bold text-stone-600 tabular-nums">
-            Ronda {index + 1} de {rounds.length}
-          </p>
+        <div className="flex items-center justify-between gap-4 mb-6">
+          {/* Una bolita por ronda: verde acierto, roja error, la actual late */}
+          <ol className="flex flex-wrap gap-1.5" aria-label={`Ronda ${index + 1} de ${rounds.length}`}>
+            {rounds.map((_, i) => (
+              <li
+                key={i}
+                className={`h-3 rounded-full transition-all duration-300 ${
+                  i < results.length ? (results[i] ? 'w-3 bg-green-500' : 'w-3 bg-red-400') : i === index ? `w-7 bg-gradient-to-r ${theme.gradient}` : 'w-3 bg-stone-200'
+                }`}
+              />
+            ))}
+          </ol>
           <p className="flex items-center gap-1" aria-label={`${lives} vidas`}>
             {Array.from({ length: LIVES }, (_, i) => (
-              <Heart key={`${i}-${i < lives}`} className={`w-6 h-6 ${i < lives ? 'text-red-500 fill-red-500' : 'text-stone-300 anim-sacude'}`} aria-hidden="true" />
+              <Heart
+                key={`${i}-${i < lives}-${i === lives ? lostAt : ''}`}
+                className={`w-7 h-7 ${i < lives ? 'text-red-500 fill-red-500' : `text-stone-300 fill-stone-200 ${i === lives ? 'anim-corazon-roto' : ''}`}`}
+                aria-hidden="true"
+              />
             ))}
           </p>
         </div>
@@ -845,16 +936,22 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
             type="button"
             onClick={() => play()}
             aria-label="Escuchar la palabra"
-            className={`ficha w-32 h-32 rounded-3xl ${theme.solid} border-black/25 text-white flex items-center justify-center shadow-lg`}
+            className={`ficha relative w-36 h-36 rounded-[2rem] ${theme.solid} border-black/25 text-white flex items-center justify-center shadow-xl`}
           >
-            <Volume2 className="w-16 h-16" aria-hidden="true" />
+            {playing && (
+              <>
+                <span className={`onda ${theme.text}`} aria-hidden="true" />
+                <span className={`onda onda-2 ${theme.text}`} aria-hidden="true" />
+              </>
+            )}
+            <Volume2 className={`w-16 h-16 ${playing ? 'anim-latido' : ''}`} aria-hidden="true" />
           </button>
           <button type="button" onClick={() => play(true)} aria-label="Escuchar despacio" className={`ficha w-16 h-16 rounded-2xl border-stone-300 bg-white ${theme.text} flex items-center justify-center`}>
             <Snail className="w-8 h-8" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Opciones" lang={language.lang}>
+        <div key={index} className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Opciones" lang={language.lang}>
           {round.options.map((opt, i) => {
             const right = chosen && opt.id === round.word.id;
             const wrong = chosen && chosen.id === opt.id && !right;
@@ -864,8 +961,9 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
                 type="button"
                 disabled={!!chosen}
                 onClick={() => choose(opt)}
-                className={`ficha min-h-16 rounded-2xl px-4 flex items-center gap-3 text-left text-xl font-black disabled:cursor-default ${
-                  right ? 'border-green-600 bg-green-50 text-green-900' : wrong ? 'border-red-500 bg-red-50 text-red-900 anim-sacude' : chosen ? 'border-stone-200 text-stone-400 bg-white' : 'border-stone-300 bg-white hover:bg-stone-50'
+                style={{ '--i': i }}
+                className={`ficha anim-entra relative min-h-16 rounded-2xl px-4 flex items-center gap-3 text-left text-xl font-black disabled:cursor-default ${
+                  right ? 'border-green-600 bg-green-50 text-green-900 anim-pop' : wrong ? 'border-red-500 bg-red-50 text-red-900 anim-sacude' : chosen ? 'border-stone-200 text-stone-400 bg-white' : 'border-stone-300 bg-white hover:bg-stone-50 hover:-translate-y-0.5'
                 }`}
               >
                 <span className="hidden sm:inline-flex w-7 h-7 shrink-0 items-center justify-center rounded-lg border-2 border-stone-200 text-xs text-stone-500" aria-hidden="true">
@@ -873,15 +971,16 @@ const ListenGame = ({ words, language, theme, idioma, onExit }) => {
                 </span>
                 <span className="flex-1">{opt.target}</span>
                 {chosen && <span className="text-sm font-semibold text-stone-500">{opt.spanish}</span>}
+                {right && <Burst trigger={chosen.at} />}
               </button>
             );
           })}
         </div>
 
         {chosen && (
-          <div className="mt-6 flex justify-end">
-            <button type="button" onClick={next} className={primaryBtn}>
-              Siguiente
+          <div className="mt-6 flex justify-end anim-entra">
+            <button type="button" onClick={next} className={primaryBtn} autoFocus>
+              {index + 1 >= rounds.length || lives === 0 ? 'Ver resultado' : 'Siguiente'}
             </button>
           </div>
         )}
@@ -895,6 +994,7 @@ const GAMES = [
   {
     id: 'parejas',
     Icon: Zap,
+    pose: 'celebrando',
     title: 'Parejas relámpago',
     text: '60 segundos para unir todas las palabras que puedas.',
     color: 'from-amber-400 to-orange-600',
@@ -904,6 +1004,7 @@ const GAMES = [
   {
     id: 'tarjetas',
     Icon: Layers,
+    pose: 'leyendo',
     title: 'Tarjetas',
     text: 'Voltea, escucha y decide: ¿la sabes o la repasas?',
     color: 'from-purple-500 to-blue-700',
@@ -912,6 +1013,7 @@ const GAMES = [
   {
     id: 'memoria',
     Icon: Brain,
+    pose: 'pensando',
     title: 'Memoria',
     text: 'Voltea tarjetas y encuentra cada palabra con su significado.',
     color: 'from-pink-500 to-rose-700',
@@ -921,6 +1023,7 @@ const GAMES = [
   {
     id: 'escucha',
     Icon: Ear,
+    pose: 'escuchando',
     title: 'Escucha y elige',
     text: 'Oye la palabra y elige cómo se escribe. ¡Tienes 3 vidas!',
     color: 'from-green-500 to-teal-700',
@@ -951,6 +1054,7 @@ const Practice = ({ user, isGuest }) => {
 
   const enough = state.words.length >= 4;
   // Se recalcula al volver de un juego, para mostrar el récord nuevo
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const records = useMemo(() => GAMES.filter((g) => g.best).map((g) => ({ ...g, value: readBest(bestKey(g.id, idioma)) })), [idioma, game]);
   const exit = () => setGame(null);
   const props = { words: state.words, language, theme, idioma, onExit: exit };
@@ -993,12 +1097,12 @@ const Practice = ({ user, isGuest }) => {
       <main className="container mx-auto max-w-7xl py-8 relative">
         {state.loading ? (
           <div className="flex flex-col items-center py-16" role="status">
-            <Mascot mood="think" size="w-32" eager />
+            <Mascot mood="think" pose="esperando" size="w-36" eager />
             <p className="mt-4 font-bold text-stone-700">Buscando tus palabras…</p>
           </div>
         ) : state.error ? (
           <div className="text-center py-12" role="alert">
-            <Mascot mood="sad" size="w-32" className="justify-center" eager />
+            <Mascot mood="sad" pose="reintentar" size="w-36" className="justify-center" eager />
             <p className="mt-4 font-bold">No pudimos cargar las palabras.</p>
             <button type="button" onClick={() => setReload((r) => r + 1)} className="mt-4 inline-flex items-center gap-2 px-6 min-h-11 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque">
               <RefreshCw className="w-5 h-5" aria-hidden="true" /> Reintentar
@@ -1006,7 +1110,7 @@ const Practice = ({ user, isGuest }) => {
           </div>
         ) : !enough ? (
           <div className="text-center py-12">
-            <Mascot size="w-32" className="justify-center" eager />
+            <Mascot pose="descansando" size="w-36" className="justify-center" eager />
             <p className="mt-4 font-bold">Todavía no hay palabras suficientes para jugar en {language.nombre}.</p>
           </div>
         ) : game === 'parejas' ? (
@@ -1023,8 +1127,9 @@ const Practice = ({ user, isGuest }) => {
             <aside className="space-y-5 lg:sticky lg:top-24">
               <Mascot
                 eager
+                pose="bienvenida"
                 bubble="top"
-                size="w-36 sm:w-44"
+                size="w-40 sm:w-48"
                 say={
                   <p className="font-semibold">
                     <span className="font-black">¿A qué jugamos?</span> Practicarás {state.words.length} palabras{' '}
@@ -1051,7 +1156,7 @@ const Practice = ({ user, isGuest }) => {
             </aside>
 
             <ul className="grid gap-5 sm:grid-cols-2">
-              {GAMES.map(({ id, Icon, title, text, color, shadow, best }, i) => {
+              {GAMES.map(({ id, Icon, pose, title, text, color, shadow, best }, i) => {
                 const value = best ? readBest(bestKey(id, idioma)) : 0;
                 return (
                   <li key={id} className="anim-entra" style={{ '--i': i }}>
@@ -1061,15 +1166,19 @@ const Practice = ({ user, isGuest }) => {
                         playTap();
                         setGame(id);
                       }}
-                      className={`group ficha tarjeta-viva relative overflow-hidden w-full h-full min-h-56 text-left rounded-3xl border-stone-200 bg-white p-6 sm:p-7 shadow-lg ${shadow} hover:border-stone-300`}
+                      className={`group ficha tarjeta-viva relative overflow-hidden w-full h-full min-h-64 text-left rounded-3xl border-stone-200 bg-white p-6 sm:p-7 shadow-lg ${shadow} hover:border-stone-300`}
                     >
-                      <span className={`pointer-events-none absolute -right-10 -top-10 w-40 h-40 rounded-full bg-gradient-to-br ${color} opacity-10 transition-transform duration-300 group-hover:scale-125`} aria-hidden="true" />
-                      <span className={`relative mb-5 w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md transition-transform duration-200 group-hover:-rotate-6`} aria-hidden="true">
+                      <span className={`pointer-events-none absolute -right-12 -top-12 w-48 h-48 rounded-full bg-gradient-to-br ${color} opacity-15 transition-transform duration-300 group-hover:scale-125`} aria-hidden="true" />
+                      {/* La llamita asoma por la esquina y sube al pasar el mouse */}
+                      <span className="pointer-events-none absolute -bottom-3 -right-2 w-32 sm:w-36 aspect-square transition-transform duration-300 ease-out group-hover:-translate-y-3 group-hover:rotate-3" aria-hidden="true">
+                        <LlamaImage pose={pose} />
+                      </span>
+                      <span className={`relative mb-5 w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110`} aria-hidden="true">
                         <Icon className="w-8 h-8 text-white" />
                       </span>
-                      <span className="relative block text-2xl font-black mb-1">{title}</span>
-                      <span className="relative block text-stone-600">{text}</span>
-                      <span className="relative mt-4 flex items-center justify-between gap-2">
+                      <span className="relative block text-2xl font-black mb-1 pr-24">{title}</span>
+                      <span className="relative block text-stone-600 pr-28">{text}</span>
+                      <span className="relative mt-4 flex items-center gap-2 pr-28">
                         {value > 0 ? (
                           <span className="inline-flex items-center gap-1 text-sm font-bold text-amber-700">
                             <Trophy className="w-4 h-4" aria-hidden="true" /> Récord: {best(value)}
@@ -1077,8 +1186,8 @@ const Practice = ({ user, isGuest }) => {
                         ) : (
                           <span className="text-sm font-bold text-stone-500">{best ? '¡Aún sin récord!' : 'Sin reloj, a tu ritmo'}</span>
                         )}
-                        <span className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-black text-white bg-gradient-to-r ${color}`}>Jugar</span>
                       </span>
+                      <span className={`relative mt-4 inline-flex items-center rounded-full px-5 py-2 text-sm font-black text-white bg-gradient-to-r ${color} shadow-md transition-transform group-hover:scale-105`}>Jugar</span>
                     </button>
                   </li>
                 );

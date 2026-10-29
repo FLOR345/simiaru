@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Users, Copy, Download, RefreshCw, School, ShieldCheck 
 import { toast } from 'sonner';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage } from '../languages';
+import { LlamaImage } from '../components/Mascot';
 
 const formatDate = (value) => (value ? new Date(value).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) : '—');
 
@@ -175,12 +176,19 @@ const Teacher = () => {
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
           Volver al perfil
         </Link>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight mt-2">
+        <div className="flex items-center gap-4 sm:gap-6 mt-2 mb-8">
+          <span className="w-24 sm:w-32 aspect-square shrink-0 llama llama-reposo" aria-hidden="true">
+            <LlamaImage pose="leyendo" eager />
+          </span>
+          <div>
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
           <span className="texto-degradado">Modo aula</span> para docentes
         </h1>
-        <p className="text-stone-700 mt-2 mb-8 max-w-2xl">
+        <p className="text-stone-700 mt-2 max-w-2xl">
           Crea un aula y comparte su código. Tus estudiantes entran en <strong>/aula</strong> con un alias, sin correo ni datos personales.
         </p>
+          </div>
+        </div>
 
         <form onSubmit={create} className="bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-6 mb-8 flex flex-col sm:flex-row gap-3 sm:items-end">
           <div className="flex-1">

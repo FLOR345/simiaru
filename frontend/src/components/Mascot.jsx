@@ -1,43 +1,65 @@
-import llamaPng from '../assets/llamita.png';
-import llamaWebp from '../assets/llamita.webp';
+// La llamita de SimiAru: 16 poses (assets/llama) y animaciones CSS ("llama-*" en index.css).
+// La pose dice QUÉ hace (escucha, lee, celebra…); el ánimo (mood) dice CÓMO se mueve.
+// Las animaciones son CSS: no frenan las transiciones de Motion y con "reducir movimiento" se quedan quietas.
 
-// La llamita de SimiAru acompaña al estudiante: respira en reposo, salta al acertar,
-// se agacha al fallar y celebra las rachas. Las animaciones son CSS (index.css, "llama-*"):
-// no frenan las transiciones de Motion y con "reducir movimiento" se quedan quietas.
+const WEBP = import.meta.glob('../assets/llama/*.webp', { eager: true, import: 'default' });
+const PNG = import.meta.glob('../assets/llama/*.png', { eager: true, import: 'default' });
+const byName = (files) => Object.fromEntries(Object.entries(files).map(([path, url]) => [path.split('/').pop().replace(/\.\w+$/, ''), url]));
+const POSES_WEBP = byName(WEBP);
+const POSES_PNG = byName(PNG);
+
+export const POSES = Object.keys(POSES_WEBP);
+
 const MOOD_CLASS = {
   idle: 'llama-reposo',
   happy: 'llama-salta',
   cheer: 'llama-celebra',
   sad: 'llama-triste',
   think: 'llama-piensa',
+  wow: 'llama-sorpresa',
 };
 
-export const LlamaImage = ({ className = '', eager = false }) => (
-  <picture>
-    <source srcSet={llamaWebp} type="image/webp" />
-    <img
-      src={llamaPng}
-      alt=""
-      width="513"
-      height="640"
-      loading={eager ? 'eager' : 'lazy'}
-      decoding="async"
-      draggable="false"
-      className={`select-none w-full h-auto ${className}`}
-    />
-  </picture>
-);
+// Pose por defecto según el ánimo
+const MOOD_POSE = {
+  idle: 'alegre',
+  happy: 'alegre',
+  cheer: 'celebrando',
+  sad: 'reintentar',
+  think: 'pensando',
+  wow: 'sorprendida',
+};
+
+export const LlamaImage = ({ pose = 'alegre', className = '', eager = false }) => {
+  const name = POSES_WEBP[pose] ? pose : 'alegre';
+  return (
+    <picture className="block w-full h-full">
+      <source srcSet={POSES_WEBP[name]} type="image/webp" />
+      <img
+        key={name}
+        src={POSES_PNG[name]}
+        alt=""
+        width="560"
+        height="560"
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        draggable="false"
+        className={`anim-pose select-none w-full h-full object-contain object-bottom ${className}`}
+      />
+    </picture>
+  );
+};
 
 /**
- * mood: idle | happy | cheer | sad | think
+ * mood: idle | happy | cheer | sad | think | wow  (cómo se mueve)
+ * pose: una de POSES (qué está haciendo); si falta, se elige según el ánimo
  * beat: cambia este número para repetir la animación del mismo ánimo
  * say: texto (o nodos) del globo de diálogo
  * bubble: 'right' (globo a la derecha) o 'top' (globo arriba)
  */
-const Mascot = ({ mood = 'idle', beat = 0, say, size = 'w-24 sm:w-28', bubble = 'right', className = '', eager = false }) => (
+const Mascot = ({ mood = 'idle', pose, beat = 0, say, size = 'w-24 sm:w-28', bubble = 'right', className = '', eager = false }) => (
   <div className={`flex ${bubble === 'top' ? 'flex-col-reverse items-center' : 'items-end'} gap-3 ${className}`}>
-    <div key={`${mood}-${beat}`} className={`${size} shrink-0 origin-bottom llama ${MOOD_CLASS[mood] ?? MOOD_CLASS.idle}`} aria-hidden="true">
-      <LlamaImage eager={eager} />
+    <div key={`${mood}-${beat}`} className={`${size} aspect-square shrink-0 origin-bottom llama ${MOOD_CLASS[mood] ?? MOOD_CLASS.idle}`} aria-hidden="true">
+      <LlamaImage pose={pose ?? MOOD_POSE[mood] ?? 'alegre'} eager={eager} />
     </div>
     {say && (
       <div

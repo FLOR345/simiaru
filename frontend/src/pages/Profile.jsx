@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar, ShieldCheck, Download, Trash2, School, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar, Download, Trash2, School, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.jpg';
 import { API_URL } from '../config.js';
@@ -12,6 +12,7 @@ import Reveal from '../ui/Reveal';
 import { api } from '../services/api';
 import { clearQueue, flush } from '../services/telemetry';
 import { saveConsentLocally } from '../components/ConsentDialog';
+import { LlamaImage } from '../components/Mascot';
 
 const authHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -108,8 +109,8 @@ const LearningData = ({ profile, onConsentChange }) => {
   return (
     <section className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="datos-titulo">
       <div className="flex items-start gap-4 mb-5">
-        <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center shadow-md shrink-0" aria-hidden="true">
-          <ShieldCheck className="w-6 h-6 text-white" />
+        <span className="w-20 aspect-square shrink-0" aria-hidden="true">
+          <LlamaImage pose="carino" />
         </span>
         <div>
           <h2 id="datos-titulo" className="text-2xl font-bold">
@@ -323,8 +324,13 @@ const Profile = ({ user, setUser }) => {
             {/* ==================== DATOS DE LA CUENTA ==================== */}
             <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="nombre-usuario">
               <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-                <span className="w-20 h-20 rounded-2xl bg-green-700 text-white text-4xl font-bold flex items-center justify-center shrink-0" aria-hidden="true">
-                  {profile?.nombre?.charAt(0).toUpperCase() || '?'}
+                <span className="relative w-28 h-28 shrink-0" aria-hidden="true">
+                  <span className="block w-full h-full llama llama-reposo">
+                    <LlamaImage pose="logro" eager />
+                  </span>
+                  <span className="absolute -bottom-1 -right-1 w-10 h-10 rounded-xl bg-green-700 text-white text-xl font-black flex items-center justify-center shadow-md ring-4 ring-white">
+                    {profile?.nombre?.charAt(0).toUpperCase() || '?'}
+                  </span>
                 </span>
                 <div className="flex-1 min-w-0">
                   <h2 id="nombre-usuario" className="text-3xl font-bold">
