@@ -188,7 +188,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
-        <div className="container mx-auto px-4 sm:px-6 py-3">
+        <div className="container mx-auto py-3">
           <div className="flex justify-between items-center gap-3">
             <Link to="/dashboard" className="flex items-center gap-3" aria-label="SimiAru, ir al panel">
               <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
@@ -241,7 +241,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-7xl">
+      <main className="container mx-auto py-8 max-w-7xl">
         {/* ==================== SALUDO ==================== */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">

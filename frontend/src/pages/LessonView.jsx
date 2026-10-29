@@ -239,7 +239,7 @@ const LessonView = ({ user, isGuest }) => {
         <span className="burbuja burbuja-verde" aria-hidden="true" />
         <span className="burbuja burbuja-azul" aria-hidden="true" />
         <span className="burbuja burbuja-morada" aria-hidden="true" />
-        <main className="container mx-auto px-4 max-w-2xl">
+        <main className="container mx-auto max-w-2xl">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8 text-center anim-entra">
             {/* Pop in del trofeo; si aprobó, papelitos que salen de él */}
             <div className="relative w-24 h-24 mx-auto mb-6" aria-hidden="true">
@@ -330,7 +330,7 @@ const LessonView = ({ user, isGuest }) => {
     return (
       <div className="min-h-screen bg-stone-50 text-stone-900">
         <header className={`${theme.header} text-white`}>
-          <div className="container mx-auto px-4 py-6 max-w-4xl">
+          <div className="container mx-auto py-6 max-w-4xl">
             <div className={`mb-4 ${theme.headerSoft} hover:text-white`}>{backLink}</div>
             <p className={`${theme.headerSoft} font-semibold`}>{theme.name}</p>
             <div className="flex flex-wrap items-end justify-between gap-2">
@@ -342,7 +342,7 @@ const LessonView = ({ user, isGuest }) => {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <main className="container mx-auto py-8 max-w-4xl">
           {lesson.contenido_teorico && (
             <section className="bg-white rounded-2xl border border-stone-200 p-6 mb-6" aria-labelledby="teoria-titulo">
               <h2 id="teoria-titulo" className="font-bold mb-2">Qué aprenderás</h2>
@@ -437,7 +437,7 @@ const LessonView = ({ user, isGuest }) => {
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 py-6 sm:py-8">
-      <main className="container mx-auto px-4 max-w-4xl">
+      <main className="container mx-auto max-w-4xl">
         <div className="flex items-center justify-between gap-4 mb-6">
           <button
             type="button"

@@ -203,7 +203,7 @@ const Profile = ({ user, setUser }) => {
     <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-40 border-b border-stone-200">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+        <div className="container mx-auto py-3 flex items-center gap-3">
           <Link to="/dashboard" aria-label="Volver al panel" className="w-11 h-11 flex items-center justify-center rounded-xl text-stone-700 hover:bg-stone-100 toque">
             <ArrowLeft className="w-6 h-6" aria-hidden="true" />
           </Link>
@@ -212,7 +212,7 @@ const Profile = ({ user, setUser }) => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
+      <main className="container mx-auto py-8 max-w-5xl">
         {loading ? (
           <p className="text-center py-20 text-lg font-semibold text-stone-700" role="status">
             Cargando tu perfil…

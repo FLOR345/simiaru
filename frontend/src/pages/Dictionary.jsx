@@ -121,7 +121,7 @@ const Dictionary = () => {
     <div className="min-h-screen bg-stone-50 text-stone-900">
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-50 border-b border-stone-200">
-        <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+        <div className="container mx-auto py-3 flex items-center gap-3">
           <Link
             to={backTo}
             aria-label={backTo === '/' ? 'Volver a la portada' : 'Volver al panel'}
@@ -139,7 +139,7 @@ const Dictionary = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
+      <main className="container mx-auto py-8 max-w-5xl">
         {/* ==================== IDIOMA ==================== */}
         <section className="mb-6" aria-label="Idioma">
           <div className="grid grid-cols-2 gap-3 sm:gap-4">

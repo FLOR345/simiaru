@@ -421,7 +421,7 @@ const Home = ({ enableGuestMode }) => {
       {/* ==================== ENCABEZADO ==================== */}
       {/* Material translúcido: el contenido pasa por debajo; el borde aparece solo cuando hay contenido detrás */}
       <header ref={headerRef} data-scrolled={scrolled} className="material-cabecera fixed top-0 w-full z-50">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="container mx-auto py-3 sm:py-4">
           <div className="flex justify-between items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
               <img src={logo} alt="" width="253" height="299" className="h-10 sm:h-12 w-auto" />
@@ -545,7 +545,7 @@ const Home = ({ enableGuestMode }) => {
           <span className="burbuja burbuja-verde" aria-hidden="true" />
           <span className="burbuja burbuja-azul" aria-hidden="true" />
           <span className="burbuja burbuja-morada" aria-hidden="true" />
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Motion: cada bloque entra después del anterior (stagger), subiendo y saliendo de un leve desenfoque */}
               <m.div className="space-y-8" initial="oculto" animate="visible" variants={HERO_LIST}>
@@ -616,42 +616,65 @@ const Home = ({ enableGuestMode }) => {
                 </m.div>
               </m.div>
 
-              {/* Foto del Titicaca con la mascota encima */}
-              {/* Motion: la foto llega desde la derecha */}
-              <m.div className="relative pb-10 lg:pb-0" initial={{ opacity: 0, x: 60, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}>
-                {/* Resplandores de color detrás de la foto, como en la primera versión */}
-                <span className="absolute -z-10 -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-25" aria-hidden="true" />
-                <span className="absolute -z-10 -bottom-10 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-20" aria-hidden="true" />
-                <figure className="foto-entrada rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
+              {/* La llama es la imagen principal (como en la primera versión); el Titicaca va detrás como una foto impresa */}
+              <m.div
+                className="relative mx-auto w-full max-w-md py-8 sm:py-10"
+                initial={{ opacity: 0, x: 60, scale: 0.96 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}
+              >
+                {/* Resplandores de color detrás, como en la primera versión */}
+                <span className="absolute -z-10 -top-6 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-30" aria-hidden="true" />
+                <span className="absolute -z-10 -bottom-6 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-25" aria-hidden="true" />
+
+                {/* Foto del Titicaca como copia impresa inclinada, detrás de la tarjeta */}
+                <m.figure
+                  className="absolute -right-1 sm:-right-12 -top-2 w-40 sm:w-52 bg-white p-2 rounded-2xl shadow-xl rotate-6"
+                  initial={{ opacity: 0, rotate: 18, y: 20 }}
+                  animate={{ opacity: 1, rotate: 6, y: 0 }}
+                  transition={{ type: 'spring', bounce: 0.35, duration: 0.9, delay: 0.7 }}
+                >
                   <img
                     src={fotoTiticaca}
-                    alt="Amanecer sobre el lago Titicaca, con los totorales de Puno en sombra"
+                    alt="Amanecer sobre el lago Titicaca, en Puno"
                     width="1920"
                     height="929"
-                    fetchpriority="high"
-                    className="w-full h-full object-cover"
+                    className="w-full aspect-[4/3] object-cover rounded-xl"
                   />
-                </figure>
-                {/* La llama entra con un pequeño rebote */}
-                <m.div className="absolute -bottom-2 left-4 sm:left-6 lg:-left-8 lg:bottom-8 bg-white rounded-3xl border border-stone-200 p-3 sm:p-4 shadow-xl" initial={{ opacity: 0, scale: 0.6, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ type: "spring", bounce: 0.45, duration: 0.8, delay: 0.9 }}>
-                  <img
+                </m.figure>
+
+                {/* Tarjeta principal con la llama */}
+                <div className="relative z-10 mx-auto max-w-xs sm:max-w-sm bg-white rounded-[2rem] border border-white shadow-2xl px-8 pt-8 pb-7 text-center">
+                  {/* Motion: la llama entra con un rebote y luego "respira" arriba y abajo */}
+                  <m.img
                     src={logo}
                     alt="Mascota de SimiAru: una llama con chullo y chalina andina"
                     width="253"
                     height="299"
-                    className="w-24 sm:w-32 h-auto"
+                    fetchpriority="high"
+                    className="w-52 sm:w-60 lg:w-64 h-auto mx-auto"
+                    initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0, y: [0, -10, 0] }}
+                    transition={{
+                      opacity: { duration: 0.4, delay: 0.5 },
+                      scale: { type: 'spring', bounce: 0.45, duration: 0.8, delay: 0.5 },
+                      rotate: { type: 'spring', bounce: 0.45, duration: 0.8, delay: 0.5 },
+                      y: { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: 1.4 },
+                    }}
                   />
-                </m.div>
+                  <p className="mt-4 text-2xl font-black texto-degradado">¡Rimaykullayki! ¡Kamisaraki!</p>
+                  <p className="mt-1 text-sm font-semibold text-stone-600">"Hola" en quechua y en aymara</p>
+                </div>
 
                 {/* Etiquetas flotantes de la primera versión, con lo que SimiAru sí tiene */}
                 {/* Motion: las etiquetas flotan arriba y abajo, cada una a su ritmo */}
-                <m.div className="etiqueta-flotante absolute -top-4 -right-2 sm:-right-5 rotate-3 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
+                <m.div className="etiqueta-flotante absolute z-20 top-10 -left-2 sm:-left-8 -rotate-6 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
                   <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
                     <Trophy className="w-5 h-5" />
                     Ayni Points
                   </span>
                 </m.div>
-                <m.div className="etiqueta-flotante absolute bottom-16 -right-2 sm:-right-5 lg:bottom-24 -rotate-3 bg-gradient-to-br from-blue-700 to-purple-700 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -10, 0] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>
+                <m.div className="etiqueta-flotante absolute z-20 -bottom-1 -right-2 sm:-right-8 rotate-3 bg-gradient-to-br from-blue-700 to-purple-700 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -10, 0] }} transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}>
                   <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
                     <Zap className="w-5 h-5" />
                     Racha diaria
@@ -672,7 +695,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== LA PALABRA VIVA ==================== */}
         <section id="palabra" className="py-24 bg-white">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Prueba una <span className="texto-degradado-corto">palabra</span>
@@ -691,7 +714,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== CÓMO FUNCIONA ==================== */}
         <section id="how-it-works" className="py-24 bg-stone-50">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Aprende en <span className="texto-degradado-corto">3 pasos</span>
@@ -733,7 +756,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== QUÉ INCLUYE ==================== */}
         <section id="features" className="py-24 bg-white">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Qué incluye <span className="texto-degradado-corto">SimiAru</span>
@@ -792,7 +815,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== IDIOMAS ==================== */}
         <section id="languages" className="py-24 bg-stone-50">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Elige tu idioma</h2>
               <BlurText text="Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
@@ -916,7 +939,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== CULTURA VIVA ==================== */}
         <section id="cultura" className="py-24 bg-white overflow-hidden">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Cultura <span className="texto-degradado-corto">viva</span>
@@ -954,7 +977,7 @@ const Home = ({ enableGuestMode }) => {
 
         {/* ==================== EL PROYECTO ==================== */}
         <section id="proyecto" className="py-24 bg-stone-50">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto">
             <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Una herramienta <span className="texto-degradado-corto">abierta</span> para lenguas originarias
@@ -980,7 +1003,7 @@ const Home = ({ enableGuestMode }) => {
         <section className="relative isolate overflow-hidden py-24 bg-gradient-to-br from-green-700 via-blue-700 to-purple-700">
           <span className="burbuja -z-10 bg-white opacity-15 top-[-6rem] left-[-6rem]" aria-hidden="true" />
           <span className="burbuja -z-10 bg-white opacity-10 bottom-[-8rem] right-[-6rem] [animation-delay:-6s]" aria-hidden="true" />
-          <div className="container mx-auto px-6 text-center">
+          <div className="container mx-auto text-center">
             <div className="max-w-4xl mx-auto space-y-8">
               <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight">
                 Empieza con la <span className="text-yellow-300">Unidad 1</span>
@@ -1021,7 +1044,7 @@ const Home = ({ enableGuestMode }) => {
 
       {/* ==================== PIE DE PÁGINA ==================== */}
       <footer className="bg-stone-900 text-white py-16">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
