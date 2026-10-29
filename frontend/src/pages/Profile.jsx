@@ -6,6 +6,9 @@ import axios from 'axios';
 import logo from '../assets/logo.jpg';
 import { API_URL } from '../config.js';
 import { getLevel } from '../utils/levels.js';
+import { RingProgress } from '@mantine/core';
+import MantineShell from '../ui/MantineShell';
+import Reveal from '../ui/Reveal';
 
 const authHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
@@ -196,7 +199,8 @@ const Profile = ({ user, setUser }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900">
+    <MantineShell>
+    <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
       {/* ==================== ENCABEZADO ==================== */}
       <header className="bg-white sticky top-0 z-40 border-b border-stone-200">
         <div className="container mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
@@ -276,20 +280,38 @@ const Profile = ({ user, setUser }) => {
             {/* ==================== INSIGNIAS ==================== */}
             {badges.length > 0 && (
               <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="insignias-titulo">
-                <h2 id="insignias-titulo" className="text-2xl font-bold">
-                  Insignias
-                </h2>
-                <p className="text-stone-600 mb-5">
-                  {obtainedBadges} de {badges.length} obtenidas
-                </p>
+                <div className="flex items-center gap-4 mb-5">
+                  {/* Mantine RingProgress: cuántas insignias llevas, de un vistazo */}
+                  <RingProgress
+                    size={84}
+                    thickness={9}
+                    roundCaps
+                    rootColor="#e7e5e4"
+                    sections={[{ value: badges.length ? (obtainedBadges / badges.length) * 100 : 0, color: 'yellow.6' }]}
+                    label={<Award className="w-7 h-7 text-amber-600 mx-auto" aria-hidden="true" />}
+                  />
+                  <div>
+                    <h2 id="insignias-titulo" className="text-2xl font-black">
+                      Insignias
+                    </h2>
+                    <p className="text-stone-600">
+                      {obtainedBadges} de {badges.length} obtenidas
+                    </p>
+                  </div>
+                </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {badges.map((badge) => (
-                    <li
+                  {badges.map((badge, i) => (
+                    <Reveal
+                      as="li"
                       key={badge.id}
-                      className={`flex items-start gap-3 p-4 rounded-2xl border-2 ${badge.obtenida ? 'border-amber-500 bg-amber-50' : 'border-stone-200 bg-stone-50'}`}
+                      delay={Math.min(i, 8) * 0.05}
+                      y={12}
+                      className={`tarjeta-viva flex items-start gap-3 p-4 rounded-2xl border-2 ${badge.obtenida ? 'border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-100 shadow-md' : 'border-stone-200 bg-stone-50'}`}
                     >
                       {badge.obtenida ? (
-                        <Award className="w-8 h-8 text-amber-700 shrink-0" aria-hidden="true" />
+                        <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-md shrink-0" aria-hidden="true">
+                          <Award className="w-6 h-6 text-white" />
+                        </span>
                       ) : (
                         <Lock className="w-8 h-8 text-stone-400 shrink-0" aria-hidden="true" />
                       )}
@@ -301,7 +323,7 @@ const Profile = ({ user, setUser }) => {
                         {badge.descripcion && <p className="text-sm text-stone-600">{badge.descripcion}</p>}
                         {badge.obtenida && badge.fecha_obtencion && <p className="text-sm text-amber-900 mt-1">Obtenida el {formatDate(badge.fecha_obtencion)}</p>}
                       </div>
-                    </li>
+                    </Reveal>
                   ))}
                 </ul>
               </section>
@@ -463,6 +485,7 @@ const Profile = ({ user, setUser }) => {
         </form>
       </Modal>
     </div>
+    </MantineShell>
   );
 };
 

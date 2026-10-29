@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect, Suspense, lazy } from 'react';
+import { LazyMotion, MotionConfig } from 'motion/react';
+
+// Motion: los componentes "m" son livianos; el motor (con layout) llega aparte, sin frenar la primera pantalla
+const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod.default);
 
 // Sonner llega en su propio archivo, después de la primera pantalla: los avisos siempre
 // responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
@@ -108,6 +112,9 @@ function App() {
   }, [loading, hasSession]);
 
   return (
+    <LazyMotion features={loadMotionFeatures}>
+    {/* reducedMotion="user": con "reducir movimiento" del sistema, Motion quita desplazamientos y deja los fundidos */}
+    <MotionConfig reducedMotion="user">
     <BrowserRouter>
       {/* Avisos de toda la app (progreso guardado, insignias, favoritos, perfil).
           Arriba al centro: nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
@@ -156,6 +163,8 @@ function App() {
       </Routes>
       </Suspense>
     </BrowserRouter>
+    </MotionConfig>
+    </LazyMotion>
   );
 }
 

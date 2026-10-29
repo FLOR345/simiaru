@@ -7,6 +7,11 @@ import logo from '../assets/logo.jpg';
 // URL del backend
 import { API_URL } from '../config.js';
 import { getLevel } from '../utils/levels.js';
+import { SegmentedControl, RingProgress, Tooltip } from '@mantine/core';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
+import MantineShell from '../ui/MantineShell';
+import { CountUp } from '../ui/lazyBits';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 const LANGUAGE_STYLE = {
@@ -123,6 +128,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       icon: 'from-orange-500 to-orange-700',
       label: 'Racha',
       value: formatNumber(displayUser?.racha_actual),
+      count: isGuest ? undefined : Number(displayUser?.racha_actual || 0),
       detail: isGuest ? 'Regístrate para guardar tu racha' : 'días seguidos',
     },
     {
@@ -132,6 +138,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       icon: 'from-amber-500 to-amber-700',
       label: 'Ayni Points',
       value: formatNumber(displayUser?.puntos_totales),
+      count: isGuest ? undefined : Number(displayUser?.puntos_totales || 0),
       detail: isGuest ? 'Regístrate para ganar puntos' : 'puntos ganados',
     },
     {
@@ -157,6 +164,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const navLink = 'flex items-center gap-2 min-h-11 px-2 text-stone-700 hover:text-green-800 font-semibold rounded-lg toque';
 
   return (
+    <MantineShell>
     <div className="min-h-screen bg-gradient-to-br from-green-50/70 via-stone-50 to-purple-50/70 text-stone-900">
       {/* ==================== AVISO MODO INVITADO ==================== */}
       {isGuest && (
@@ -184,18 +192,23 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
           <div className="flex justify-between items-center gap-3">
             <Link to="/dashboard" className="flex items-center gap-3" aria-label="SimiAru, ir al panel">
               <img src={logo} alt="" width="253" height="299" className="h-10 w-auto" />
-              <span className="text-2xl font-extrabold text-green-800 hidden md:block">SimiAru</span>
+              <span className="text-2xl font-black texto-degradado hidden md:block">SimiAru</span>
             </Link>
 
             <nav className="flex items-center gap-1 sm:gap-3" aria-label="Principal">
-              <Link to="/dictionary" className={navLink} aria-label="Diccionario">
-                <BookOpen className="w-5 h-5" aria-hidden="true" />
-                <span className="hidden lg:inline">Diccionario</span>
-              </Link>
-              <Link to="/culture" className={navLink} aria-label="Cultura">
-                <Sparkles className="w-5 h-5" aria-hidden="true" />
-                <span className="hidden lg:inline">Cultura</span>
-              </Link>
+              {/* Mantine Tooltip: en pantallas medianas los íconos dicen qué son al pasar el mouse o enfocarlos */}
+              <Tooltip label="Diccionario" withArrow openDelay={300} transitionProps={{ transition: 'pop', duration: 150 }}>
+                <Link to="/dictionary" className={navLink} aria-label="Diccionario">
+                  <BookOpen className="w-5 h-5" aria-hidden="true" />
+                  <span className="hidden lg:inline">Diccionario</span>
+                </Link>
+              </Tooltip>
+              <Tooltip label="Cultura" withArrow openDelay={300} transitionProps={{ transition: 'pop', duration: 150 }}>
+                <Link to="/culture" className={navLink} aria-label="Cultura">
+                  <Sparkles className="w-5 h-5" aria-hidden="true" />
+                  <span className="hidden lg:inline">Cultura</span>
+                </Link>
+              </Tooltip>
 
               {!isGuest ? (
                 <Link to="/profile" className={navLink} aria-label={`Tu perfil, ${displayUser?.nombre || ''}`}>
@@ -213,15 +226,16 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                 </span>
               )}
 
-              <button
-                type="button"
-                onClick={handleLogout}
-                aria-label={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'}
-                title={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'}
-                className="w-11 h-11 flex items-center justify-center text-red-700 hover:bg-red-50 rounded-lg toque"
-              >
-                <LogOut className="w-5 h-5" aria-hidden="true" />
-              </button>
+              <Tooltip label={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'} withArrow openDelay={300} transitionProps={{ transition: 'pop', duration: 150 }}>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  aria-label={isGuest ? 'Salir del modo invitado' : 'Cerrar sesión'}
+                  className="w-11 h-11 flex items-center justify-center text-red-700 hover:bg-red-50 rounded-lg toque"
+                >
+                  <LogOut className="w-5 h-5" aria-hidden="true" />
+                </button>
+              </Tooltip>
             </nav>
           </div>
         </div>
@@ -288,7 +302,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
         {/* ==================== ESTADÍSTICAS ==================== */}
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {stats.map(({ Icon, iconClass, card, icon, label, value, detail }, i) => (
+          {stats.map(({ Icon, card, icon, label, value, count, detail }, i) => (
             <li key={label} className={`tarjeta-viva anim-entra bg-gradient-to-br ${isGuest ? "from-white to-stone-100" : card} rounded-3xl border border-white shadow-sm p-5 sm:p-6`} style={{ "--i": i }}>
               <div className="flex items-center gap-2 mb-3">
                 <span className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br ${isGuest ? "from-stone-300 to-stone-400" : icon}`} aria-hidden="true">
@@ -296,7 +310,10 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
                 </span>
                 <span className="text-sm font-bold text-stone-600">{label}</span>
               </div>
-              <p className="text-[clamp(1.25rem,6vw,1.875rem)] sm:text-4xl font-extrabold mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">{value}</p>
+              <p className="text-[clamp(1.25rem,6vw,1.875rem)] sm:text-4xl font-extrabold mb-1 tabular-nums whitespace-nowrap [overflow-wrap:normal]">
+                {/* Count Up: los números suben al aparecer */}
+                {typeof count === "number" ? <CountUp to={count} separator="," duration={1.4} delay={i * 0.1} /> : value}
+              </p>
               <p className="text-sm text-stone-600">{detail}</p>
             </li>
           ))}
@@ -307,26 +324,23 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
           <h2 id="idioma-titulo" className="text-2xl font-bold">Idioma</h2>
           <p className="text-stone-600 mb-6">Cambia entre quechua y aymara cuando quieras</p>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {Object.entries(LANGUAGE_STYLE).map(([key, style]) => {
-              const selected = selectedLanguage === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => setSelectedLanguage(key)}
-                  className={`text-left p-6 rounded-2xl border-2 toque ${selected ? style.selected : 'border-stone-200 bg-white hover:border-stone-400'}`}
-                >
-                  <span className="flex items-center justify-between mb-2">
-                    <span className={`text-2xl font-bold ${style.accent}`}>{style.label}</span>
-                    {selected && <CheckCircle className={`w-7 h-7 ${style.accent}`} aria-hidden="true" />}
-                  </span>
-                  <span className="block text-stone-600">{style.region}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* Mantine SegmentedControl: el indicador de color se desliza al lenguaje elegido */}
+          <SegmentedControl
+            fullWidth
+            size="lg"
+            radius="xl"
+            value={selectedLanguage}
+            onChange={setSelectedLanguage}
+            color={selectedLanguage === 'aymara' ? '#1e40af' : '#15803d'}
+            transitionDuration={250}
+            transitionTimingFunction="cubic-bezier(0.23, 1, 0.32, 1)"
+            aria-label="Idioma"
+            data={Object.entries(LANGUAGE_STYLE).map(([key, style]) => ({ value: key, label: style.label }))}
+            styles={{ root: { padding: 6 }, label: { fontWeight: 800, fontSize: '1.125rem' } }}
+          />
+          <p key={selectedLanguage} className="mt-4 text-stone-600 anim-entra">
+            {LANGUAGE_STYLE[selectedLanguage].region}
+          </p>
         </section>
 
         {/* ==================== RUTA DE APRENDIZAJE ==================== */}
@@ -338,18 +352,22 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
             </div>
 
             {!isGuest && overallProgress > 0 && (
-              <div className="w-48">
-                <p className="text-right text-2xl font-extrabold mb-1">{overallProgress}%</p>
-                <div
-                  className="w-full bg-stone-200 rounded-full h-3 overflow-hidden"
-                  role="progressbar"
-                  aria-label={`Progreso en ${lang.label}`}
-                  aria-valuenow={overallProgress}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
-                  <Barra value={overallProgress} className={lang.bar} />
-                </div>
+              // Mantine RingProgress: el avance del idioma como un anillo con el porcentaje al centro
+              <div
+                role="progressbar"
+                aria-label={`Progreso en ${lang.label}`}
+                aria-valuenow={overallProgress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <RingProgress
+                  size={104}
+                  thickness={10}
+                  roundCaps
+                  rootColor="#e7e5e4"
+                  sections={[{ value: overallProgress, color: selectedLanguage === 'aymara' ? '#1e40af' : '#15803d' }]}
+                  label={<p className="text-center text-xl font-black tabular-nums">{overallProgress}%</p>}
+                />
               </div>
             )}
           </div>
@@ -423,6 +441,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         )}
       </main>
     </div>
+    </MantineShell>
   );
 };
 
@@ -531,7 +550,17 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
         </button>
       )}
 
+      {/* Motion: la unidad se despliega con su altura real (auto) y se pliega igual al cerrarla */}
+      <AnimatePresence initial={false}>
       {expanded && !isLockedForGuest && (
+        <m.div
+          key="panel"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+          className="overflow-hidden"
+        >
         <div id={panelId} className="border-t-2 border-stone-100 bg-stone-50 p-4 sm:p-6">
           {loading ? (
             <p className="text-center py-8 text-stone-600" role="status">
@@ -604,7 +633,9 @@ const UnitCard = ({ unit, index, isLessonCompleted, style, isGuest }) => {
             </ol>
           )}
         </div>
+        </m.div>
       )}
+      </AnimatePresence>
     </li>
   );
 };

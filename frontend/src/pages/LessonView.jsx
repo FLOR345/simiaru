@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
 import { api } from '../services/api';
 import ExerciseTypes from '../components/lessons/ExerciseTypes';
 import { Volume2, X, Check, ArrowLeft, ArrowRight, Star, Trophy, AlertCircle, RefreshCw, UserX } from 'lucide-react';
@@ -476,7 +478,14 @@ const LessonView = ({ user, isGuest }) => {
 
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
           {/* key: cada pregunta nueva entra desde un poco más abajo en vez de reemplazar a la anterior de golpe */}
-          <div key={currentExercise} className="anim-entra">
+          <AnimatePresence mode="wait" initial={false}>
+          <m.div
+            key={currentExercise}
+            initial={{ opacity: 0, x: 32 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -32 }}
+            transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+          >
           <ExerciseTypes
             exercise={exercise}
             onAnswer={handleAnswer}
@@ -484,7 +493,8 @@ const LessonView = ({ user, isGuest }) => {
             answered={!!feedback}
             languageLabel={theme.name}
           />
-          </div>
+          </m.div>
+          </AnimatePresence>
 
           {/* Corrección: se anuncia y espera a que la persona pulse Continuar.
               Entra desde abajo; si es correcta el ícono hace pop, si no, el mensaje se sacude suave */}

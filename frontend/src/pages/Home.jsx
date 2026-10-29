@@ -3,6 +3,13 @@ import { Mountain, Heart, BookOpen, Globe, Trophy, Zap, Target, CheckCircle, Arr
 import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../config';
 import { preloadOn, Register, Login, Dashboard, Dictionary } from '../routes';
+import { AnimatePresence, useReducedMotion } from 'motion/react';
+import * as m from 'motion/react-m';
+import Reveal from '../ui/Reveal';
+// React Bits (reactbits.dev, licencia MIT + Commons Clause): componentes copiados al proyecto
+import { CountUp, SpotlightCard, TiltedCard } from '../ui/lazyBits';
+import Magnet from '../components/reactbits/Magnet';
+import ShinyText from '../components/reactbits/ShinyText';
 import logo from '../assets/logo.jpg';
 import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
 import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
@@ -67,11 +74,11 @@ const STEP_COLORS = [
   { circle: 'from-purple-600 to-purple-800', glow: 'bg-purple-200' },
 ];
 const CARD_COLORS = [
-  { card: 'from-blue-50 to-blue-100/60', deco: 'bg-blue-600/10', icon: 'from-blue-600 to-blue-800', tag: 'text-blue-800' },
-  { card: 'from-green-50 to-green-100/60', deco: 'bg-green-600/10', icon: 'from-green-600 to-green-800', tag: 'text-green-800' },
-  { card: 'from-purple-50 to-purple-100/60', deco: 'bg-purple-600/10', icon: 'from-purple-600 to-purple-800', tag: 'text-purple-800' },
-  { card: 'from-amber-50 to-orange-100/60', deco: 'bg-orange-600/10', icon: 'from-orange-600 to-orange-800', tag: 'text-orange-800' },
-  { card: 'from-pink-50 to-rose-100/60', deco: 'bg-rose-600/10', icon: 'from-rose-600 to-pink-700', tag: 'text-rose-800' },
+  { card: 'from-blue-50 to-blue-100/60', deco: 'bg-blue-600/10', icon: 'from-blue-600 to-blue-800', tag: 'text-blue-800', spot: '#3b82f6' },
+  { card: 'from-green-50 to-green-100/60', deco: 'bg-green-600/10', icon: 'from-green-600 to-green-800', tag: 'text-green-800', spot: '#22c55e' },
+  { card: 'from-purple-50 to-purple-100/60', deco: 'bg-purple-600/10', icon: 'from-purple-600 to-purple-800', tag: 'text-purple-800', spot: '#a855f7' },
+  { card: 'from-amber-50 to-orange-100/60', deco: 'bg-orange-600/10', icon: 'from-orange-600 to-orange-800', tag: 'text-orange-800', spot: '#f97316' },
+  { card: 'from-pink-50 to-rose-100/60', deco: 'bg-rose-600/10', icon: 'from-rose-600 to-pink-700', tag: 'text-rose-800', spot: '#f43f5e' },
 ];
 
 const STEPS = [
@@ -95,11 +102,17 @@ const FEATURES = [
   [Shield, 'Sin publicidad', 'Aprende sin anuncios ni interrupciones', 'Gratis y de código abierto'],
 ];
 
+// [número, sufijo, etiqueta]: los números suben con Count Up al aparecer en pantalla
 const PROJECT_STATS = [
-  ['26', 'Lecciones'],
-  ['1,500+', 'Palabras en el diccionario'],
-  ['285', 'Ejercicios'],
-  ['69', 'Contenidos culturales'],
+  [26, '', 'Lecciones'],
+  [1500, '+', 'Palabras en el diccionario'],
+  [285, '', 'Ejercicios'],
+  [69, '', 'Contenidos culturales'],
+];
+const HERO_STATS = [
+  [100, '%', 'Gratis'],
+  [2, '', 'Idiomas'],
+  [26, '', 'Lecciones'],
 ];
 
 const NAV_LINKS = [
@@ -302,6 +315,7 @@ const miniatura = 'inline-block h-[0.95em] w-[1.5em] mx-1 align-[-0.15em] object
 const Home = ({ enableGuestMode }) => {
   const [activeTab, setActiveTab] = useState('quechua');
   const [menuOpen, setMenuOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const navigate = useNavigate();
 
   const headerRef = useRef(null);
@@ -466,8 +480,18 @@ const Home = ({ enableGuestMode }) => {
           </div>
 
           {/* Menú de celular y tablet */}
+          {/* Motion: el menú baja al abrirse y vuelve a subir al cerrarse (mismo camino de ida y vuelta) */}
+          <AnimatePresence initial={false}>
           {menuOpen && (
-            <nav id="menu-movil" aria-label="Menú" className="menu-entrada xl:hidden mt-3 pt-2 pb-2 border-t border-stone-900/10">
+            <m.nav
+              id="menu-movil"
+              aria-label="Menú"
+              className="xl:hidden mt-3 pt-2 pb-2 border-t border-stone-900/10 overflow-hidden"
+              initial={{ opacity: 0, height: 0, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, height: 'auto', filter: 'blur(0px)' }}
+              exit={{ opacity: 0, height: 0, filter: 'blur(4px)' }}
+              transition={{ duration: reduceMotion ? 0.15 : 0.25, ease: [0.23, 1, 0.32, 1] }}
+            >
               <ul>
                 {NAV_LINKS.map(([href, label]) => (
                   <li key={href}>
@@ -500,8 +524,9 @@ const Home = ({ enableGuestMode }) => {
                   Iniciar sesión
                 </Link>
               </div>
-            </nav>
+            </m.nav>
           )}
+          </AnimatePresence>
         </div>
       </header>
 
@@ -517,7 +542,9 @@ const Home = ({ enableGuestMode }) => {
               <div className="space-y-8">
                 <p className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-green-700/20 rounded-full text-sm font-bold">
                   <Sparkles className="w-4 h-4 text-green-700" aria-hidden="true" />
-                  <span className="texto-degradado-corto">Gratis • Sin publicidad • Código abierto</span>
+                  {/* Shiny Text: un brillo que cruza la etiqueta cada pocos segundos */}
+                  <ShinyText text="Gratis • Sin publicidad • Código abierto" color="#166534" shineColor="#86efac" speed={3} delay={2} />
+
                 </p>
 
                 <div className="space-y-5">
@@ -532,13 +559,16 @@ const Home = ({ enableGuestMode }) => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    to="/register" {...preloadOn(Register)}
-                    className="group px-9 py-4 boton-degradado font-bold rounded-2xl shadow-lg text-center text-lg flex items-center justify-center gap-3"
-                  >
-                    Empezar gratis
-                    <ArrowRight className="w-6 h-6 motion-safe:group-hover:translate-x-1 transition-transform duration-200 ease-out" />
-                  </Link>
+                  {/* Magnet: el botón principal se acerca un poco al mouse (en pantallas táctiles no hace nada) */}
+                  <Magnet padding={60} magnetStrength={5} wrapperClassName="block sm:inline-block" innerClassName="block">
+                    <Link
+                      to="/register" {...preloadOn(Register)}
+                      className="group px-9 py-4 boton-degradado font-bold rounded-2xl shadow-lg text-center text-lg flex items-center justify-center gap-3"
+                    >
+                      Empezar gratis
+                      <ArrowRight className="w-6 h-6 motion-safe:group-hover:translate-x-1 transition-transform duration-200 ease-out" />
+                    </Link>
+                  </Magnet>
                   <button
                     type="button"
                     onClick={handleGuestMode} {...preloadOn(Dashboard)}
@@ -555,9 +585,11 @@ const Home = ({ enableGuestMode }) => {
                 </p>
 
                 <div className="grid grid-cols-3 gap-6 pt-8 border-t-2 border-stone-200/70">
-                  {[['100%', 'Gratis'], ['2', 'Idiomas'], ['26', 'Lecciones']].map(([value, label]) => (
+                  {HERO_STATS.map(([value, suffix, label], i) => (
                     <div key={label}>
-                      <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black texto-degradado-corto mb-1">{value}</div>
+                      <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black texto-degradado-corto mb-1 tabular-nums">
+                        {value}{suffix}
+                      </div>
                       <div className="text-sm text-stone-600 font-semibold">{label}</div>
                     </div>
                   ))}
@@ -618,7 +650,7 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== LA PALABRA VIVA ==================== */}
         <section id="palabra" className="py-24 bg-white">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-12 space-y-4">
+            <Reveal className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Prueba una <span className="texto-degradado-corto">palabra</span>
               </h2>
@@ -629,7 +661,7 @@ const Home = ({ enableGuestMode }) => {
                 <span className="whitespace-nowrap">chacra<img className={miniatura} src={fotoPapas} alt="" width="1300" height="747" loading="lazy" /></span> y de la{' '}
                 <span className="whitespace-nowrap">fiesta<img className={miniatura} src={fotoSikuris} alt="" width="1100" height="875" loading="lazy" />,</span> en quechua y en aymara
               </p>
-            </div>
+            </Reveal>
             <PalabraViva />
           </div>
         </section>
@@ -637,12 +669,12 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== CÓMO FUNCIONA ==================== */}
         <section id="how-it-works" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 space-y-4">
+            <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Aprende en <span className="texto-degradado-corto">3 pasos</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Tu viaje hacia las lenguas andinas comienza aquí</p>
-            </div>
+            </Reveal>
 
             <ol className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
               {STEPS.map(([title, text], i) => (
@@ -679,20 +711,27 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== QUÉ INCLUYE ==================== */}
         <section id="features" className="py-24 bg-white">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 space-y-4">
+            <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Qué incluye <span className="texto-degradado-corto">SimiAru</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 Vocabulario, ejercicios y cultura del altiplano en un solo lugar, gratis y sin publicidad
               </p>
-            </div>
+            </Reveal>
 
             <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {FEATURES.map(([Icon, title, text, tag], i) => {
                 const color = CARD_COLORS[i % CARD_COLORS.length];
                 return (
-                <li key={title} className={`tarjeta-viva group relative overflow-hidden bg-gradient-to-br ${color.card} rounded-3xl p-7 sm:p-8`}>
+                <Reveal as="li" key={title} delay={(i % 3) * 0.08}>
+                {/* Spotlight Card: una luz de color sigue al mouse dentro de la tarjeta */}
+                <SpotlightCard
+                  theme="light"
+                  spotlightColor={color.spot}
+                  intensity={0.35}
+                  className={`tarjeta-viva group h-full bg-gradient-to-br ${color.card} !p-7 sm:!p-8`}
+                >
                   {/* Cuadro decorativo inclinado que se endereza al pasar el mouse */}
                   <span className={`absolute top-6 right-6 w-16 h-16 ${color.deco} rounded-2xl rotate-12 transition-transform duration-300 ease-out motion-safe:group-hover:rotate-0`} aria-hidden="true" />
                   <div className={`relative w-14 h-14 bg-gradient-to-br ${color.icon} rounded-2xl flex items-center justify-center mb-5 shadow-lg`}>
@@ -704,7 +743,8 @@ const Home = ({ enableGuestMode }) => {
                     <CheckCircle className="w-4 h-4" aria-hidden="true" />
                     {tag}
                   </p>
-                </li>
+                </SpotlightCard>
+                </Reveal>
                 );
               })}
 
@@ -732,10 +772,10 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== IDIOMAS ==================== */}
         <section id="languages" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-12 space-y-4">
+            <Reveal className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Elige tu idioma</h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones</p>
-            </div>
+            </Reveal>
 
             <figure className="max-w-5xl mx-auto mb-12">
               <div className="rounded-3xl overflow-hidden aspect-[16/9] sm:aspect-[21/9]">
@@ -769,11 +809,20 @@ const Home = ({ enableGuestMode }) => {
                     tabIndex={selected ? 0 : -1}
                     onKeyDown={handleTabKey}
                     onClick={() => setActiveTab(key)}
-                    className={`px-8 py-3.5 rounded-2xl font-bold text-lg border-2 toque ${
-                      selected ? LANGUAGES[key].tabOn : 'bg-white border-stone-300 text-stone-700 hover:border-stone-400'
+                    className={`relative px-8 py-3.5 rounded-2xl font-bold text-lg border-2 toque ${
+                      selected ? 'border-transparent text-white' : 'bg-white border-stone-300 text-stone-700 hover:border-stone-400'
                     }`}
                   >
-                    {LANGUAGES[key].label}
+                    {/* Motion layoutId: el fondo de color se desliza de una pestaña a la otra */}
+                    {selected && (
+                      <m.span
+                        layoutId="pestana-idioma"
+                        className={`absolute -inset-0.5 rounded-2xl ${LANGUAGES[key].tabOn}`}
+                        transition={reduceMotion ? { duration: 0 } : { type: 'spring', bounce: 0.18, duration: 0.45 }}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="relative">{LANGUAGES[key].label}</span>
                   </button>
                 );
               })}
@@ -847,25 +896,38 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== CULTURA VIVA ==================== */}
         <section id="cultura" className="py-24 bg-white overflow-hidden">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 space-y-4">
+            <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Cultura <span className="texto-degradado-corto">viva</span>
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 69 cuentos, proverbios, adivinanzas y canciones, en quechua y en aymara, cada uno con su traducción
               </p>
-            </div>
+            </Reveal>
 
             <ul className="grid sm:grid-cols-3 gap-10 sm:gap-6 max-w-5xl mx-auto items-center">
-              {FOTOS_CULTURA.map(([src, alt, caption, width, height, giro]) => (
-                <li key={caption}>
-                  <figure className={`copia ${giro} bg-white p-3 pb-4 rounded-xl border border-stone-200 shadow-lg`}>
-                    <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                      <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                    </div>
+              {FOTOS_CULTURA.map(([src, alt, caption, , , giro], i) => (
+                <Reveal as="li" key={caption} delay={i * 0.1}>
+                  <figure className={`copia ${giro} bg-white p-3 pb-4 rounded-2xl border border-stone-200 shadow-lg`}>
+                    {/* Tilted Card: la foto se inclina en 3D hacia el mouse, con un reflejo de luz */}
+                    <TiltedCard
+                      imageSrc={src}
+                      altText={alt}
+                      containerHeight="220px"
+                      containerWidth="100%"
+                      imageHeight="220px"
+                      imageWidth="100%"
+                      rotateAmplitude={10}
+                      scaleOnHover={1.04}
+                      showTooltip={false}
+                      flipOnClick={false}
+                      gyroscope={false}
+                      radius={12}
+                      glare={0.35}
+                    />
                     <figcaption className="mt-3 text-center font-semibold text-stone-700">{caption}</figcaption>
                   </figure>
-                </li>
+                </Reveal>
               ))}
             </ul>
           </div>
@@ -874,19 +936,21 @@ const Home = ({ enableGuestMode }) => {
         {/* ==================== EL PROYECTO ==================== */}
         <section id="proyecto" className="py-24 bg-stone-50">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 space-y-4">
+            <Reveal className="text-center mb-16 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Una herramienta <span className="texto-degradado-corto">abierta</span> para lenguas originarias
               </h2>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
                 SimiAru es un proyecto gratuito y de código abierto para aprender quechua y aymara. Su contenido sigue creciendo y cualquier persona puede revisar y mejorar el código.
               </p>
-            </div>
+            </Reveal>
 
             <ul className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
-              {PROJECT_STATS.map(([value, label]) => (
+              {PROJECT_STATS.map(([value, suffix, label], i) => (
                 <li key={label}>
-                  <div className="text-4xl sm:text-5xl font-black texto-degradado mb-2">{value}</div>
+                  <div className="text-4xl sm:text-5xl font-black texto-degradado mb-2 tabular-nums">
+                    <CountUp to={value} suffix={suffix} separator="," duration={2} delay={i * 0.12} />
+                  </div>
                   <div className="text-stone-600 font-semibold">{label}</div>
                 </li>
               ))}
