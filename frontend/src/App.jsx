@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { LazyMotion, MotionConfig } from 'motion/react';
+// React Bits: chispas verdes en cada clic o toque, en toda la app (sin chispas con "reducir movimiento")
+import ClickSpark from './components/reactbits/ClickSpark';
 
 // Motion: los componentes "m" son livianos; el motor (con layout) llega aparte, sin frenar la primera pantalla
 const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod.default);
@@ -121,6 +123,7 @@ function App() {
       <Suspense fallback={null}>
         <Toaster position="top-center" richColors closeButton duration={4000} toastOptions={{ style: { fontFamily: 'inherit' } }} />
       </Suspense>
+      <ClickSpark sparkColor="#16a34a" sparkCount={10} sparkRadius={26} sparkSize={12} duration={450}>
       <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path="/" element={<Home enableGuestMode={() => setIsGuest(true)} />} />
@@ -162,6 +165,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       </Suspense>
+      </ClickSpark>
     </BrowserRouter>
     </MotionConfig>
     </LazyMotion>

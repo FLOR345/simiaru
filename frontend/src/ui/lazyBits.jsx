@@ -6,6 +6,15 @@ import { lazy, Suspense } from 'react';
 const CountUpLazy = lazy(() => import('../components/reactbits/CountUp'));
 const SpotlightCardLazy = lazy(() => import('../components/reactbits/SpotlightCard'));
 const TiltedCardLazy = lazy(() => import('../components/reactbits/TiltedCard'));
+const BlurTextLazy = lazy(() => import('../components/reactbits/BlurText'));
+
+// Blur Text: las palabras pasan de borrosas a nítidas una tras otra al aparecer en pantalla.
+// Mientras se descarga se ve el párrafo normal, con las mismas clases.
+export const BlurText = ({ text, className = '', ...props }) => (
+  <Suspense fallback={<p className={className}>{text}</p>}>
+    <BlurTextLazy text={text} className={`justify-center ${className}`} {...props} />
+  </Suspense>
+);
 
 const formatNumber = (value, separator) =>
   separator ? String(value).replace(/\B(?=(\d{3})+(?!\d))/g, separator) : String(value);

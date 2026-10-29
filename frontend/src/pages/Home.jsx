@@ -7,9 +7,10 @@ import { AnimatePresence, useReducedMotion } from 'motion/react';
 import * as m from 'motion/react-m';
 import Reveal from '../ui/Reveal';
 // React Bits (reactbits.dev, licencia MIT + Commons Clause): componentes copiados al proyecto
-import { CountUp, SpotlightCard, TiltedCard } from '../ui/lazyBits';
+import { CountUp, SpotlightCard, TiltedCard, BlurText } from '../ui/lazyBits';
 import Magnet from '../components/reactbits/Magnet';
 import ShinyText from '../components/reactbits/ShinyText';
+import StarBorder from '../components/reactbits/StarBorder';
 import logo from '../assets/logo.jpg';
 import fotoTiticaca from '../assets/fotos/titicaca-amanecer.jpg';
 import fotoPuno from '../assets/fotos/puno-titicaca.jpg';
@@ -109,6 +110,13 @@ const PROJECT_STATS = [
   [285, '', 'Ejercicios'],
   [69, '', 'Contenidos culturales'],
 ];
+// Entrada del inicio con Motion: el contenedor reparte el turno a cada bloque
+const HERO_LIST = { oculto: {}, visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } };
+const HERO_ITEM = {
+  oculto: { opacity: 0, y: 28, filter: 'blur(8px)' },
+  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.7, ease: [0.23, 1, 0.32, 1] } },
+};
+
 const HERO_STATS = [
   [100, '%', 'Gratis'],
   [2, '', 'Idiomas'],
@@ -539,15 +547,16 @@ const Home = ({ enableGuestMode }) => {
           <span className="burbuja burbuja-morada" aria-hidden="true" />
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
-                <p className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-green-700/20 rounded-full text-sm font-bold">
+              {/* Motion: cada bloque entra después del anterior (stagger), subiendo y saliendo de un leve desenfoque */}
+              <m.div className="space-y-8" initial="oculto" animate="visible" variants={HERO_LIST}>
+                <m.p variants={HERO_ITEM} className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-green-700/20 rounded-full text-sm font-bold">
                   <Sparkles className="w-4 h-4 text-green-700" aria-hidden="true" />
                   {/* Shiny Text: un brillo que cruza la etiqueta cada pocos segundos */}
                   <ShinyText text="Gratis • Sin publicidad • Código abierto" color="#166534" shineColor="#86efac" speed={3} delay={2} />
 
-                </p>
+                </m.p>
 
-                <div className="space-y-5">
+                <m.div variants={HERO_ITEM} className="space-y-5">
                   <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
                     <span className="text-stone-900">Aprende</span>
                     <br />
@@ -556,9 +565,9 @@ const Home = ({ enableGuestMode }) => {
                   <p className="text-xl sm:text-2xl text-stone-600 leading-relaxed max-w-xl">
                     Lecciones cortas, un diccionario y textos culturales para empezar a aprender las lenguas del altiplano
                   </p>
-                </div>
+                </m.div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <m.div variants={HERO_ITEM} className="flex flex-col sm:flex-row gap-4">
                   {/* Magnet: el botón principal se acerca un poco al mouse (en pantallas táctiles no hace nada) */}
                   <Magnet padding={60} magnetStrength={5} wrapperClassName="block sm:inline-block" innerClassName="block">
                     <Link
@@ -569,35 +578,47 @@ const Home = ({ enableGuestMode }) => {
                       <ArrowRight className="w-6 h-6 motion-safe:group-hover:translate-x-1 transition-transform duration-200 ease-out" />
                     </Link>
                   </Magnet>
-                  <button
+                  {/* Star Border (React Bits): una luz naranja recorre el borde del botón de invitado */}
+                  <StarBorder
+                    as="button"
                     type="button"
-                    onClick={handleGuestMode} {...preloadOn(Dashboard)}
-                    className="px-9 py-4 bg-white border-2 border-orange-700 text-orange-800 font-bold rounded-2xl hover:bg-orange-50 toque text-center text-lg flex items-center justify-center gap-3"
+                    onClick={handleGuestMode}
+                    {...preloadOn(Dashboard)}
+                    theme="light"
+                    color="#ea580c"
+                    borderColor="rgba(194, 65, 12, 0.45)"
+                    textColor="#9a3412"
+                    radius={16}
+                    thickness={2}
+                    duration={3.5}
+                    glow={0.8}
+                    className="toque !px-9 !py-4 text-lg font-bold gap-3 hover:bg-orange-50"
                   >
                     <UserX className="w-6 h-6" />
                     Probar sin cuenta
-                  </button>
-                </div>
+                  </StarBorder>
+                </m.div>
 
-                <p className="flex items-center gap-2 text-sm text-stone-600">
+                <m.p variants={HERO_ITEM} className="flex items-center gap-2 text-sm text-stone-600">
                   <CheckCircle className="w-4 h-4 text-orange-700 shrink-0" />
                   El modo invitado te permite explorar la Unidad 1 sin crear una cuenta
-                </p>
+                </m.p>
 
-                <div className="grid grid-cols-3 gap-6 pt-8 border-t-2 border-stone-200/70">
+                <m.div variants={HERO_ITEM} className="grid grid-cols-3 gap-6 pt-8 border-t-2 border-stone-200/70">
                   {HERO_STATS.map(([value, suffix, label], i) => (
                     <div key={label}>
                       <div className="text-2xl min-[375px]:text-3xl sm:text-4xl font-black texto-degradado-corto mb-1 tabular-nums">
-                        {value}{suffix}
+                        <CountUp to={value} suffix={suffix} duration={1.5} delay={0.8 + i * 0.15} />
                       </div>
                       <div className="text-sm text-stone-600 font-semibold">{label}</div>
                     </div>
                   ))}
-                </div>
-              </div>
+                </m.div>
+              </m.div>
 
               {/* Foto del Titicaca con la mascota encima */}
-              <div className="relative pb-10 lg:pb-0">
+              {/* Motion: la foto llega desde la derecha */}
+              <m.div className="relative pb-10 lg:pb-0" initial={{ opacity: 0, x: 60, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}>
                 {/* Resplandores de color detrás de la foto, como en la primera versión */}
                 <span className="absolute -z-10 -top-10 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-25" aria-hidden="true" />
                 <span className="absolute -z-10 -bottom-10 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-20" aria-hidden="true" />
@@ -611,7 +632,8 @@ const Home = ({ enableGuestMode }) => {
                     className="w-full h-full object-cover"
                   />
                 </figure>
-                <div className="absolute -bottom-2 left-4 sm:left-6 lg:-left-8 lg:bottom-8 bg-white rounded-3xl border border-stone-200 p-3 sm:p-4 shadow-xl">
+                {/* La llama entra con un pequeño rebote */}
+                <m.div className="absolute -bottom-2 left-4 sm:left-6 lg:-left-8 lg:bottom-8 bg-white rounded-3xl border border-stone-200 p-3 sm:p-4 shadow-xl" initial={{ opacity: 0, scale: 0.6, rotate: -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ type: "spring", bounce: 0.45, duration: 0.8, delay: 0.9 }}>
                   <img
                     src={logo}
                     alt="Mascota de SimiAru: una llama con chullo y chalina andina"
@@ -619,22 +641,23 @@ const Home = ({ enableGuestMode }) => {
                     height="299"
                     className="w-24 sm:w-32 h-auto"
                   />
-                </div>
+                </m.div>
 
                 {/* Etiquetas flotantes de la primera versión, con lo que SimiAru sí tiene */}
-                <div className="etiqueta-flotante absolute -top-4 -right-2 sm:-right-5 rotate-3 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true">
+                {/* Motion: las etiquetas flotan arriba y abajo, cada una a su ritmo */}
+                <m.div className="etiqueta-flotante absolute -top-4 -right-2 sm:-right-5 rotate-3 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
                   <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
                     <Trophy className="w-5 h-5" />
                     Ayni Points
                   </span>
-                </div>
-                <div className="etiqueta-flotante absolute bottom-16 -right-2 sm:-right-5 lg:bottom-24 -rotate-3 bg-gradient-to-br from-blue-700 to-purple-700 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true">
+                </m.div>
+                <m.div className="etiqueta-flotante absolute bottom-16 -right-2 sm:-right-5 lg:bottom-24 -rotate-3 bg-gradient-to-br from-blue-700 to-purple-700 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -10, 0] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>
                   <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
                     <Zap className="w-5 h-5" />
                     Racha diaria
                   </span>
-                </div>
-              </div>
+                </m.div>
+              </m.div>
             </div>
           </div>
 
@@ -673,7 +696,7 @@ const Home = ({ enableGuestMode }) => {
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Aprende en <span className="texto-degradado-corto">3 pasos</span>
               </h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">Tu viaje hacia las lenguas andinas comienza aquí</p>
+              <BlurText text="Tu viaje hacia las lenguas andinas comienza aquí" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
             <ol className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
@@ -715,9 +738,7 @@ const Home = ({ enableGuestMode }) => {
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Qué incluye <span className="texto-degradado-corto">SimiAru</span>
               </h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-                Vocabulario, ejercicios y cultura del altiplano en un solo lugar, gratis y sin publicidad
-              </p>
+              <BlurText text="Vocabulario, ejercicios y cultura del altiplano en un solo lugar, gratis y sin publicidad" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
             <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -774,7 +795,7 @@ const Home = ({ enableGuestMode }) => {
           <div className="container mx-auto px-6">
             <Reveal className="text-center mb-12 space-y-4">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Elige tu idioma</h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones</p>
+              <BlurText text="Dos lenguas del altiplano, cada una con 6 unidades y 13 lecciones" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
             <figure className="max-w-5xl mx-auto mb-12">
@@ -900,9 +921,7 @@ const Home = ({ enableGuestMode }) => {
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Cultura <span className="texto-degradado-corto">viva</span>
               </h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-                69 cuentos, proverbios, adivinanzas y canciones, en quechua y en aymara, cada uno con su traducción
-              </p>
+              <BlurText text="69 cuentos, proverbios, adivinanzas y canciones, en quechua y en aymara, cada uno con su traducción" className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
             <ul className="grid sm:grid-cols-3 gap-10 sm:gap-6 max-w-5xl mx-auto items-center">
@@ -940,9 +959,7 @@ const Home = ({ enableGuestMode }) => {
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
                 Una herramienta <span className="texto-degradado-corto">abierta</span> para lenguas originarias
               </h2>
-              <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-                SimiAru es un proyecto gratuito y de código abierto para aprender quechua y aymara. Su contenido sigue creciendo y cualquier persona puede revisar y mejorar el código.
-              </p>
+              <BlurText text="SimiAru es un proyecto gratuito y de código abierto para aprender quechua y aymara. Su contenido sigue creciendo y cualquier persona puede revisar y mejorar el código." className="text-xl text-stone-600 max-w-3xl mx-auto" delay={60} stepDuration={0.3} />
             </Reveal>
 
             <ul className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
