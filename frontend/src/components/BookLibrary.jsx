@@ -28,13 +28,25 @@ const BookCard = ({ libro, index }) => {
       whileHover={{ y: -6 }}
       className="group flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm hover:shadow-xl transition-shadow"
     >
-      {/* "Portada" diseñada: ícono de libro sobre un fondo de color con el tejido andino */}
-      <div className={`relative h-40 bg-gradient-to-br ${bg} flex items-center justify-center overflow-hidden`}>
+      {/* Portada oficial sobre un fondo de color con el tejido andino (si no hay portada, un ícono de libro) */}
+      <div className={`relative ${libro.portada ? 'h-72 pt-10' : 'h-40'} bg-gradient-to-br ${bg} flex items-center justify-center overflow-hidden [perspective:900px]`}>
         <span className="absolute inset-0 opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
         <span className="tejido-andino absolute inset-x-0 bottom-0 h-2.5 opacity-90" aria-hidden="true" />
-        <span className="relative w-20 h-20 rounded-3xl bg-white/20 ring-2 ring-white/40 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" aria-hidden="true">
-          <Icon className="w-10 h-10 text-white" strokeWidth={2} />
-        </span>
+        {libro.portada ? (
+          <img
+            src={libro.portada}
+            alt={`Portada de «${libro.titulo}»`}
+            loading="lazy"
+            decoding="async"
+            width="480"
+            height="680"
+            className="relative h-48 w-auto max-w-[70%] object-contain rounded-r-lg rounded-l-sm shadow-[6px_10px_24px_rgba(0,0,0,0.35)] ring-1 ring-black/10 transition-transform duration-500 ease-out group-hover:[transform:rotateY(-14deg)_scale(1.06)]"
+          />
+        ) : (
+          <span className="relative w-20 h-20 rounded-3xl bg-white/20 ring-2 ring-white/40 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" aria-hidden="true">
+            <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+          </span>
+        )}
         <span className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-black text-stone-800">{lang?.nombre ?? libro.idioma}</span>
         <span className="absolute top-3 right-3 rounded-full bg-black/25 px-3 py-1 text-xs font-bold text-white">{libro.tipo}</span>
       </div>
@@ -68,6 +80,8 @@ const BookCard = ({ libro, index }) => {
             </span>
           </div>
         </dl>
+
+        {libro.creditoPortada && <p className="mt-3 text-xs text-stone-500">{libro.creditoPortada} · {libro.licencia}</p>}
 
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:mt-auto sm:pt-5">
           <a
@@ -157,7 +171,7 @@ const BookLibrary = ({ idioma }) => {
         <p className="rounded-3xl bg-white border border-stone-200 p-8 text-center text-stone-600">No encontramos libros con esa búsqueda.</p>
       )}
       <p className="mt-4 text-xs text-stone-500">
-        Datos tomados de cada ficha oficial. Las portadas no se copian; se agregarán cuando se confirme el permiso de cada una.
+        Datos y portadas tomados de cada ficha oficial del Ministerio de Educación del Perú, que los publica con acceso abierto bajo las licencias indicadas. Se muestran sin modificar, solo reducidas de tamaño.
       </p>
     </section>
   );

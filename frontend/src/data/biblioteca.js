@@ -1,7 +1,12 @@
 // Biblioteca de libros en quechua y aimara: solo ENLACES a la fuente oficial (no se guardan los PDF).
 // Datos tomados de cada ficha del Repositorio Institucional del Ministerio de Educación del Perú
 // (consultadas y con la descarga comprobada el 29/10/2026). Las descripciones son nuestras.
-// Para agregar un libro: copia una entrada y completa los datos desde su ficha oficial.
+// Portadas: la imagen oficial que publica el mismo repositorio en cada ficha, reducida a WebP
+// (assets/portadas/<id>.webp), con su crédito. Para agregar un libro: copia una entrada y completa
+// los datos desde su ficha oficial; si tiene portada, guárdala como assets/portadas/<id>.webp.
+const COVERS = Object.fromEntries(
+  Object.entries(import.meta.glob('../assets/portadas/*.webp', { eager: true, import: 'default' })).map(([path, url]) => [path.split('/').pop().replace('.webp', ''), url])
+);
 const MINEDU = 'Repositorio del Ministerio de Educación del Perú (Minedu)';
 const BASE = 'https://repositorio.minedu.gob.pe';
 
@@ -126,6 +131,6 @@ const BIBLIOTECA = [
     descarga: `${BASE}/bitstream/handle/20.500.12799/10215/Suma%20arusa%20%e2%80%93%20Aymara%20jarawinaka.%20Colecci%c3%b3n%20de%20poes%c3%adas%20-%204%c2%b0%20Primaria%20-%20Aimara.pdf?sequence=1&isAllowed=y`,
     peso: '28,7 MB',
   },
-].map((libro) => ({ fuente: MINEDU, ...libro }));
+].map((libro) => ({ fuente: MINEDU, portada: COVERS[libro.id] ?? null, creditoPortada: COVERS[libro.id] ? 'Portada: Ministerio de Educación del Perú' : null, ...libro }));
 
 export default BIBLIOTECA;
