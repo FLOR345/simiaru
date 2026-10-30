@@ -441,6 +441,12 @@ const LessonView = ({ user, isGuest }) => {
                 {saveState === 'saved' && (
                   <span className="text-green-800">
                     Progreso guardado{serverResult?.racha ? ` · Racha de ${serverResult.racha} ${serverResult.racha === 1 ? 'día' : 'días'} 🔥` : ''}
+                    {serverResult?.correo?.enviado === true && (
+                      <span className="block mt-1 text-stone-600">📧 Te enviamos tu resultado a {serverResult.correo.email}</span>
+                    )}
+                    {serverResult?.correo?.enviado === false && serverResult.correo.motivo && (
+                      <span className="block mt-1 text-amber-800">No pudimos enviarte el correo con tu resultado: {serverResult.correo.motivo}</span>
+                    )}
                   </span>
                 )}
                 {saveState === 'queued' && (

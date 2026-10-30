@@ -7,6 +7,7 @@ import { getLanguage, languageStyle } from '../../languages';
 import { playTap, playMatch, playWrong } from '../../utils/sounds';
 import Mascot from '../Mascot';
 import { speak } from '../../utils/speech';
+import { layoutBox } from '../GameFx';
 
 // ==================== COMPARACIÓN DE RESPUESTAS ====================
 // Acepta diferencias de escritura que no cambian la palabra:
@@ -124,16 +125,16 @@ const MatchingLines = ({ containerRef, pairs, pairsKey }) => {
   const measure = useCallback(() => {
     const box = containerRef.current;
     if (!box) return;
-    const c = box.getBoundingClientRect();
     setLines(
       pairs
         .map((p) => {
           const a = box.querySelector(`[data-tile="L-${p.l}"]`);
           const b = box.querySelector(`[data-tile="R-${p.r}"]`);
           if (!a || !b) return null;
-          const ar = a.getBoundingClientRect();
-          const br = b.getBoundingClientRect();
-          return { key: `${p.l}-${p.r}`, x1: ar.right - c.left, y1: ar.top + ar.height / 2 - c.top, x2: br.left - c.left, y2: br.top + br.height / 2 - c.top, color: p.color };
+          // Posición de diseño (offset): no la mueven las animaciones de entrada ni el "pop" de las fichas
+          const A = layoutBox(a, box);
+          const B = layoutBox(b, box);
+          return { key: `${p.l}-${p.r}`, x1: A.x + A.w, y1: A.y + A.h / 2, x2: B.x, y2: B.y + B.h / 2, color: p.color };
         })
         .filter(Boolean)
     );
@@ -145,12 +146,7 @@ const MatchingLines = ({ containerRef, pairs, pairsKey }) => {
     if (!box || typeof ResizeObserver === 'undefined') return undefined;
     const ro = new ResizeObserver(measure);
     ro.observe(box);
-    // Las fichas entran con una animación: se mide otra vez cuando terminan
-    const t = setTimeout(measure, 700);
-    return () => {
-      ro.disconnect();
-      clearTimeout(t);
-    };
+    return () => ro.disconnect();
   }, [measure, containerRef]);
   return (
     <svg className="pointer-events-none absolute inset-0 w-full h-full overflow-visible z-10" aria-hidden="true">
@@ -873,7 +869,7 @@ const ExerciseTypes = ({
               aria-pressed={state === 'selected'}
               disabled={answered || state === 'done'}
               lang={side === 'L' ? language?.lang : undefined}
-              className={`${tileClass(state === 'done' ? 'idle' : state, theme)} justify-center !text-center anim-entra ${state === 'done' ? 'anim-pop' : ''}`}
+              className={`${tileClass(state === 'done' ? 'idle' : state, theme)} justify-center !text-center anim-entra ${state === 'done' ? 'anim-brilla' : ''}`}
               style={{ '--i': index + (side === 'R' ? 2 : 0), ...(color ? { borderColor: color, backgroundColor: `${color}14`, color } : {}) }}
             >
               <KeyHint n={(offset + index + 1) % 10} state={state} />

@@ -8,7 +8,7 @@ import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playMatch, playWrong, playComplete, playCorrect } from '../utils/sounds';
 import { speak } from '../utils/speech';
 import Mascot, { LlamaImage } from '../components/Mascot';
-import { Burst, FloatText, Confetti, Countdown, Stars } from '../components/GameFx';
+import { Burst, FloatText, Confetti, Countdown, Stars, LinkLine } from '../components/GameFx';
 import Counter from '../components/reactbits/Counter';
 import GlareHover from '../components/reactbits/GlareHover';
 import ShinyText from '../components/reactbits/ShinyText';
@@ -193,7 +193,7 @@ const BONUS_SECONDS = 3;
 const tile = (state, theme) => {
   const base = 'ficha relative w-full min-h-14 sm:min-h-16 rounded-2xl px-3 py-2 flex items-center justify-center gap-2 text-center font-bold text-base sm:text-lg disabled:cursor-default';
   if (state === 'selected') return `${base} ${theme.border} ${theme.soft} ${theme.text} -translate-y-0.5 shadow-md`;
-  if (state === 'flash') return `${base} border-green-600 bg-green-100 text-green-900 anim-pop anim-brilla`;
+  if (state === 'flash') return `${base} border-green-600 bg-green-100 text-green-900 anim-brilla`;
   if (state === 'wrong') return `${base} border-red-500 bg-red-50 text-red-900 anim-sacude`;
   return `${base} border-stone-300 bg-white text-stone-800 hover:bg-stone-50 hover:-translate-y-0.5`;
 };
@@ -218,6 +218,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
   const [best, setBest] = useState(() => readBest(key));
   const [record, setRecord] = useState(false);
   const [llama, react] = useMood('hablando');
+  const boardRef = useRef(null);
   const endAt = useRef(0);
   const pool = useRef([]);
   const scoreRef = useRef(0);
@@ -304,14 +305,14 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
         setLeft(nl);
         setRight(nr);
         setFlash(null);
-      }, 320);
+      }, 460);
     } else {
       playWrong();
       setCombo(0);
       setShake(Date.now());
       react('sad', 'reintentar');
       setWrong({ L: li, R: ri });
-      setTimeout(() => setWrong(null), 500);
+      setTimeout(() => setWrong(null), 560);
     }
   };
 
@@ -405,10 +406,13 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
         )}
       </div>
 
-      <div key={shake} className={`grid grid-cols-2 gap-3 sm:gap-5 ${shake ? 'anim-tiembla' : ''}`}>
+      <div key={shake} ref={boardRef} className={`relative grid grid-cols-2 gap-x-10 sm:gap-x-20 gap-y-3 ${shake ? 'anim-tiembla' : ''}`}>
+        {/* Línea que une la pareja: verde si es correcta, roja punteada si no */}
+        {flash && <LinkLine boxRef={boardRef} from={`[data-tile="L-${flash.L}"]`} to={`[data-tile="R-${flash.R}"]`} color="#16a34a" trigger={flash.at} />}
+        {wrong && <LinkLine boxRef={boardRef} from={`[data-tile="L-${wrong.L}"]`} to={`[data-tile="R-${wrong.R}"]`} color="#ef4444" dashed trigger={`${wrong.L}-${wrong.R}`} />}
         <div className="space-y-3" lang={language.lang}>
           {left.map((w, i) => (
-            <button key={`${w?.id}-${i}`} type="button" onClick={() => tap('L', i)} className={tile(stateOf('L', i), theme)} aria-pressed={stateOf('L', i) === 'selected'}>
+            <button key={`${w?.id}-${i}`} data-tile={`L-${i}`} type="button" onClick={() => tap('L', i)} className={tile(stateOf('L', i), theme)} aria-pressed={stateOf('L', i) === 'selected'}>
               {w?.target}
               {flash?.L === i && <Burst trigger={flash.at} />}
             </button>
@@ -416,7 +420,7 @@ const PairsGame = ({ words, language, theme, idioma, onExit }) => {
         </div>
         <div className="space-y-3">
           {right.map((w, i) => (
-            <button key={`${w?.id}-${i}`} type="button" onClick={() => tap('R', i)} className={tile(stateOf('R', i), theme)} aria-pressed={stateOf('R', i) === 'selected'}>
+            <button key={`${w?.id}-${i}`} data-tile={`R-${i}`} type="button" onClick={() => tap('R', i)} className={tile(stateOf('R', i), theme)} aria-pressed={stateOf('R', i) === 'selected'}>
               {w?.spanish}
               {flash?.R === i && <Burst trigger={flash.at} />}
             </button>

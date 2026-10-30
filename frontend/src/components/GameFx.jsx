@@ -1,6 +1,7 @@
 // Efectos compartidos de los juegos y las lecciones: chispas, texto que flota,
 // cuenta regresiva, estrellas de resultado y confeti. Todo con CSS (index.css).
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import * as m from 'motion/react-m';
 import { Star } from 'lucide-react';
 import { playTick, playGo, playStar } from '../utils/sounds';
 
@@ -81,5 +82,57 @@ export const Stars = ({ count }) => {
         />
       ))}
     </div>
+  );
+};
+
+// Caja de un elemento relativa a un contenedor, sin contar transformaciones (offsetLeft/Top):
+// las animaciones de entrada o el "pop" de una ficha no la mueven.
+export const layoutBox = (el, box) => {
+  let x = 0;
+  let y = 0;
+  let node = el;
+  while (node && node !== box) {
+    x += node.offsetLeft;
+    y += node.offsetTop;
+    node = node.offsetParent;
+  }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+};
+
+// Línea curva que une dos fichas de un tablero (el contenedor debe ser "relative").
+// from/to: selectores dentro del contenedor; trigger: cambia para volver a dibujarla.
+export const LinkLine = ({ boxRef, from, to, color = '#16a34a', trigger, dashed = false }) => {
+  const [line, setLine] = useState(null);
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    const a = box?.querySelector(from);
+    const b = box?.querySelector(to);
+    if (!a || !b) {
+      setLine(null);
+      return;
+    }
+    const A = layoutBox(a, box);
+    const B = layoutBox(b, box);
+    setLine({ x1: A.x + A.w, y1: A.y + A.h / 2, x2: B.x, y2: B.y + B.h / 2 });
+  }, [boxRef, from, to, trigger]);
+  if (!line) return null;
+  const mx = (line.x1 + line.x2) / 2;
+  return (
+    <svg className="pointer-events-none absolute inset-0 w-full h-full overflow-visible z-10" aria-hidden="true">
+      <m.path
+        key={trigger}
+        d={`M ${line.x1} ${line.y1} C ${mx} ${line.y1}, ${mx} ${line.y2}, ${line.x2} ${line.y2}`}
+        stroke={color}
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeDasharray={dashed ? '2 10' : undefined}
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+      />
+      <circle cx={line.x1} cy={line.y1} r="7" fill={color} />
+      <circle cx={line.x2} cy={line.y2} r="7" fill={color} />
+    </svg>
   );
 };

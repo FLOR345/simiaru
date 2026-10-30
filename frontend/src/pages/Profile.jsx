@@ -66,6 +66,54 @@ const fieldClass = 'w-full min-h-12 px-4 border-2 border-stone-300 rounded-xl fo
 const primaryButton = 'w-full min-h-12 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl toque flex items-center justify-center gap-2 disabled:opacity-60';
 
 // Datos de aprendizaje: ver el permiso, cambiarlo, descargar y borrar (soberanía de los datos)
+// Correos de progreso: al terminar una lección llega el resultado al correo de la cuenta.
+// El botón envía un correo de prueba y, si falla, dice por qué (clave de Brevo, remitente, límite diario…).
+const EmailCheck = ({ email }) => {
+  const [state, setState] = useState({ status: 'idle', message: '' });
+  const send = async () => {
+    setState({ status: 'sending', message: '' });
+    try {
+      const { data } = await api.sendTestEmail();
+      setState({ status: 'ok', message: data.message });
+      toast.success('Correo enviado', { description: data.message });
+    } catch (error) {
+      const message = error.response?.data?.message || 'No pudimos conectar con el servidor. Inténtalo en un momento.';
+      setState({ status: 'error', message });
+    }
+  };
+  return (
+    <section className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="correos-titulo">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <span className="w-20 aspect-square shrink-0" aria-hidden="true">
+          <LlamaImage pose="escribiendo" sticker sizes="5rem" />
+        </span>
+        <div className="flex-1 min-w-0">
+          <h2 id="correos-titulo" className="text-2xl font-bold">
+            Correos de progreso
+          </h2>
+          <p className="text-stone-600">
+            Cuando terminas una lección te enviamos tu resultado a <strong className="text-stone-800 break-all">{email}</strong>. También recibes recordatorios de racha.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={send}
+          disabled={state.status === 'sending'}
+          className="ficha min-h-12 px-5 rounded-2xl border-stone-300 bg-white font-bold hover:bg-stone-50 disabled:opacity-60 whitespace-nowrap"
+        >
+          {state.status === 'sending' ? 'Enviando…' : 'Enviarme un correo de prueba'}
+        </button>
+      </div>
+      {state.status === 'ok' && <p className="mt-4 rounded-2xl bg-green-50 border border-green-200 p-3 text-green-900 font-semibold" role="status">{state.message}</p>}
+      {state.status === 'error' && (
+        <p className="mt-4 rounded-2xl bg-amber-50 border border-amber-300 p-3 text-amber-900 font-semibold" role="alert">
+          No se pudo enviar: {state.message}
+        </p>
+      )}
+    </section>
+  );
+};
+
 const LearningData = ({ profile, onConsentChange }) => {
   const [busy, setBusy] = useState(false);
   const consent = profile?.consentimiento_datos;
@@ -487,6 +535,9 @@ const Profile = ({ user, setUser }) => {
                 if (setUser) setUser(updated);
               }}
             />
+
+            {/* ==================== CORREOS DE PROGRESO ==================== */}
+            {!profile?.es_cuenta_aula && profile?.email && <EmailCheck email={profile.email} />}
 
             {/* ==================== MODO AULA (DOCENTES) ==================== */}
             {!profile?.es_cuenta_aula && (

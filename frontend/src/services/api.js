@@ -117,6 +117,8 @@ export const api = {
     axiosInstance.get(`/api/culture?tipo=${encodeURIComponent(tipo)}&idioma=${encodeURIComponent(idioma)}`),
 
   // ===== DATOS DE APRENDIZAJE (consentimiento y exportación) =====
+  // Correo de prueba al usuario de la sesión (para comprobar que llegan los correos de progreso)
+  sendTestEmail: () => axiosInstance.post('/api/notifications/test'),
   getConsent: () => axiosInstance.get('/api/research/consent'),
   setConsent: (consiente) => axiosInstance.put('/api/research/consent', { consiente }),
   deleteMyEvents: () => axiosInstance.delete('/api/research/events/me'),

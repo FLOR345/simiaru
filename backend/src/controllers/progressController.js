@@ -27,11 +27,15 @@ export const saveProgress = async (req, res, next) => {
 
     const result = await applyLessonResult({ userId, leccionId, porcentaje, completado });
 
+    // El resultado se envía por correo; se espera hasta 5 s para poder decirle a la persona si llegó
+    let correo = null;
     if (porcentaje >= 60) {
-      notifyLessonCompleted(userId, leccionId, porcentaje).catch((err) => console.log('Error enviando notificación:', err.message));
+      const envio = notifyLessonCompleted(userId, leccionId, porcentaje).catch((err) => ({ enviado: false, motivo: err.message }));
+      correo = await Promise.race([envio, new Promise((r) => setTimeout(() => r({ enviado: null }), 5000))]);
+      if (correo === false) correo = null;
     }
 
-    res.json({ success: true, message: 'Progreso guardado', ...result });
+    res.json({ success: true, message: 'Progreso guardado', ...result, correo });
   } catch (error) {
     next(error);
   }

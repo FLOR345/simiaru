@@ -15,18 +15,15 @@ export const sendTestEmail = async (req, res) => {
       puntos_totales: req.user.puntos_totales || 100
     };
 
+    if (!usuario.email || String(usuario.email).endsWith('.invalid')) {
+      return res.status(400).json({ success: false, message: 'Tu cuenta no tiene un correo donde enviar.' });
+    }
     const success = await emailService.sendStreakReminder(usuario);
 
     if (success) {
-      res.json({ 
-        success: true, 
-        message: `Email de prueba enviado a ${usuario.email}` 
-      });
+      res.json({ success: true, message: `Te enviamos un correo de prueba a ${usuario.email}. Revisa también la carpeta de spam.` });
     } else {
-      res.status(500).json({ 
-        success: false, 
-        message: 'Error al enviar email' 
-      });
+      res.status(502).json({ success: false, message: emailService.lastEmailError || 'No se pudo enviar el correo.' });
     }
   } catch (error) {
     console.error('Error en sendTestEmail:', error);
@@ -55,9 +52,8 @@ export const notifyLessonCompleted = async (usuarioId, leccionId, porcentaje) =>
     
     const leccion = lessonResult.rows[0];
 
-    await emailService.sendLessonCompleted(usuario, leccion, porcentaje);
-    
-    return true;
+    const sent = await emailService.sendLessonCompleted(usuario, leccion, porcentaje);
+    return sent === true ? { enviado: true, email: usuario.email } : { enviado: false, motivo: emailService.lastEmailError };
   } catch (error) {
     console.error('Error en notifyLessonCompleted:', error);
     return false;

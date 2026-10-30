@@ -7,7 +7,7 @@ import logo from '../assets/logo.webp';
 // URL del backend
 import { API_URL } from '../config.js';
 import { getLevel } from '../utils/levels.js';
-import { SegmentedControl, RingProgress, Tooltip } from '@mantine/core';
+import { RingProgress, Tooltip } from '@mantine/core';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import MantineShell from '../ui/MantineShell';
@@ -20,6 +20,7 @@ import { LANGUAGES, languageStyle } from '../languages';
 import GradientText from '../components/reactbits/GradientText';
 import Decor from '../components/Decor';
 import SplitText from '../components/reactbits/SplitText';
+import LanguagePicker from '../components/LanguagePicker';
 
 // Misma paleta que la portada: verde = quechua, azul lago = aymara, terracota = invitado
 // Idiomas desde los paquetes de src/languages: una lengua nueva con contenido aparece sola en el selector
@@ -352,26 +353,10 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
 
         {/* ==================== IDIOMA ==================== */}
         <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-8" aria-labelledby="idioma-titulo">
-          <h2 id="idioma-titulo" className="text-2xl font-bold">Idioma</h2>
-          <p className="text-stone-600 mb-6">Cambia entre quechua y aymara cuando quieras</p>
+          <h2 id="idioma-titulo" className="text-2xl font-black">¿Qué lengua quieres aprender?</h2>
+          <p className="text-stone-600 mb-5">Puedes cambiar cuando quieras: tu avance de cada una se guarda aparte</p>
 
-          {/* Mantine SegmentedControl: el indicador de color se desliza al lenguaje elegido */}
-          <SegmentedControl
-            fullWidth
-            size="lg"
-            radius="xl"
-            value={selectedLanguage}
-            onChange={setSelectedLanguage}
-            color={LANGUAGE_STYLE[selectedLanguage]?.hex}
-            transitionDuration={250}
-            transitionTimingFunction="cubic-bezier(0.23, 1, 0.32, 1)"
-            aria-label="Idioma"
-            data={Object.entries(LANGUAGE_STYLE).map(([key, style]) => ({ value: key, label: style.label }))}
-            styles={{ root: { padding: 6 }, label: { fontWeight: 800, fontSize: '1.125rem' } }}
-          />
-          <p key={selectedLanguage} className="mt-4 text-stone-600 anim-entra">
-            {LANGUAGE_STYLE[selectedLanguage].region}
-          </p>
+          <LanguagePicker value={selectedLanguage} onChange={setSelectedLanguage} />
         </section>
 
         {/* ==================== RUTA DE APRENDIZAJE ==================== */}

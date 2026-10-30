@@ -21,6 +21,21 @@ const SENDER = {
 
 console.log('✅ Servicio de email Brevo API configurado');
 
+// Motivo del último fallo de envío (para avisar en la app en vez de fallar en silencio)
+export let lastEmailError = null;
+
+// Traduce los errores más comunes de Brevo a algo que se entienda
+const explainBrevoError = (error) => {
+  const body = error?.response?.body || {};
+  const code = body.code || '';
+  const text = body.message || error?.message || 'error desconocido';
+  if (!process.env.BREVO_API_KEY) return 'El servidor no tiene configurada la clave de Brevo (BREVO_API_KEY).';
+  if (error?.status === 401 || code === 'unauthorized') return 'La clave de Brevo (BREVO_API_KEY) no es válida o fue revocada.';
+  if (/sender/i.test(text)) return `Brevo rechazó el remitente ${SENDER.email}: hay que verificarlo en Brevo (Senders).`;
+  if (error?.status === 402 || /credit|quota|limit/i.test(text)) return 'Se acabaron los envíos gratuitos de Brevo por hoy.';
+  return `Brevo respondió: ${text}`;
+};
+
 // Función helper para enviar email
 const sendEmail = async (to, subject, htmlContent) => {
   // Sin correos en pruebas automáticas ni a las cuentas de aula (su dirección interna .invalid no existe)
@@ -32,11 +47,17 @@ const sendEmail = async (to, subject, htmlContent) => {
   sendSmtpEmail.htmlContent = htmlContent;
 
   try {
+    if (!to) {
+      lastEmailError = 'La cuenta no tiene correo.';
+      return false;
+    }
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log(`📧 Email enviado a: ${to}`);
+    lastEmailError = null;
     return true;
   } catch (error) {
-    console.error(`❌ Error enviando email a ${to}:`, error.message);
+    lastEmailError = explainBrevoError(error);
+    console.error(`❌ Error enviando email a ${to}: ${lastEmailError}`, JSON.stringify(error?.response?.body || {}));
     return false;
   }
 };
