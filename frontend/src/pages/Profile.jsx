@@ -82,7 +82,7 @@ const EmailCheck = ({ email }) => {
     }
   };
   return (
-    <section className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="correos-titulo">
+    <Reveal as="section" y={28} className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="correos-titulo">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <span className="w-20 aspect-square shrink-0" aria-hidden="true">
           <LlamaImage pose="escribiendo" sticker sizes="5rem" />
@@ -110,7 +110,7 @@ const EmailCheck = ({ email }) => {
           No se pudo enviar: {state.message}
         </p>
       )}
-    </section>
+    </Reveal>
   );
 };
 
@@ -156,7 +156,7 @@ const LearningData = ({ profile, onConsentChange }) => {
   };
 
   return (
-    <section className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="datos-titulo">
+    <Reveal as="section" y={28} className="mt-6 bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="datos-titulo">
       <div className="flex items-start gap-4 mb-5">
         <span className="w-20 aspect-square shrink-0" aria-hidden="true">
           <LlamaImage pose="carino" />
@@ -197,7 +197,7 @@ const LearningData = ({ profile, onConsentChange }) => {
           Borrar mis datos
         </button>
       </div>
-    </section>
+    </Reveal>
   );
 };
 
@@ -429,7 +429,7 @@ const Profile = ({ user, setUser }) => {
 
             {/* ==================== INSIGNIAS ==================== */}
             {badges.length > 0 && (
-              <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="insignias-titulo">
+              <Reveal as="section" y={28} className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-6" aria-labelledby="insignias-titulo">
                 <div className="flex items-center gap-4 mb-5">
                   {/* Mantine RingProgress: cuántas insignias llevas, de un vistazo */}
                   <RingProgress
@@ -476,11 +476,11 @@ const Profile = ({ user, setUser }) => {
                     </Reveal>
                   ))}
                 </ul>
-              </section>
+              </Reveal>
             )}
 
             {/* ==================== HISTORIAL ==================== */}
-            <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="historial-titulo">
+            <Reveal as="section" y={28} className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="historial-titulo">
               <h2 id="historial-titulo" className="text-2xl font-bold">
                 Historial de lecciones
               </h2>
@@ -524,7 +524,7 @@ const Profile = ({ user, setUser }) => {
                   })}
                 </ol>
               )}
-            </section>
+            </Reveal>
 
             {/* ==================== MIS DATOS DE APRENDIZAJE ==================== */}
             <LearningData

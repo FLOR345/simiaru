@@ -15,6 +15,8 @@ import Home from './pages/Home';
 import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice, NotFound, BodyNumbers } from './routes';
 import { LlamaImage } from './components/Mascot';
 import { startTelemetry } from './services/telemetry';
+import ScrollProgress from './ui/ScrollProgress';
+import PageFade from './ui/PageFade';
 import OfflineBanner from './components/OfflineBanner';
 
 // Pantalla de espera: mismo fondo claro que la app y solo visible si la carga pasa de 0,3 s
@@ -132,12 +134,14 @@ function App() {
     <BrowserRouter>
       {/* Avisos de toda la app (progreso guardado, insignias, favoritos, perfil).
           Arriba a la derecha (debajo del encabezado): nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
+      <ScrollProgress />
       <OfflineBanner />
       <Suspense fallback={null}>
         <Notifications />
       </Suspense>
       <ClickSpark sparkColor="#16a34a" sparkCount={10} sparkRadius={26} sparkSize={12} duration={450}>
       <Suspense fallback={<LoadingScreen />}>
+      <PageFade>
       <Routes>
         <Route path="/" element={<Home enableGuestMode={() => setIsGuest(true)} />} />
         <Route path="/login" element={<Login setUser={setUser} setIsGuest={setIsGuest} />} />
@@ -202,6 +206,7 @@ function App() {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </PageFade>
       </Suspense>
       </ClickSpark>
     </BrowserRouter>

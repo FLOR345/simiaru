@@ -17,9 +17,21 @@ const NotFound = () => {
       <Decor />
       <div className="max-w-xl text-center">
         <Mascot pose="buscando" sticker mood="think" size="w-44 sm:w-52" bubble="top" className="mx-auto" eager say={<p className="font-black text-lg">¿Mana kanchu? ¡No la encuentro!</p>} />
-        <m.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mt-6 text-7xl sm:text-8xl font-black texto-degradado">
-          404
-        </m.p>
+        <p className="mt-6 flex justify-center text-7xl sm:text-8xl font-black texto-degradado" aria-label="404">
+          {['4', '0', '4'].map((d, i) => (
+            <m.span
+              key={i}
+              aria-hidden="true"
+              initial={{ opacity: 0, y: -40, rotate: -12 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.2 + i * 0.12 }}
+              whileHover={{ y: -10, rotate: i === 1 ? 0 : i === 0 ? -8 : 8, scale: 1.1 }}
+              className="inline-block cursor-default"
+            >
+              {d}
+            </m.span>
+          ))}
+        </p>
         <h1 className="mt-2 text-2xl sm:text-3xl font-black">Esta página no existe</h1>
         <p className="mt-2 text-stone-600">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">

@@ -2,6 +2,7 @@
 // Al entrar se muestra un código personal para volver a entrar desde otro dispositivo.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import * as m from 'motion/react-m';
 import { KeyRound, Users, User, Copy, Check, ArrowRight } from 'lucide-react';
 import { toast } from '../utils/notify';
 import { AuthLayout, ErrorMessage, Field, SubmitButton } from '../components/auth/AuthLayout';
@@ -126,9 +127,12 @@ const Classroom = ({ setUser, setIsGuest }) => {
               setTab(id);
               setError('');
             }}
-            className={`min-h-11 rounded-xl font-bold text-sm toque ${tab === id ? 'bg-white shadow text-stone-900' : 'text-stone-600 hover:text-stone-900'}`}
+            className={`relative min-h-11 rounded-xl font-bold text-sm toque ${tab === id ? 'text-stone-900' : 'text-stone-600 hover:text-stone-900'}`}
           >
-            {label}
+            {tab === id && (
+              <m.span layoutId="aula-pestana" className="absolute inset-0 rounded-xl bg-white shadow" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
+            )}
+            <span className="relative">{label}</span>
           </button>
         ))}
       </div>

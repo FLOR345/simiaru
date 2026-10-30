@@ -52,6 +52,7 @@ export const TiltedCard = (props) => (
 
 // GSAP (Animated Content) y Rotating Text también se descargan aparte: la portada carga primero
 const AnimatedContentLazy = lazy(() => import('../components/reactbits/AnimatedContent'));
+const MagnetLazy = lazy(() => import('../components/reactbits/Magnet'));
 const RotatingTextLazy = lazy(() => import('../components/reactbits/RotatingText'));
 
 export const AnimatedContent = ({ children, ...props }) => (
@@ -63,5 +64,12 @@ export const AnimatedContent = ({ children, ...props }) => (
 export const RotatingText = (props) => (
   <Suspense fallback={<span className={`flex ${props.mainClassName ?? ''}`}>{props.texts?.[0]}</span>}>
     <RotatingTextLazy {...props} />
+  </Suspense>
+);
+
+// Magnet: el elemento se acerca un poco al mouse. Mientras se descarga se ve igual, sin movimiento
+export const Magnet = ({ children, ...props }) => (
+  <Suspense fallback={<div className={props.wrapperClassName}>{children}</div>}>
+    <MagnetLazy {...props}>{children}</MagnetLazy>
   </Suspense>
 );

@@ -1,4 +1,5 @@
 // Modo aula para docentes: crear aulas, compartir el código, ver el avance por alias y exportar los datos.
+import StaggerIn from '../ui/StaggerIn';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Users, Copy, Download, RefreshCw, School, ShieldCheck } from 'lucide-react';
@@ -246,11 +247,11 @@ const Teacher = () => {
         ) : aulas.length === 0 ? (
           <p className="text-stone-600">Todavía no creaste ningún aula.</p>
         ) : (
-          <ul className="space-y-4">
+          <StaggerIn as="ul" className="space-y-4">
             {aulas.map((aula) => (
               <ClassroomCard key={aula.id} aula={aula} />
             ))}
-          </ul>
+          </StaggerIn>
         )}
       </main>
     </div>

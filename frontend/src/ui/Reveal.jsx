@@ -9,7 +9,7 @@ const EASE_OUT = [0.23, 1, 0.32, 1];
 const Reveal = ({ as = 'div', children, delay = 0, y = 40, className, ...rest }) => {
   const reduce = useReducedMotion();
   // Acceso estático (m.li / m.div): así Vite incluye solo esos dos y no todos los elementos de Motion
-  const Component = as === 'li' ? m.li : m.div;
+  const Component = as === 'li' ? m.li : as === 'section' ? m.section : m.div;
   return (
     <Component
       className={className}

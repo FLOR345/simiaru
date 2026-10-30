@@ -733,3 +733,42 @@ dialog.modal {
   .Toastify__toast-container { top: 4.5rem !important; }
   .Toastify__toast.simiaru-toast { margin: 0 0.75rem 0.5rem; }
 }
+
+/* ==================== Microanimaciones extra ==================== */
+/* Las fichas se levantan un poco al pasar el mouse (y se hunden al presionar, ver arriba) */
+@media (hover: hover) and (pointer: fine) {
+  .ficha:hover:not(:active):not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -10px rgba(28, 25, 23, 0.35);
+  }
+  /* La flecha de los botones principales se adelanta al pasar el mouse */
+  .boton-degradado svg {
+    transition: transform 250ms var(--ease-out);
+  }
+  .boton-degradado:hover:not(:disabled) svg:last-child {
+    transform: translateX(4px);
+  }
+}
+
+/* Campos: el ícono se ilumina y crece un poco al escribir */
+.campo svg {
+  transition: color 180ms ease, transform 250ms var(--ease-pop);
+}
+.campo:focus-within svg {
+  color: #15803d;
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* Palabras y tarjetas de lista: llegan escalonadas */
+@keyframes flota {
+  50% { transform: translateY(-8px); }
+}
+.anim-flota {
+  animation: flota 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.35s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-flota {
+    animation: none;
+  }
+}

@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { LlamaImage } from '../Mascot';
 import Decor from '../Decor';
 import GradientText from '../reactbits/GradientText';
+import StaggerIn from '../../ui/StaggerIn';
+import { Magnet } from '../../ui/lazyBits';
 
 export const AuthLayout = ({ title, subtitle, children, footer, pose = 'bienvenida' }) => (
   // Mismo fondo de la portada: degradado suave con burbujas de color difuminadas
@@ -15,17 +17,19 @@ export const AuthLayout = ({ title, subtitle, children, footer, pose = 'bienveni
     <main className="w-full max-w-md anim-entra">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-white shadow-2xl p-6 sm:p-8">
         <div className="text-center mb-8">
-          <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-3">
-            <span className="block w-32 aspect-square llama llama-reposo" aria-hidden="true">
-              <LlamaImage pose={pose} sticker eager sizes="8rem" />
-            </span>
-          </Link>
+          <Magnet padding={50} magnetStrength={6} wrapperClassName="inline-block" innerClassName="block">
+            <Link to="/" aria-label="SimiAru, volver al inicio" className="inline-flex justify-center mb-3">
+              <span className="block w-32 aspect-square llama llama-reposo" aria-hidden="true">
+                <LlamaImage pose={pose} sticker eager sizes="8rem" />
+              </span>
+            </Link>
+          </Magnet>
           <h1 className="text-3xl font-black">
             <GradientText colors={['#15803d', '#0ea5e9', '#7c3aed', '#db2777', '#15803d']} animationSpeed={6}>{title}</GradientText>
           </h1>
           <p className="text-stone-600 mt-2">{subtitle}</p>
         </div>
-        {children}
+        <StaggerIn stagger={0.08} y={14} delay={0.15}>{children}</StaggerIn>
       </div>
       {footer}
     </main>
@@ -69,7 +73,7 @@ export const Field = ({ id, label, icon: Icon, hint, ...inputProps }) => (
     <label htmlFor={id} className="block font-bold mb-2">
       {label}
     </label>
-    <div className="relative">
+    <div className="campo relative">
       <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" aria-hidden="true" />
       <input
         id={id}

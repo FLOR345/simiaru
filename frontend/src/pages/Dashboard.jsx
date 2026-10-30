@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Reveal from '../ui/Reveal';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogOut, Flame, Star, TrendingUp, BookOpen, Lock, CheckCircle, Sparkles, Award, ChevronDown, Play, UserX, AlertCircle, RefreshCw, XCircle, Gamepad2, ArrowRight, PersonStanding } from 'lucide-react';
 import axios from 'axios';
@@ -387,15 +388,15 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
         )}
 
         {/* ==================== IDIOMA ==================== */}
-        <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-8" aria-labelledby="idioma-titulo">
+        <Reveal as="section" y={28} className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 mb-8" aria-labelledby="idioma-titulo">
           <h2 id="idioma-titulo" className="text-2xl font-black">¿Qué lengua quieres aprender?</h2>
           <p className="text-stone-600 mb-5">Puedes cambiar cuando quieras: tu avance de cada una se guarda aparte</p>
 
           <LanguagePicker value={selectedLanguage} onChange={setSelectedLanguage} stats={langStats} />
-        </section>
+        </Reveal>
 
         {/* ==================== RUTA DE APRENDIZAJE ==================== */}
-        <section className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="ruta-titulo" aria-busy={loading}>
+        <Reveal as="section" y={28} className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8" aria-labelledby="ruta-titulo" aria-busy={loading}>
           <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
             <div>
               <h2 id="ruta-titulo" className="text-2xl sm:text-3xl font-black">
@@ -454,7 +455,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
             // Camino de aprendizaje al estilo Duolingo (components/LearningPath.jsx)
             <LearningPath units={units} langId={selectedLanguage} isGuest={isGuest} isLessonCompleted={isLessonCompleted} />
           )}
-        </section>
+        </Reveal>
 
         {/* ==================== JUEGOS ==================== */}
         <Link
