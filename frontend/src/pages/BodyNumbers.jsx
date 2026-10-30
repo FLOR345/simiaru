@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import * as m from 'motion/react-m';
 import { AnimatePresence } from 'motion/react';
-import { ArrowLeft, Volume2, Heart, Trophy, RotateCcw, Sparkles, Hand, Eye, Hash, Ear, Search, Minus, Plus, Timer, Star } from 'lucide-react';
+import { ArrowLeft, Volume2, Heart, Trophy, RotateCcw, Sparkles, Hand, Eye, Hash, Ear, Search, Minus, Plus, Timer, Star, Move } from 'lucide-react';
 import { GiVitruvianMan, GiAbacus } from 'react-icons/gi';
 import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { speak } from '../utils/speech';
@@ -13,7 +13,7 @@ import { playTap, playCorrect, playWrong } from '../utils/sounds';
 import Mascot, { LlamaImage } from '../components/Mascot';
 import Decor from '../components/Decor';
 import BodyFigure from '../components/BodyFigure';
-import { Confetti } from '../components/GameFx';
+import { Confetti, Burst } from '../components/GameFx';
 import GradientText from '../components/reactbits/GradientText';
 import { AnimatedContent, BlurText, CountUp } from '../ui/lazyBits';
 import { partesDe, frasesParte, numeroEn, partesNumero } from '../data/cuerpoNumeros';
@@ -224,47 +224,58 @@ const useGame = (bestKey, makeRound) => {
 // ==================== CUERPO ====================
 const BodyExplore = ({ idioma, language, theme }) => {
   const parts = useMemo(() => partesDe(idioma), [idioma]);
-  const [active, setActive] = useState('cabeza');
-  const [seen, setSeen] = useState(() => new Set(['cabeza']));
+  const [active, setActive] = useState('nariz');
+  const [vista, setVista] = useState('frente');
+  const [seen, setSeen] = useState(() => new Set(['nariz']));
   const part = parts.find((p) => p.id === active) || parts[0];
   const fr = frasesParte(part, idioma);
   const select = (p) => {
+    playTap();
     setActive(p.id);
+    setVista(p.vista);
     setSeen((s) => new Set(s).add(p.id));
     speak(p[idioma], { lang: language.voz?.respaldo });
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] items-start">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] items-start">
       <div className="relative rounded-[2rem] bg-gradient-to-b from-white to-stone-50 ring-1 ring-stone-200 p-6 shadow-sm">
-        <span className={`pointer-events-none absolute -left-10 top-10 h-48 w-48 rounded-full bg-gradient-to-br ${theme.gradient} opacity-15 blur-3xl`} aria-hidden="true" />
-        <BodyFigure parts={parts} active={active} onPick={select} label={(p) => p[idioma]} color={theme.hex} />
-        <p className="mt-3 text-center text-sm font-bold text-stone-500">Toca un punto del cuerpo</p>
+        <BodyFigure parts={parts} vista={vista} onFlip={setVista} active={active} onPick={select} label={(p) => p[idioma]} color={theme.hex} />
+        <p className="mt-2 text-center text-sm font-bold text-stone-500">Toca un punto · desliza para darle la vuelta</p>
       </div>
 
       <div className="space-y-5">
         <AnimatePresence mode="wait">
           <m.div
             key={`${part.id}-${idioma}`}
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: 24, rotateX: -8 }}
+            animate={{ opacity: 1, x: 0, rotateX: 0 }}
             exit={{ opacity: 0, x: -24 }}
             transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
             className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${theme.gradient} p-7 text-white shadow-xl`}
           >
             <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
+            <m.span className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/20 blur-2xl" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 4, repeat: Infinity }} aria-hidden="true" />
             <span className="tejido-andino absolute inset-x-0 bottom-0 h-2" aria-hidden="true" />
             <div className="relative">
-              <p className="text-xs font-black uppercase tracking-widest text-white/80">{language.nombre} · {part.es}</p>
-              <p className="mt-1 text-5xl sm:text-6xl font-black leading-none" lang={language.lang}>
-                {part[idioma]}
+              <p className="text-xs font-black uppercase tracking-widest text-white/80">
+                {language.nombre} · {part.vista === 'frente' ? 'de frente' : 'de espalda'}
+              </p>
+              <p className="mt-1 text-5xl sm:text-7xl font-black leading-none drop-shadow-[0_6px_20px_rgba(0,0,0,0.25)]" lang={language.lang}>
+                {String(part[idioma])
+                  .split('')
+                  .map((ch, i) => (
+                    <m.span key={i} className="inline-block" initial={{ opacity: 0, y: 30, rotate: -10 }} animate={{ opacity: 1, y: 0, rotate: 0 }} transition={{ delay: i * 0.04, type: 'spring', bounce: 0.5 }}>
+                      {ch === ' ' ? ' ' : ch}
+                    </m.span>
+                  ))}
               </p>
               <p className="mt-2 text-xl font-semibold text-white/90">
                 {part.art} {part.es}
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {[fr.es, fr.toca].map((f) => (
-                  <button key={f.original} type="button" onClick={() => speak(f.original, { lang: language.voz?.respaldo })} className="rounded-2xl bg-white/15 p-4 text-left ring-1 ring-white/30 backdrop-blur hover:bg-white/25">
+                  <button key={f.original} type="button" onClick={() => speak(f.original, { lang: language.voz?.respaldo })} className="rounded-2xl bg-white/15 p-4 text-left ring-1 ring-white/30 backdrop-blur transition-colors hover:bg-white/25">
                     <span className="flex items-center gap-2 font-black" lang={language.lang}>
                       <Volume2 className="w-4 h-4 shrink-0" aria-hidden="true" /> {f.original}
                     </span>
@@ -281,7 +292,6 @@ const BodyExplore = ({ idioma, language, theme }) => {
           </m.div>
         </AnimatePresence>
 
-        {/* Todas las partes, para saltar a cualquiera */}
         <div className="rounded-3xl bg-white ring-1 ring-stone-200 p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="font-black">Partes del cuerpo</p>
@@ -292,29 +302,44 @@ const BodyExplore = ({ idioma, language, theme }) => {
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-stone-100">
             <m.div className={`h-full rounded-full bg-gradient-to-r ${theme.gradient}`} animate={{ width: `${(seen.size / parts.length) * 100}%` }} />
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {parts.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => select(p)}
-                aria-pressed={p.id === active}
-                className={`min-h-10 rounded-full px-3 text-sm font-bold transition-colors ${p.id === active ? `${theme.solid} text-white` : seen.has(p.id) ? `${theme.soft} ${theme.text}` : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}
-              >
-                <span lang={language.lang}>{p[idioma]}</span> <span className="opacity-70">· {p.es}</span>
-              </button>
-            ))}
-          </div>
+          {seen.size === parts.length && (
+            <m.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-2xl bg-amber-50 px-4 py-2 font-bold text-amber-900">
+              ¡Conoces todas las partes! Ahora prueba los juegos.
+            </m.p>
+          )}
+          {['frente', 'espalda'].map((v) => (
+            <div key={v} className="mt-4">
+              <p className="mb-2 text-xs font-black uppercase tracking-widest text-stone-500">{v === 'frente' ? 'De frente' : 'De espalda'}</p>
+              <div className="flex flex-wrap gap-2">
+                {parts
+                  .filter((p) => p.vista === v)
+                  .map((p) => (
+                    <m.button
+                      key={p.id}
+                      type="button"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => select(p)}
+                      aria-pressed={p.id === active}
+                      className={`min-h-10 rounded-full px-3 text-sm font-bold transition-colors ${p.id === active ? `${theme.solid} text-white shadow-md` : seen.has(p.id) ? `${theme.soft} ${theme.text}` : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}
+                    >
+                      <span lang={language.lang}>{p[idioma]}</span> <span className="opacity-70">· {p.es}</span>
+                    </m.button>
+                  ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-// Juego 1: "La llama dice" — la instrucción en la lengua; se toca la parte en la ilustración
+// Juego 1: "La llama dice" — la instrucción en la lengua; se toca la parte (a veces hay que darle la vuelta)
 const LlamaSays = ({ idioma, language, theme, onExplore }) => {
   const parts = useMemo(() => partesDe(idioma), [idioma]);
   const order = useMemo(() => shuffle(parts), [parts]);
+  const [vista, setVista] = useState('frente');
   const g = useGame(`simiaru-llama-dice-${idioma}`, (r) => order[r % order.length]);
   const target = g.current;
   const fr = frasesParte(target, idioma);
@@ -322,19 +347,38 @@ const LlamaSays = ({ idioma, language, theme, onExplore }) => {
     if (!g.over) speak(fr.toca.original, { lang: language.voz?.respaldo });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [g.round, g.over]);
+  // Si falla, el cuerpo gira solo para mostrar dónde estaba
+  useEffect(() => {
+    if (g.flash && !g.flash.ok) setVista(target.vista);
+  }, [g.flash, target.vista]);
 
   if (g.over) return <EndScreen score={g.score} best={g.best} onReplay={g.restart} onExplore={onExplore} theme={theme} won={g.lives > 0} />;
+  const otherSide = target.vista !== vista && !g.flash;
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] items-start">
-      <div className="rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-sm">
-        <BodyFigure parts={parts} flash={g.flash} onPick={(p) => g.answer(p.id === target.id, p.id)} color={theme.hex} label={g.flash ? (p) => (p.id === target.id ? p[idioma] : '') : undefined} active={g.flash && !g.flash.ok ? target.id : undefined} />
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] items-start">
+      <div className="relative rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-sm">
+        <BodyFigure
+          parts={parts}
+          vista={vista}
+          onFlip={setVista}
+          hint={otherSide}
+          flash={g.flash}
+          onPick={(p) => g.answer(p.id === target.id, p.id)}
+          color={theme.hex}
+          active={g.flash ? target.id : undefined}
+          label={g.flash ? (p) => p[idioma] : undefined}
+        />
+        {g.flash?.ok && <Burst trigger={g.round + 1} count={14} distance={70} />}
       </div>
       <div className="space-y-5">
         <HUD {...g} theme={theme} timeLeft={SECONDS} />
         <AnimatePresence mode="wait">
           <m.div key={g.round} initial={{ opacity: 0, y: 20, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20 }} className="relative overflow-hidden rounded-[2rem] bg-white ring-1 ring-stone-200 p-7 shadow-xl">
+            <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${theme.gradient}`} aria-hidden="true" />
             <div className="flex items-start gap-4">
-              <Mascot pose="hablando" sticker size="w-24 shrink-0" />
+              <m.div animate={{ rotate: [0, -6, 6, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.5 }}>
+                <Mascot pose="hablando" sticker size="w-24 shrink-0" />
+              </m.div>
               <div className="min-w-0">
                 <p className="text-xs font-black uppercase tracking-widest text-stone-500">La llama dice…</p>
                 <p className={`mt-1 text-3xl sm:text-4xl font-black leading-tight ${theme.text}`} lang={language.lang}>
@@ -348,6 +392,11 @@ const LlamaSays = ({ idioma, language, theme, onExplore }) => {
                     </m.p>
                   )}
                 </AnimatePresence>
+                {otherSide && (
+                  <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }} className="mt-2 text-sm font-bold text-amber-700">
+                    Pista: esta parte se ve mejor de {target.vista === 'espalda' ? 'espalda' : 'frente'}.
+                  </m.p>
+                )}
                 <div className="mt-4">
                   <ListenButton text={fr.toca.original} language={language} theme={theme} label="Escuchar otra vez" />
                 </div>
@@ -355,13 +404,12 @@ const LlamaSays = ({ idioma, language, theme, onExplore }) => {
             </div>
           </m.div>
         </AnimatePresence>
-        <p className="text-sm text-stone-500">Toca la parte del cuerpo en el dibujo antes de que se acabe el tiempo.</p>
       </div>
     </div>
   );
 };
 
-// Juego 2: "¿Qué parte es?" — una parte brilla en el dibujo y se elige su nombre
+// Juego 2: "¿Qué parte es?" — el cuerpo gira, una parte se ilumina y se elige su nombre
 const WhichPart = ({ idioma, language, theme, onExplore }) => {
   const parts = useMemo(() => partesDe(idioma), [idioma]);
   const order = useMemo(() => shuffle(parts), [parts]);
@@ -373,9 +421,10 @@ const WhichPart = ({ idioma, language, theme, onExplore }) => {
 
   if (g.over) return <EndScreen score={g.score} best={g.best} onReplay={g.restart} onExplore={onExplore} theme={theme} won={g.lives > 0} />;
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] items-start">
-      <div className="rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-sm">
-        <BodyFigure parts={parts.filter((p) => p.id === t.id)} active={t.id} color={theme.hex} flash={g.flash} />
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] items-start">
+      <div className="relative rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-sm">
+        <BodyFigure parts={parts.filter((p) => p.id === t.id)} vista={t.vista} active={t.id} color={theme.hex} flash={g.flash} label={g.flash ? (p) => p[idioma] : undefined} />
+        {g.flash?.ok && <Burst trigger={g.round + 1} count={14} distance={70} />}
       </div>
       <div className="space-y-5">
         <HUD {...g} theme={theme} timeLeft={SECONDS} />
@@ -388,9 +437,10 @@ const WhichPart = ({ idioma, language, theme, onExplore }) => {
                 <m.button
                   key={`${g.round}-${o.id}`}
                   type="button"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={state === 'bad' ? { x: [0, -10, 10, -6, 6, 0], opacity: 1, y: 0 } : { opacity: 1, y: 0, scale: state === 'ok' ? 1.05 : 1 }}
-                  transition={{ delay: g.flash ? 0 : i * 0.06 }}
+                  initial={{ opacity: 0, y: 14, rotateX: -40 }}
+                  animate={state === 'bad' ? { x: [0, -10, 10, -6, 6, 0], opacity: 1, y: 0, rotateX: 0 } : { opacity: 1, y: 0, rotateX: 0, scale: state === 'ok' ? 1.05 : 1 }}
+                  transition={{ delay: g.flash ? 0 : i * 0.07 }}
+                  whileHover={!g.flash ? { y: -3 } : undefined}
                   onClick={() => {
                     speak(o[idioma], { lang: language.voz?.respaldo });
                     g.answer(o.id === t.id, o.id);
@@ -406,6 +456,135 @@ const WhichPart = ({ idioma, language, theme, onExplore }) => {
             })}
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Juego 3: "Pega las palabras" — se arrastra cada palabra hasta su lugar en el cuerpo (de frente y luego de espalda)
+const DragLabels = ({ idioma, language, theme, onExplore }) => {
+  const parts = useMemo(() => partesDe(idioma), [idioma]);
+  const makeRound = () => {
+    const front = shuffle(parts.filter((p) => p.vista === 'frente')).slice(0, 7);
+    const back = parts.filter((p) => p.vista === 'espalda');
+    return { front, back };
+  };
+  const [set, setSet] = useState(makeRound);
+  const [vista, setVista] = useState('frente');
+  const [placed, setPlaced] = useState({});
+  const [mistakes, setMistakes] = useState(0);
+  const [wrong, setWrong] = useState(null);
+  const [burst, setBurst] = useState(0);
+  const [done, setDone] = useState(false);
+  const faceRef = useRef(null);
+  const bestKey = `simiaru-pega-palabras-${idioma}`;
+  const [best, setBest] = useState(() => store.get(bestKey));
+
+  const pending = (vista === 'frente' ? set.front : set.back).filter((p) => !placed[p.id]);
+  const total = set.front.length + set.back.length;
+  const count = Object.keys(placed).length;
+
+  useEffect(() => {
+    if (done) return;
+    if (vista === 'frente' && set.front.every((p) => placed[p.id])) {
+      const t = setTimeout(() => setVista('espalda'), 700);
+      return () => clearTimeout(t);
+    }
+    if (count === total) {
+      const score = Math.max(0, 1000 - mistakes * 100);
+      if (score > best) {
+        store.set(bestKey, score);
+        setBest(score);
+      }
+      const t = setTimeout(() => setDone(true), 900);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placed]);
+
+  // Al soltar: si cae cerca del punto correcto, se pega
+  const drop = (p, info) => {
+    const face = faceRef.current;
+    if (!face) return false;
+    const r = face.getBoundingClientRect();
+    const { w, h } = { w: p.vista === 'frente' ? 290 : 286, h: p.vista === 'frente' ? 577 : 574 };
+    const cx = r.left + (p.x / w) * r.width;
+    const cy = r.top + (p.y / h) * r.height;
+    const px = info.point.x - window.scrollX;
+    const py = info.point.y - window.scrollY;
+    const ok = Math.hypot(px - cx, py - cy) < Math.max(38, r.width * 0.12);
+    if (ok) {
+      playCorrect();
+      speak(p[idioma], { lang: language.voz?.respaldo });
+      setPlaced((s) => ({ ...s, [p.id]: p[idioma] }));
+      setBurst((b) => b + 1);
+    } else {
+      playWrong();
+      setMistakes((x) => x + 1);
+      setWrong(p.id);
+      setTimeout(() => setWrong(null), 600);
+    }
+    return ok;
+  };
+
+  const restart = () => {
+    setSet(makeRound());
+    setVista('frente');
+    setPlaced({});
+    setMistakes(0);
+    setDone(false);
+  };
+
+  if (done) return <EndScreen score={Math.max(0, 1000 - mistakes * 100)} best={best} onReplay={restart} onExplore={onExplore} theme={theme} won />;
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] items-start">
+      <div className="relative rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-sm">
+        <BodyFigure ref={faceRef} parts={parts.filter((p) => [...set.front, ...set.back].some((x) => x.id === p.id))} vista={vista} placed={placed} color={theme.hex} showDots spotlight={false} onPick={() => {}} />
+        <Burst trigger={burst} count={16} distance={80} />
+      </div>
+      <div className="space-y-5">
+        <div className="rounded-3xl bg-white/90 backdrop-blur ring-1 ring-stone-200 p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="font-black text-xl tabular-nums">
+              {count} / {total}
+            </span>
+            <span className="text-sm font-bold text-stone-500">Errores: {mistakes}</span>
+            <span className="ml-auto rounded-full bg-stone-100 px-3 py-1 text-sm font-black text-stone-700">{vista === 'frente' ? 'De frente' : 'De espalda'}</span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100">
+            <m.div className={`h-full rounded-full bg-gradient-to-r ${theme.gradient}`} animate={{ width: `${(count / total) * 100}%` }} />
+          </div>
+        </div>
+        <div className="rounded-[2rem] bg-white ring-1 ring-stone-200 p-6 shadow-xl">
+          <p className="text-xs font-black uppercase tracking-widest text-stone-500">Arrastra cada palabra hasta su punto en el cuerpo</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <AnimatePresence>
+              {pending.map((p, i) => (
+                <m.div
+                  key={`${vista}-${p.id}`}
+                  layout
+                  drag
+                  dragSnapToOrigin
+                  dragElastic={0.9}
+                  whileDrag={{ scale: 1.15, rotate: -4, zIndex: 60, boxShadow: '0 20px 40px rgba(0,0,0,0.25)' }}
+                  onDragEnd={(e, info) => drop(p, info)}
+                  initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                  animate={wrong === p.id ? { x: [0, -10, 10, -6, 6, 0], opacity: 1, scale: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  transition={{ delay: i * 0.05, type: 'spring', bounce: 0.4 }}
+                  className={`relative cursor-grab touch-none select-none rounded-2xl px-4 py-3 text-xl font-black text-white shadow-lg active:cursor-grabbing bg-gradient-to-br ${wrong === p.id ? 'from-rose-500 to-rose-700' : theme.gradient}`}
+                  lang={language.lang}
+                >
+                  {p[idioma]}
+                  <span className="block text-xs font-bold text-white/80">{p.es}</span>
+                </m.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          {pending.length === 0 && vista === 'frente' && <p className="mt-2 font-bold text-green-700">¡Listo de frente! Ahora el cuerpo se da la vuelta…</p>}
+        </div>
+        <p className="text-sm text-stone-500">Con el mouse o con el dedo: suelta la palabra encima del punto que le corresponde.</p>
       </div>
     </div>
   );
@@ -626,6 +805,7 @@ const MODES = {
     { id: 'explorar', label: 'Explorar', Icon: Eye },
     { id: 'llama-dice', label: 'La llama dice', Icon: Hand },
     { id: 'que-parte', label: '¿Qué parte es?', Icon: Sparkles },
+    { id: 'pega', label: 'Pega las palabras', Icon: Move },
   ],
   numeros: [
     { id: 'explorar', label: 'Explorar', Icon: Hash },
@@ -743,6 +923,7 @@ const BodyNumbers = ({ user }) => {
             {tab === 'cuerpo' && mode === 'explorar' && <BodyExplore {...props} />}
             {tab === 'cuerpo' && mode === 'llama-dice' && <LlamaSays {...props} />}
             {tab === 'cuerpo' && mode === 'que-parte' && <WhichPart {...props} />}
+            {tab === 'cuerpo' && mode === 'pega' && <DragLabels {...props} />}
             {tab === 'numeros' && mode === 'explorar' && <NumbersExplore {...props} />}
             {tab === 'numeros' && mode === 'cuenta' && <CountLlamas {...props} />}
             {tab === 'numeros' && mode === 'escucha' && <ListenTap {...props} />}

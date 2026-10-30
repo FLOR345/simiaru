@@ -1,25 +1,32 @@
 // Partes del cuerpo y números en quechua (collao/cusqueño) y aimara, para la sección "Mi cuerpo y los números".
-// x, y: punto de la parte en la ilustración (viewBox 0 0 400 760); art: artículo en castellano.
+// art: artículo en castellano; vista: frente o espalda de la ilustración.
 // Frases: "Este es mi…" (Kayqa umaymi / Akax p'iqijawa) y "Toca tu…" (Umaykita llamiy / P'iqima llamkt'am).
 
+// Ilustración de frente (290×577) y de espalda (286×574): x, y en píxeles de cada imagen
+export const VISTAS = { frente: { w: 290, h: 577 }, espalda: { w: 286, h: 574 } };
+
 export const PARTES = [
-  { id: 'cabeza', es: 'cabeza', art: 'la', quechua: 'uma', aymara: "p'iqi", x: 200, y: 64, r: 30 },
-  { id: 'cabello', es: 'cabello', art: 'el', quechua: 'chukcha', aymara: "ñik'uta", x: 152, y: 96, r: 22 },
-  { id: 'cara', es: 'cara', art: 'la', quechua: 'uya', aymara: 'ajanu', x: 242, y: 160, r: 20 },
-  { id: 'ojo', es: 'ojo', art: 'el', quechua: 'ñawi', aymara: 'nayra', x: 176, y: 126, r: 16 },
-  { id: 'oreja', es: 'oreja', art: 'la', quechua: 'ninri', aymara: 'jinchu', x: 134, y: 138, r: 17 },
-  { id: 'nariz', es: 'nariz', art: 'la', quechua: 'sinqa', aymara: 'nasa', x: 200, y: 146, r: 14 },
-  { id: 'boca', es: 'boca', art: 'la', quechua: 'simi', aymara: 'laka', x: 200, y: 176, r: 16 },
-  { id: 'cuello', es: 'cuello', art: 'el', quechua: 'kunka', aymara: 'kunka', x: 200, y: 210, r: 16 },
-  { id: 'pecho', es: 'pecho', art: 'el', quechua: 'qhasqu', aymara: 'ch\'iqa', x: 236, y: 314, r: 22, soloQuechua: true },
-  { id: 'corazon', es: 'corazón', art: 'el', quechua: 'sunqu', aymara: 'lluqu', x: 170, y: 300, r: 18 },
-  { id: 'barriga', es: 'barriga', art: 'la', quechua: 'wiksa', aymara: 'puraka', x: 200, y: 374, r: 24 },
-  { id: 'brazo', es: 'brazo', art: 'el', quechua: 'rikra', aymara: 'ampara', x: 116, y: 392, r: 20, soloQuechua: true },
-  { id: 'codo', es: 'codo', art: 'el', quechua: 'kuchuch', aymara: 'mujlli', x: 296, y: 382, r: 16, soloAymara: true },
-  { id: 'mano', es: 'mano', art: 'la', quechua: 'maki', aymara: 'ampara', x: 104, y: 470, r: 22 },
-  { id: 'dedo', es: 'dedo', art: 'el', quechua: "ruk'ana", aymara: "luk'ana", x: 300, y: 494, r: 15 },
-  { id: 'rodilla', es: 'rodilla', art: 'la', quechua: 'muqu', aymara: 'qunquri', x: 172, y: 600, r: 18 },
-  { id: 'pie', es: 'pie', art: 'el', quechua: 'chaki', aymara: 'kayu', x: 230, y: 708, r: 22 },
+  // De frente
+  { id: 'cabello', vista: 'frente', es: 'cabello', art: 'el', quechua: 'chukcha', aymara: "ñik'uta", x: 150, y: 34 },
+  { id: 'ojo', vista: 'frente', es: 'ojo', art: 'el', quechua: 'ñawi', aymara: 'nayra', x: 116, y: 140 },
+  { id: 'oreja', vista: 'frente', es: 'oreja', art: 'la', quechua: 'ninri', aymara: 'jinchu', x: 74, y: 148 },
+  { id: 'nariz', vista: 'frente', es: 'nariz', art: 'la', quechua: 'sinqa', aymara: 'nasa', x: 142, y: 160 },
+  { id: 'cara', vista: 'frente', es: 'cara', art: 'la', quechua: 'uya', aymara: 'ajanu', x: 192, y: 166 },
+  { id: 'boca', vista: 'frente', es: 'boca', art: 'la', quechua: 'simi', aymara: 'laka', x: 145, y: 186 },
+  { id: 'cuello', vista: 'frente', es: 'cuello', art: 'el', quechua: 'kunka', aymara: 'kunka', x: 145, y: 222 },
+  { id: 'pecho', vista: 'frente', es: 'pecho', art: 'el', quechua: 'qhasqu', aymara: '', x: 116, y: 262, soloQuechua: true },
+  { id: 'corazon', vista: 'frente', es: 'corazón', art: 'el', quechua: 'sunqu', aymara: 'lluqu', x: 172, y: 286 },
+  { id: 'barriga', vista: 'frente', es: 'barriga', art: 'la', quechua: 'wiksa', aymara: 'puraka', x: 145, y: 306 },
+  { id: 'ombligo', vista: 'frente', es: 'ombligo', art: 'el', quechua: 'pupu', aymara: 'kururu', x: 145, y: 343 },
+  { id: 'mano', vista: 'frente', es: 'mano', art: 'la', quechua: 'maki', aymara: 'ampara', x: 32, y: 366 },
+  { id: 'dedo', vista: 'frente', es: 'dedo', art: 'el', quechua: "ruk'ana", aymara: "luk'ana", x: 258, y: 382 },
+  { id: 'rodilla', vista: 'frente', es: 'rodilla', art: 'la', quechua: 'muqu', aymara: 'qunquri', x: 108, y: 455 },
+  { id: 'pie', vista: 'frente', es: 'pie', art: 'el', quechua: 'chaki', aymara: 'kayu', x: 183, y: 553 },
+  // De espalda
+  { id: 'cabeza', vista: 'espalda', es: 'cabeza', art: 'la', quechua: 'uma', aymara: "p'iqi", x: 150, y: 96 },
+  { id: 'hombro', vista: 'espalda', es: 'hombro', art: 'el', quechua: 'rikra', aymara: 'kallachi', x: 88, y: 240 },
+  { id: 'espalda', vista: 'espalda', es: 'espalda', art: 'la', quechua: 'wasa', aymara: 'jikhani', x: 150, y: 282 },
+  { id: 'codo', vista: 'espalda', es: 'codo', art: 'el', quechua: '', aymara: 'mujlli', x: 50, y: 322, soloAymara: true },
 ];
 
 // Partes de cada lengua (algunas se dicen solo con seguridad en una de ellas)
