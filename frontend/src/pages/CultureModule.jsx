@@ -7,6 +7,7 @@ import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playCorrect, playWrong } from '../utils/sounds';
 import { speak } from '../utils/speech';
 import Mascot from '../components/Mascot';
+import BookLibrary from '../components/BookLibrary';
 import Decor from '../components/Decor';
 import GradientText from '../components/reactbits/GradientText';
 
@@ -682,6 +683,9 @@ const CultureModule = ({ user }) => {
             )}
 
             {renderResults()}
+
+            {/* Biblioteca: libros en quechua y aimara de fuentes oficiales (solo enlaces) */}
+            {selectedType === 'cuento' && !selectedStory && <BookLibrary idioma={selectedLanguage} />}
           </div>
         </div>
       </main>
