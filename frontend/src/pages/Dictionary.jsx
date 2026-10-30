@@ -33,6 +33,11 @@ import Mascot from '../components/Mascot';
 import WordOfDay from '../components/WordOfDay';
 import Decor from '../components/Decor';
 import GradientText from '../components/reactbits/GradientText';
+import * as m from 'motion/react-m';
+import { wordIcon, categoryIcon, colorOf } from '../ui/wordIcons';
+// Los ejemplos de todas las palabras (unas 1500) se descargan aparte, cuando ya se ve la página
+let EJEMPLOS = {};
+const loadExamples = () => import('../data/ejemplos.json').then((mod) => (EJEMPLOS = mod.default));
 
 // Apóstrofos del teclado del celular (’ ´) se buscan como el apóstrofo simple de la base
 const cleanQuery = (text) => text.replace(/[’‘´`ʼ]/g, "'").trim();
@@ -122,6 +127,12 @@ const Dictionary = () => {
   const [favorites, setFavorites] = useState(() => storage.get('simiaru-favoritas', {}));
   const [recent, setRecent] = useState(() => storage.get('simiaru-busquedas', []));
   const requestId = useRef(0); // ignora respuestas que llegan tarde de búsquedas anteriores
+  const [, setExamplesReady] = useState(false);
+  useEffect(() => {
+    loadExamples()
+      .then(() => setExamplesReady(true))
+      .catch(() => {});
+  }, []);
 
   const language = getLanguage(selectedLanguage) ?? LANGUAGES[0];
   const theme = languageStyle(selectedLanguage);
@@ -345,7 +356,7 @@ const Dictionary = () => {
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
                   {categories.map((group) => {
-                    const Icon = CATEGORY_ICONS[group.key] ?? Tag;
+                    const Icon = CATEGORY_ICONS[group.key] ?? categoryIcon(group.key) ?? Tag;
                     const isSelected = selectedCategory?.key === group.key;
                     return (
                       <button
@@ -534,35 +545,66 @@ const EmptyState = ({ pose, icon: Icon, title, text }) => (
 );
 
 // ==================== TARJETA DE PALABRA ====================
+const exKey = (w) => `${String(w.palabra_objetivo ?? '').trim().toLowerCase().normalize('NFC')}|${String(w.palabra_espanol ?? '').trim().toLowerCase().normalize('NFC')}`;
+
+// Ejemplo de la palabra: el de la base (con su traducción) o el de SimiAru
+const exampleOf = (word, idioma) => {
+  const ex = EJEMPLOS[idioma]?.[exKey(word)];
+  if (word.ejemplo_uso) return [word.ejemplo_uso, word.traduccion_ejemplo || (ex && ex[0] === word.ejemplo_uso.trim() ? ex[1] : null)];
+  return ex || null;
+};
+
 const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 0 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const Icon = wordIcon(word);
+  const swatch = colorOf(word);
+  const example = exampleOf(word, language.id);
 
-  const play = () => {
+  const play = (text = word.palabra_objetivo, url = word.audio_url) => {
     setIsPlaying(true);
-    speak(word.palabra_objetivo, { url: word.audio_url, lang: language.voz?.respaldo });
+    speak(text, { url, lang: language.voz?.respaldo });
     setTimeout(() => setIsPlaying(false), 1300);
   };
 
   return (
-    <li className="tarjeta-viva anim-entra bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 shadow-sm" style={{ '--i': Math.min(index, 8) }}>
-      <div className="flex items-start gap-3">
+    <m.li
+      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-30px' }}
+      transition={{ type: 'spring', bounce: 0.3, duration: 0.6, delay: Math.min(index, 8) * 0.04 }}
+      whileHover={{ y: -4 }}
+      className="group relative overflow-hidden bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 shadow-sm hover:shadow-xl hover:shadow-stone-900/10 transition-shadow"
+    >
+      <span className={`pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-2xl transition-opacity group-hover:opacity-25`} aria-hidden="true" />
+      <div className="relative flex items-start gap-4">
+        {/* Ícono de la palabra (o el color mismo) */}
+        <m.span
+          whileHover={{ rotate: [0, -8, 8, 0], scale: 1.08 }}
+          transition={{ duration: 0.5 }}
+          className={`relative shrink-0 w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl flex items-center justify-center shadow-lg ring-4 ring-white ${swatch ? '' : `bg-gradient-to-br ${theme.gradient}`}`}
+          style={swatch ? { background: swatch } : undefined}
+          aria-hidden="true"
+        >
+          {!swatch && <span className="absolute inset-0 rounded-2xl opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_5px,transparent_5px_14px)]" />}
+          <Icon className={`relative w-9 h-9 sm:w-10 sm:h-10 ${swatch && /^#(f|e|d)/i.test(swatch) ? 'text-stone-800' : 'text-white'} drop-shadow`} />
+        </m.span>
         <div className="flex-1 min-w-0">
-          <p className={`text-2xl sm:text-3xl font-black break-words ${theme.text}`} lang={language.lang}>
+          <p className={`text-2xl sm:text-3xl font-black break-words leading-tight ${theme.text}`} lang={language.lang}>
             <Highlight text={word.palabra_objetivo} query={query} />
           </p>
           {word.pronunciacion && <p className="text-stone-600 mt-1">/{word.pronunciacion}/</p>}
-          <p className="text-lg font-bold mt-1">
+          <p className="text-lg font-bold mt-0.5 text-stone-800">
             <Highlight text={word.palabra_espanol} query={query} />
           </p>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
           <button
             type="button"
-            onClick={play}
+            onClick={() => play()}
             aria-label={`Escuchar ${word.palabra_objetivo}${word.audio_url ? ' (voz MMS)' : ' (voz del navegador)'}`}
-            className={`ficha w-12 h-12 flex items-center justify-center ${theme.solid} border-black/20 text-white rounded-xl`}
+            className={`ficha w-11 h-11 flex items-center justify-center ${theme.solid} border-black/20 text-white rounded-xl`}
           >
-            <Volume2 className={`w-6 h-6 ${isPlaying ? 'anim-latido' : ''}`} aria-hidden="true" />
+            <Volume2 className={`w-5 h-5 ${isPlaying ? 'anim-latido' : ''}`} aria-hidden="true" />
           </button>
           <button
             type="button"
@@ -572,14 +614,14 @@ const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 
             }}
             aria-pressed={!!favorite}
             aria-label={favorite ? `Quitar ${word.palabra_objetivo} de favoritas` : `Guardar ${word.palabra_objetivo} en favoritas`}
-            className={`ficha w-12 h-12 flex items-center justify-center rounded-xl ${favorite ? 'border-rose-600 bg-rose-500 text-white' : 'border-stone-300 bg-white text-stone-500 hover:text-rose-600'}`}
+            className={`ficha w-11 h-11 flex items-center justify-center rounded-xl ${favorite ? 'border-rose-600 bg-rose-500 text-white' : 'border-stone-300 bg-white text-stone-500 hover:text-rose-600'}`}
           >
-            <Heart key={favorite ? 'si' : 'no'} className={`w-6 h-6 ${favorite ? 'fill-white anim-latido' : ''}`} aria-hidden="true" />
+            <Heart key={favorite ? 'si' : 'no'} className={`w-5 h-5 ${favorite ? 'fill-white anim-latido' : ''}`} aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mt-3">
+      <div className="relative flex flex-wrap items-center gap-2 mt-4">
         {word.categoria && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 text-stone-700 text-sm font-semibold rounded-full capitalize">
             <Tag className="w-3.5 h-3.5" aria-hidden="true" />
@@ -590,23 +632,35 @@ const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 
         {word.audio_url && <span className="px-3 py-1 bg-green-50 text-green-800 text-sm font-semibold rounded-full">Voz MMS</span>}
       </div>
 
-      {word.ejemplo_uso && (
-        <div className="mt-4 p-4 bg-stone-50 rounded-2xl">
-          <p className="text-xs font-black uppercase tracking-wider text-stone-500 mb-1">Ejemplo</p>
-          <p className="italic" lang={language.lang}>
-            “{word.ejemplo_uso}”
-          </p>
-          {word.traduccion_ejemplo && <p className="text-stone-600 mt-1">{word.traduccion_ejemplo}</p>}
+      {example && (
+        <div className={`relative mt-4 rounded-2xl border-l-4 ${theme.border} ${theme.soft} p-4`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-wider text-stone-500 mb-1">Ejemplo</p>
+              <p className="font-semibold text-stone-900 italic" lang={language.lang}>
+                “{example[0]}”
+              </p>
+              {example[1] && <p className="text-stone-600 mt-1">{example[1]}</p>}
+            </div>
+            <button
+              type="button"
+              onClick={() => play(example[0], null)}
+              aria-label="Escuchar el ejemplo"
+              className="shrink-0 w-9 h-9 rounded-full bg-white/80 ring-1 ring-black/5 flex items-center justify-center text-stone-600 hover:text-stone-900"
+            >
+              <Volume2 className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       )}
 
       {word.leccion_nombre && (
-        <p className="mt-4 flex items-center gap-2 text-sm text-stone-600">
+        <p className="relative mt-4 flex items-center gap-2 text-sm text-stone-600">
           <BookOpen className="w-4 h-4" aria-hidden="true" />
           De la lección <span className="font-semibold text-stone-800">{word.leccion_nombre}</span>
         </p>
       )}
-    </li>
+    </m.li>
   );
 };
 

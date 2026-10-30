@@ -19,6 +19,7 @@
     "motion": "14.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.7.0",
     "react-router-dom": "^6.30.1",
     "react-toastify": "^11.0.5"
   },

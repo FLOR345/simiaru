@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '../utils/notify';
-import { Volume2, Heart, Search, ArrowLeft, AlertCircle, RefreshCw, BookOpen, Lightbulb, Quote, Music, Dices, Eye, Check, MapPin } from 'lucide-react';
+import { Volume2, Heart, Search, ArrowLeft, AlertCircle, RefreshCw, BookOpen, Lightbulb, Quote, Music, Dices, Eye, Check, PartyPopper, MapPin } from 'lucide-react';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playCorrect, playWrong } from '../utils/sounds';
@@ -10,8 +10,12 @@ import Mascot from '../components/Mascot';
 import BookLibrary from '../components/BookLibrary';
 import { StoryGrid, StoryReader } from '../components/Stories';
 import { conCuentosExtra } from '../data/cuentos';
+import { riddlePhoto, proverbIcon } from '../data/cultura';
+import { Confetti } from '../components/GameFx';
+import * as m from 'motion/react-m';
 import Decor from '../components/Decor';
 import GradientText from '../components/reactbits/GradientText';
+import { AnimatedContent, BlurText } from '../ui/lazyBits';
 
 const TYPES = [
   { value: 'adivinanza', label: 'Adivinanzas', singular: 'adivinanza', pose: 'pensando', Icon: Lightbulb, color: 'from-amber-400 to-orange-600', hint: '¿Adivinas qué es? Escribe tu respuesta y descúbrela.' },
@@ -100,6 +104,7 @@ const RiddleCard = ({ item, index, language, theme, fav, onAnswered }) => {
     }
   };
   const revealed = state === 'right' || state === 'shown';
+  const photo = useMemo(() => riddlePhoto(item), [item]);
 
   return (
     <li id={`cultura-${item.id}`} className="tarjeta-viva anim-entra bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden" style={{ '--i': Math.min(index, 8) }}>
@@ -118,11 +123,43 @@ const RiddleCard = ({ item, index, language, theme, fav, onAnswered }) => {
       </div>
       <div className="p-5 sm:p-6">
         {revealed ? (
-          <div className={`rounded-2xl p-4 anim-pop ${state === 'right' ? 'bg-green-50 border-2 border-green-500' : 'bg-amber-50 border-2 border-amber-400'}`}>
-            <p className={`font-black text-lg mb-1 ${state === 'right' ? 'text-green-800' : 'text-amber-900'}`}>
-              {state === 'right' ? '¡Adivinaste! 🎉' : 'La respuesta es…'} {item.titulo}
-            </p>
-            {item.explicacion && <p className="text-stone-800">{item.explicacion}</p>}
+          <div className={`relative overflow-hidden rounded-2xl ${state === 'right' ? 'bg-green-50 ring-2 ring-green-500' : 'bg-amber-50 ring-2 ring-amber-400'}`}>
+            {/* La respuesta se descubre con su foto, que se abre desde el centro */}
+            {photo && (
+              <m.figure
+                className="relative m-0 aspect-[16/9] overflow-hidden"
+                initial={{ clipPath: 'circle(0% at 50% 50%)' }}
+                animate={{ clipPath: 'circle(75% at 50% 50%)' }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <m.img src={photo.src} alt={photo.alt} style={{ objectPosition: photo.posicion }} className="h-full w-full object-cover" initial={{ scale: 1.25 }} animate={{ scale: 1 }} transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }} />
+                <span className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent" aria-hidden="true" />
+                <m.figcaption
+                  className="absolute bottom-3 left-4 right-4 text-white"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                >
+                  <span className="block text-xs font-black uppercase tracking-widest text-white/80">{state === 'right' ? '¡Adivinaste!' : 'La respuesta es'}</span>
+                  <span className="block text-3xl font-black drop-shadow">{item.titulo}</span>
+                </m.figcaption>
+                {photo.credito && (
+                  <a href={photo.credito.pagina} target="_blank" rel="noopener noreferrer" className="absolute right-2 top-2 rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-white/90 backdrop-blur hover:bg-black/60">
+                    Foto: {photo.credito.autor} · {photo.credito.licencia}
+                  </a>
+                )}
+                {state === 'right' && <Confetti />}
+              </m.figure>
+            )}
+            <div className="p-4">
+              {!photo && (
+                <p className={`font-black text-lg mb-1 inline-flex items-center gap-2 ${state === 'right' ? 'text-green-800' : 'text-amber-900'}`}>
+                  {state === 'right' && <PartyPopper className="w-5 h-5" aria-hidden="true" />}
+                  {state === 'right' ? '¡Adivinaste!' : 'La respuesta es…'} {item.titulo}
+                </p>
+              )}
+              {item.explicacion && <p className="text-stone-800">{item.explicacion}</p>}
+            </div>
           </div>
         ) : (
           <form onSubmit={check} className="space-y-3">
@@ -164,16 +201,35 @@ const RiddleCard = ({ item, index, language, theme, fav, onAnswered }) => {
 // ==================== Proverbio ====================
 const ProverbCard = ({ item, index, language, theme, fav }) => {
   const [open, setOpen] = useState(false);
+  const Icon = proverbIcon(item);
   return (
-    <li id={`cultura-${item.id}`} className="tarjeta-viva anim-entra bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-6" style={{ '--i': Math.min(index, 8) }}>
-      <div className="flex items-start justify-between gap-3">
-        <Quote className={`w-10 h-10 ${theme.text} opacity-30 shrink-0`} aria-hidden="true" />
+    <m.li
+      id={`cultura-${item.id}`}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-30px' }}
+      transition={{ type: 'spring', bounce: 0.3, duration: 0.6, delay: Math.min(index, 6) * 0.05 }}
+      className="group relative overflow-hidden bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-6 hover:shadow-xl hover:shadow-stone-900/10 transition-shadow"
+    >
+      <span className={`pointer-events-none absolute -right-14 -top-14 h-44 w-44 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-2xl transition-opacity group-hover:opacity-25`} aria-hidden="true" />
+      <Quote className={`pointer-events-none absolute right-5 bottom-4 w-24 h-24 ${theme.text} opacity-[0.06]`} aria-hidden="true" />
+      <div className="relative flex items-start justify-between gap-3">
+        {/* Ícono de lo que habla el proverbio */}
+        <m.span
+          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+          transition={{ duration: 0.5 }}
+          className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center shadow-lg ring-4 ring-white`}
+          aria-hidden="true"
+        >
+          <span className="absolute inset-0 rounded-2xl opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_5px,transparent_5px_14px)]" />
+          <Icon className="relative w-9 h-9 text-white drop-shadow" />
+        </m.span>
         <FavoriteButton {...fav} />
       </div>
-      <p className="mt-2 text-2xl font-black leading-snug" lang={language.lang}>
+      <p className="relative mt-4 text-2xl font-black leading-snug" lang={language.lang}>
         {item.contenido_original}
       </p>
-      {item.titulo && <p className="mt-1 text-sm font-bold text-stone-500">{item.titulo}</p>}
+      {item.titulo && <p className="relative mt-1 text-sm font-bold text-stone-500">{item.titulo}</p>}
       <div className="mt-3 flex flex-wrap gap-2">
         <ListenButton text={item.contenido_original} language={language} />
       </div>
@@ -199,7 +255,7 @@ const ProverbCard = ({ item, index, language, theme, fav }) => {
           ¿Qué significará? Descúbrelo
         </button>
       )}
-    </li>
+    </m.li>
   );
 };
 
@@ -589,6 +645,35 @@ const CultureModule = ({ user }) => {
               </p>
             )}
 
+            {/* Encabezado de la sección: entra con GSAP (Animated Content) y el título con Blur Text */}
+            {selectedType !== 'cuento' && !loading && !loadError && content.length > 0 && (
+              <AnimatedContent key={`${selectedType}-${selectedLanguage}`} distance={40} duration={0.7} ease="back.out(1.4)" scale={0.96} blur={4} threshold={0.05}>
+                <div className={`relative mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br ${type.color} p-6 sm:p-8 text-white shadow-xl shadow-stone-900/10`}>
+                  <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
+                  <m.span className="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/25 blur-3xl" animate={{ x: [0, -30, 0], y: [0, 20, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} aria-hidden="true" />
+                  <span className="tejido-andino absolute inset-x-0 bottom-0 h-2" aria-hidden="true" />
+                  <div className="relative flex items-center gap-5">
+                    <m.span
+                      className="hidden sm:flex w-20 h-20 shrink-0 items-center justify-center rounded-3xl bg-white/20 ring-2 ring-white/40 backdrop-blur"
+                      animate={{ rotate: [0, -6, 6, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                      aria-hidden="true"
+                    >
+                      <type.Icon className="w-10 h-10" />
+                    </m.span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-black uppercase tracking-widest text-white/80">Cultura viva · {language.nombre}</p>
+                      <BlurText key={`${selectedType}-${selectedLanguage}`} text={`${type.label} en ${language.nombre.toLowerCase()}`} className="!justify-start text-3xl sm:text-4xl font-black leading-tight" delay={70} stepDuration={0.3} />
+                      <p className="mt-1 text-white/90 font-semibold">
+                        {content.length} {type.label.toLowerCase()}
+                        {selectedType === 'adivinanza' && ` · ${solved} adivinadas`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedContent>
+            )}
+
             {renderResults()}
           </div>
         </div>
@@ -597,7 +682,7 @@ const CultureModule = ({ user }) => {
 
       {/* Biblioteca andina: a todo lo ancho de la pantalla, debajo de los cuentos */}
       {selectedType === 'cuento' && !selectedStory && (
-        <section className="relative mx-auto w-full max-w-[112rem] px-4 sm:px-8 lg:px-12 pb-20">
+        <section className="relative mx-auto w-full max-w-[74rem] px-4 sm:px-6 pb-20">
           <BookLibrary idioma={selectedLanguage} />
         </section>
       )}

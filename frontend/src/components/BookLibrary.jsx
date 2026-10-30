@@ -44,7 +44,7 @@ const TYPE_STYLE = {
   Retahílas: { Icon: Smile, bg: 'from-lime-400 via-green-500 to-emerald-600' },
   Fábulas: { Icon: Rabbit, bg: 'from-yellow-400 via-amber-500 to-orange-600' },
 };
-const SHELF_PREVIEW = 12; // libros visibles por estante antes de "Ver todos"
+const SHELF_PREVIEW = 10; // libros visibles por estante antes de "Ver todos"
 const styleOf = (tipo) => TYPE_STYLE[tipo] ?? { Icon: BookOpen, bg: 'from-stone-500 to-stone-700' };
 
 const SHELVES = [
@@ -144,17 +144,32 @@ const BookSheet = ({ libro, onClose, saved, onToggleSave }) => {
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
         <div className="grid sm:grid-cols-[15rem_1fr]">
-          <div className={`relative flex items-center justify-center bg-gradient-to-br ${styleOf(libro.tipo).bg} p-8 sm:rounded-l-[2rem] rounded-t-[2rem] sm:rounded-tr-none`}>
-            <span className="absolute inset-0 opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
-            <m.span layoutId={`libro-${libro.id}`} className="relative block w-40 aspect-[3/4] overflow-hidden rounded-r-xl rounded-l-[4px] shadow-[8px_14px_30px_rgba(0,0,0,0.4)]">
-              <Cover libro={libro} />
-              <span className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/35 to-transparent" aria-hidden="true" />
+          {/* Verde si el libro es en quechua, azul si es en aimara */}
+          <div className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-br ${libro.idioma === 'aymara' ? 'from-sky-400 via-blue-600 to-indigo-800' : 'from-emerald-400 via-green-600 to-teal-800'} p-8 sm:rounded-l-[2rem] rounded-t-[2rem] sm:rounded-tr-none`}>
+            <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
+            <m.span className="absolute -top-16 -left-10 h-48 w-48 rounded-full bg-white/25 blur-3xl" animate={{ x: [0, 30, 0], y: [0, 20, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} aria-hidden="true" />
+            <m.span className={`absolute -bottom-20 -right-10 h-56 w-56 rounded-full ${libro.idioma === 'aymara' ? 'bg-cyan-300/40' : 'bg-lime-300/40'} blur-3xl`} animate={{ x: [0, -24, 0], y: [0, -18, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} aria-hidden="true" />
+            <span className="tejido-andino absolute inset-x-0 bottom-0 h-2" aria-hidden="true" />
+            <m.span
+              className="absolute bottom-5 left-5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white backdrop-blur"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+            >
+              {lang?.nombre}
+            </m.span>
+            <m.span animate={{ y: [0, -8, 0], rotate: [0, -1.5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }} className="relative block">
+              <m.span layoutId={`libro-${libro.id}`} className="relative block w-40 aspect-[3/4] overflow-hidden rounded-r-xl rounded-l-[4px] shadow-[10px_18px_36px_rgba(0,0,0,0.45)] ring-1 ring-white/30">
+                <Cover libro={libro} />
+                <span className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/35 to-transparent" aria-hidden="true" />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent opacity-60" aria-hidden="true" />
+              </m.span>
             </m.span>
           </div>
           <div className="p-6 sm:p-8">
             <p className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-widest text-stone-500">
               <Icon className="w-4 h-4" aria-hidden="true" /> {libro.tipo} · {lang?.nombre}
-              {libro.variedad && libro.variedad.toLowerCase() !== lang?.nombre?.toLowerCase() && ` · ${libro.variedad}`}
+              {libro.variedad && libro.variedad.toLowerCase().replace('aimara', 'aymara') !== lang?.nombre?.toLowerCase().replace('aimara', 'aymara') && ` · ${libro.variedad}`}
             </p>
             <h3 id="ficha-libro-titulo" className="mt-1 text-2xl sm:text-3xl font-black leading-tight" lang={lang?.lang}>
               {libro.titulo}
@@ -282,7 +297,7 @@ const BookLibrary = ({ idioma }) => {
   ).slice(0, 8);
 
   const grid = (list) => (
-    <ul className="grid grid-cols-2 min-[480px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10">
+    <ul className="grid grid-cols-2 min-[480px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10">
       {list.map((libro) => (
         <ShelfBook key={libro.id} libro={libro} onOpen={(l) => (playTap(), setOpen(l))} saved={saved.includes(libro.id)} />
       ))}
