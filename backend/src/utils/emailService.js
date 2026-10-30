@@ -33,7 +33,9 @@ const explainBrevoError = (error) => {
   const code = body.code || '';
   const text = body.message || error?.message || 'error desconocido';
   if (!BREVO_KEY) return 'El servidor no tiene configurada la clave de Brevo (BREVO_API_KEY).';
-  if (error?.status === 401 || code === 'unauthorized') return 'La clave de Brevo (BREVO_API_KEY) no es válida o fue revocada.';
+  // Brevo bloquea las llamadas desde direcciones IP no autorizadas (Render cambia de IP)
+  if (/ip address|unrecognised ip|unrecognized ip|IP/i.test(text)) return 'Brevo bloqueó la dirección IP del servidor. En Brevo → Seguridad → IP autorizadas, desactiva el bloqueo o agrega las IP de salida de Render.';
+  if (error?.status === 401 || code === 'unauthorized') return 'La clave de Brevo (BREVO_API_KEY) no es válida, está desactivada o fue revocada.';
   if (/sender/i.test(text)) return `Brevo rechazó el remitente ${SENDER.email}: hay que verificarlo en Brevo (Senders).`;
   if (error?.status === 402 || /credit|quota|limit/i.test(text)) return 'Se acabaron los envíos gratuitos de Brevo por hoy.';
   return `Brevo respondió: ${text}`;
