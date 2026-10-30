@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { ArrowLeft, Award, Flame, Star, BookOpen, Target, CheckCircle, Lock, X, Edit3, AlertCircle, RefreshCw, Calendar, Download, Trash2, School, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.webp';

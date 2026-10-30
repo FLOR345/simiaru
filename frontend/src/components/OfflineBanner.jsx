@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { WifiOff } from 'lucide-react';
 import { LlamaImage } from './Mascot';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { syncProgress } from '../services/offlineSync';
 import { flush } from '../services/telemetry';
 

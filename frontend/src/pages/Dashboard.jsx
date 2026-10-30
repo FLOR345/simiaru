@@ -18,7 +18,6 @@ import Mascot from '../components/Mascot';
 import { Practice, preloadOn } from '../routes';
 import { LANGUAGES, languageStyle, getLanguage } from '../languages';
 import WeekActivity from '../components/WeekActivity';
-import WordOfDay, { pickWordOfDay } from '../components/WordOfDay';
 import GradientText from '../components/reactbits/GradientText';
 import Decor from '../components/Decor';
 import SplitText from '../components/reactbits/SplitText';
@@ -44,7 +43,6 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [loadError, setLoadError] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('quechua');
   const [langTotals, setLangTotals] = useState({}); // lecciones de cada lengua
-  const [dayWords, setDayWords] = useState([]);
 
   // Total de lecciones de cada lengua (para el avance en las tarjetas de idioma)
   useEffect(() => {
@@ -58,13 +56,6 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
     ).then((entries) => setLangTotals(Object.fromEntries(entries)));
   }, []);
 
-  // Palabras para la palabra del día
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/api/dictionary/all?idioma=${selectedLanguage}`)
-      .then((r) => setDayWords(r.data.words || []))
-      .catch(() => setDayWords([]));
-  }, [selectedLanguage]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -141,7 +132,6 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
       { total: langTotals[l.id], done: isGuest ? 0 : progress.filter((p) => p.completado && p.idioma === l.id).length },
     ])
   );
-  const wordOfDay = pickWordOfDay(dayWords);
 
   const completedLessons = progress.filter((p) => p.completado && (!p.idioma || p.idioma === selectedLanguage)).length;
   const totalLessons = units.reduce((acc, unit) => acc + (unit.lecciones_count || 0), 0);
@@ -345,15 +335,12 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
           </ul>
         </div>
 
-        {/* ==================== META DIARIA, SEMANA Y PALABRA DEL DÍA ==================== */}
-        <div className={`grid gap-6 mb-8 ${!isGuest ? 'lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]' : ''}`}>
-          {!isGuest && <WeekActivity progress={progress} theme={languageStyle(selectedLanguage)} />}
-          {wordOfDay && (
-            <div className="rounded-3xl bg-white/85 backdrop-blur border border-white shadow-sm p-5 sm:p-6">
-              <WordOfDay word={wordOfDay} language={getLanguage(selectedLanguage)} theme={languageStyle(selectedLanguage)} height="h-48" />
-            </div>
-          )}
-        </div>
+        {/* ==================== META DIARIA Y SEMANA ==================== */}
+        {!isGuest && (
+          <div className="mb-8">
+            <WeekActivity progress={progress} theme={languageStyle(selectedLanguage)} />
+          </div>
+        )}
 
         {/* ==================== QUÉ INCLUYE EL MODO INVITADO ==================== */}
         {isGuest && (

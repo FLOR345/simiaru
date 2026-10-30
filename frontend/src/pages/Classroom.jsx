@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { KeyRound, Users, User, Copy, Check, ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { AuthLayout, ErrorMessage, Field, SubmitButton } from '../components/auth/AuthLayout';
 import { api } from '../services/api';
 

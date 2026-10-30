@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { Check, Lock, Star, RefreshCw, Trophy, Cloud, Sparkle, Mountain } from 'lucide-react';
 import { Tooltip } from '@mantine/core';
 import * as m from 'motion/react-m';

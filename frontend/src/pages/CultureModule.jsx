@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { Volume2, Heart, Search, ArrowLeft, AlertCircle, RefreshCw, BookOpen, Lightbulb, Quote, Music, Dices, Eye, Languages, Minus, Plus, Check, MapPin } from 'lucide-react';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage, languageStyle } from '../languages';

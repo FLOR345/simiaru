@@ -9,7 +9,8 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 
 // Sonner llega en su propio archivo, después de la primera pantalla: los avisos siempre
 // responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
-const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
+// Notificaciones (React-Toastify): se descargan aparte, después de la primera pantalla
+const Notifications = lazy(() => import('./components/Notifications'));
 import Home from './pages/Home';
 import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice, NotFound } from './routes';
 import { LlamaImage } from './components/Mascot';
@@ -133,7 +134,7 @@ function App() {
           Arriba a la derecha (debajo del encabezado): nunca tapa el botón "Continuar" de las lecciones, que va abajo */}
       <OfflineBanner />
       <Suspense fallback={null}>
-        <Toaster position="top-right" richColors closeButton expand visibleToasts={4} offset={80} duration={4500} toastOptions={{ style: { fontFamily: 'inherit', borderRadius: '1rem' } }} />
+        <Notifications />
       </Suspense>
       <ClickSpark sparkColor="#16a34a" sparkCount={10} sparkRadius={26} sparkSize={12} duration={450}>
       <Suspense fallback={<LoadingScreen />}>

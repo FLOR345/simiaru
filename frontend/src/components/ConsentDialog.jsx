@@ -2,7 +2,7 @@
 // Sin respuesta (o con "Ahora no") no se registra nada. Se puede cambiar y borrar todo desde el perfil.
 import { useEffect, useRef, useState } from 'react';
 import { ShieldCheck, Download, Trash2, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { api } from '../services/api';
 import { clearQueue, flush } from '../services/telemetry';
 import { LlamaImage } from './Mascot';

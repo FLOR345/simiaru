@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { api } from '../services/api';

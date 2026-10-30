@@ -62,7 +62,8 @@ const WeekActivity = ({ progress = [], theme }) => {
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-white/85 backdrop-blur border border-white shadow-sm p-5 sm:p-6" aria-labelledby="meta-titulo">
-      <div className="flex flex-col sm:flex-row gap-5 sm:items-center">
+      <div className="flex flex-col lg:flex-row gap-5 lg:gap-8 lg:items-center">
+      <div className="flex flex-col sm:flex-row gap-5 sm:items-center lg:shrink-0">
         {/* Anillo de la meta de hoy */}
         <div className="relative w-28 h-28 shrink-0 mx-auto sm:mx-0" role="img" aria-label={`Hoy: ${doneToday} de ${goal} lecciones`}>
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
@@ -122,7 +123,7 @@ const WeekActivity = ({ progress = [], theme }) => {
       </div>
 
       {/* Esta semana */}
-      <div className="mt-5 pt-4 border-t border-stone-100">
+      <div className="flex-1 min-w-0 pt-4 border-t border-stone-100 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-8">
         <p className="mb-2 flex items-center justify-between text-sm font-bold text-stone-700">
           <span>Esta semana</span>
           <span className="text-stone-500">
@@ -136,7 +137,7 @@ const WeekActivity = ({ progress = [], theme }) => {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', bounce: 0.5, delay: i * 0.05 }}
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                className={`w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full flex items-center justify-center ${
                   w.count > 0 ? 'bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-md' : w.future ? 'bg-stone-50 border-2 border-dashed border-stone-200' : 'bg-stone-100 text-stone-300'
                 } ${w.isToday ? 'ring-4 ring-amber-300' : ''}`}
                 title={`${w.name}: ${w.count} ${w.count === 1 ? 'lección' : 'lecciones'}`}
@@ -150,6 +151,7 @@ const WeekActivity = ({ progress = [], theme }) => {
             </li>
           ))}
         </ol>
+      </div>
       </div>
     </section>
   );

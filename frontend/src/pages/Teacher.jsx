@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Users, Copy, Download, RefreshCw, School, ShieldCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../utils/notify';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage } from '../languages';
 import { LlamaImage } from '../components/Mascot';

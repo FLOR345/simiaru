@@ -9,7 +9,10 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'https://simiaru-3j6b.vercel.ap
 // Configurar Brevo API
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+// La clave puede venir con otro nombre (Brevo antes se llamaba Sendinblue); se quitan espacios sobrantes
+const BREVO_KEY = (process.env.BREVO_API_KEY || process.env.BREVO_KEY || process.env.SENDINBLUE_API_KEY || process.env.SIB_API_KEY || '').trim();
+apiKey.apiKey = BREVO_KEY;
+if (!BREVO_KEY) console.warn('⚠️ Falta BREVO_API_KEY: no se enviarán correos (agrégala en las variables de entorno del servidor).');
 
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
@@ -29,7 +32,7 @@ const explainBrevoError = (error) => {
   const body = error?.response?.body || {};
   const code = body.code || '';
   const text = body.message || error?.message || 'error desconocido';
-  if (!process.env.BREVO_API_KEY) return 'El servidor no tiene configurada la clave de Brevo (BREVO_API_KEY).';
+  if (!BREVO_KEY) return 'El servidor no tiene configurada la clave de Brevo (BREVO_API_KEY).';
   if (error?.status === 401 || code === 'unauthorized') return 'La clave de Brevo (BREVO_API_KEY) no es válida o fue revocada.';
   if (/sender/i.test(text)) return `Brevo rechazó el remitente ${SENDER.email}: hay que verificarlo en Brevo (Senders).`;
   if (error?.status === 402 || /credit|quota|limit/i.test(text)) return 'Se acabaron los envíos gratuitos de Brevo por hoy.';
@@ -49,6 +52,10 @@ const sendEmail = async (to, subject, htmlContent) => {
   try {
     if (!to) {
       lastEmailError = 'La cuenta no tiene correo.';
+      return false;
+    }
+    if (!BREVO_KEY) {
+      lastEmailError = 'El servidor no tiene configurada la clave de Brevo (BREVO_API_KEY).';
       return false;
     }
     await apiInstance.sendTransacEmail(sendSmtpEmail);
