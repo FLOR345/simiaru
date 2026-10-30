@@ -16,7 +16,9 @@ import ConsentDialog from '../components/ConsentDialog';
 import LearningPath from '../components/LearningPath';
 import Mascot from '../components/Mascot';
 import { Practice, preloadOn } from '../routes';
-import { LANGUAGES, languageStyle } from '../languages';
+import { LANGUAGES, languageStyle, getLanguage } from '../languages';
+import WeekActivity from '../components/WeekActivity';
+import WordOfDay, { pickWordOfDay } from '../components/WordOfDay';
 import GradientText from '../components/reactbits/GradientText';
 import Decor from '../components/Decor';
 import SplitText from '../components/reactbits/SplitText';
@@ -41,6 +43,28 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('quechua');
+  const [langTotals, setLangTotals] = useState({}); // lecciones de cada lengua
+  const [dayWords, setDayWords] = useState([]);
+
+  // Total de lecciones de cada lengua (para el avance en las tarjetas de idioma)
+  useEffect(() => {
+    Promise.all(
+      LANGUAGES.map((l) =>
+        axios
+          .get(`${API_URL}/api/lessons/units?idioma=${l.id}`)
+          .then((r) => [l.id, (r.data.units || []).reduce((a, u) => a + (u.lecciones_count || 0), 0)])
+          .catch(() => [l.id, 0])
+      )
+    ).then((entries) => setLangTotals(Object.fromEntries(entries)));
+  }, []);
+
+  // Palabras para la palabra del día
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/api/dictionary/all?idioma=${selectedLanguage}`)
+      .then((r) => setDayWords(r.data.words || []))
+      .catch(() => setDayWords([]));
+  }, [selectedLanguage]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,6 +135,14 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
   };
 
   // Solo las lecciones del idioma elegido (el progreso trae las de todas las lenguas)
+  const langStats = Object.fromEntries(
+    LANGUAGES.filter((l) => langTotals[l.id] !== undefined).map((l) => [
+      l.id,
+      { total: langTotals[l.id], done: isGuest ? 0 : progress.filter((p) => p.completado && p.idioma === l.id).length },
+    ])
+  );
+  const wordOfDay = pickWordOfDay(dayWords);
+
   const completedLessons = progress.filter((p) => p.completado && (!p.idioma || p.idioma === selectedLanguage)).length;
   const totalLessons = units.reduce((acc, unit) => acc + (unit.lecciones_count || 0), 0);
   const overallProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
@@ -313,6 +345,16 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
           </ul>
         </div>
 
+        {/* ==================== META DIARIA, SEMANA Y PALABRA DEL DÍA ==================== */}
+        <div className={`grid gap-6 mb-8 ${!isGuest ? 'lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]' : ''}`}>
+          {!isGuest && <WeekActivity progress={progress} theme={languageStyle(selectedLanguage)} />}
+          {wordOfDay && (
+            <div className="rounded-3xl bg-white/85 backdrop-blur border border-white shadow-sm p-5 sm:p-6">
+              <WordOfDay word={wordOfDay} language={getLanguage(selectedLanguage)} theme={languageStyle(selectedLanguage)} height="h-48" />
+            </div>
+          )}
+        </div>
+
         {/* ==================== QUÉ INCLUYE EL MODO INVITADO ==================== */}
         {isGuest && (
           <section className="mb-8 bg-white border-2 border-orange-700 rounded-2xl p-6" aria-labelledby="invitado-titulo">
@@ -356,7 +398,7 @@ const Dashboard = ({ user, setUser, isGuest, setIsGuest }) => {
           <h2 id="idioma-titulo" className="text-2xl font-black">¿Qué lengua quieres aprender?</h2>
           <p className="text-stone-600 mb-5">Puedes cambiar cuando quieras: tu avance de cada una se guarda aparte</p>
 
-          <LanguagePicker value={selectedLanguage} onChange={setSelectedLanguage} />
+          <LanguagePicker value={selectedLanguage} onChange={setSelectedLanguage} stats={langStats} />
         </section>
 
         {/* ==================== RUTA DE APRENDIZAJE ==================== */}

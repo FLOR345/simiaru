@@ -11,7 +11,7 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 // responden a una acción posterior (guardar, marcar un favorito), así que ninguno se pierde
 const Toaster = lazy(() => import('sonner').then((m) => ({ default: m.Toaster })));
 import Home from './pages/Home';
-import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice } from './routes';
+import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice, NotFound } from './routes';
 import { LlamaImage } from './components/Mascot';
 import { startTelemetry } from './services/telemetry';
 import OfflineBanner from './components/OfflineBanner';
@@ -191,7 +191,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       </Suspense>
       </ClickSpark>

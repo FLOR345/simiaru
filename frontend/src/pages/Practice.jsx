@@ -14,6 +14,7 @@ import GlareHover from '../components/reactbits/GlareHover';
 import ShinyText from '../components/reactbits/ShinyText';
 import Decor from '../components/Decor';
 import SplitText from '../components/reactbits/SplitText';
+import { readDifficult, reviewDifficult } from '../utils/difficultWords';
 
 // ==================== Juegos de práctica ====================
 // Repasan las palabras de las lecciones que la persona ya completó (o de la Unidad 1 si aún no hay).
@@ -501,7 +502,7 @@ const FlashCard = ({ word, language, theme, flipped, onFlip, onDecide }) => {
   );
 };
 
-const CardsGame = ({ words, language, theme, onExit }) => {
+const CardsGame = ({ words, language, theme, onExit, onReview }) => {
   const newDeck = () => shuffle(words).slice(0, 12).map((w) => ({ ...w, repeat: false }));
   const [deck, setDeck] = useState(newDeck);
   const [index, setIndex] = useState(0);
@@ -525,6 +526,7 @@ const CardsGame = ({ words, language, theme, onExit }) => {
   const decide = useCallback(
     (knew) => {
       if (!card) return;
+      onReview?.(card.id, knew);
       setDir(knew ? 1 : -1);
       react(knew ? 'happy' : 'think', knew ? 'alegre' : 'pensando');
       if (knew) {
@@ -1059,6 +1061,9 @@ const Practice = ({ user, isGuest }) => {
   }, [idioma, isGuest, reload]);
 
   const enough = state.words.length >= 4;
+  // Palabras falladas en las lecciones (se recalcula al volver de un juego)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const difficult = useMemo(() => readDifficult(idioma), [idioma, game]);
   // Se recalcula al volver de un juego, para mostrar el récord nuevo
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const records = useMemo(() => GAMES.filter((g) => g.best).map((g) => ({ ...g, value: readBest(bestKey(g.id, idioma)) })), [idioma, game]);
@@ -1081,7 +1086,7 @@ const Practice = ({ user, isGuest }) => {
               <ArrowLeft className="w-5 h-5" aria-hidden="true" /> Panel
             </Link>
           )}
-          <h1 className="text-lg sm:text-xl font-black mr-auto truncate">{game ? GAMES.find((g) => g.id === game)?.title : 'Juegos'}</h1>
+          <h1 className="text-lg sm:text-xl font-black mr-auto truncate">{game === 'dificiles' ? 'Tus palabras difíciles' : game ? GAMES.find((g) => g.id === game)?.title : 'Juegos'}</h1>
           {!game && (
             <div className="flex rounded-full bg-stone-100 p-1" role="group" aria-label="Idioma">
               {LANGUAGES.map((l) => (
@@ -1122,6 +1127,8 @@ const Practice = ({ user, isGuest }) => {
           </div>
         ) : game === 'parejas' ? (
           <PairsGame key={idioma} {...props} />
+        ) : game === 'dificiles' ? (
+          <CardsGame key={`dificiles-${idioma}`} {...props} words={difficult} onReview={(id, knew) => reviewDifficult(idioma, id, knew)} />
         ) : game === 'tarjetas' ? (
           <CardsGame key={idioma} {...props} />
         ) : game === 'memoria' ? (
@@ -1167,6 +1174,34 @@ const Practice = ({ user, isGuest }) => {
             <h2 className="mb-5 text-3xl sm:text-4xl font-black">
               <SplitText text="¡Elige tu juego!" tag="span" effect="wave" delay={45} duration={0.8} textAlign="left" rootMargin="0px" hoverEffect="wave" />
             </h2>
+            {difficult.length > 0 && (
+              <m.button
+                type="button"
+                onClick={() => {
+                  playTap();
+                  setGame('dificiles');
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="group ficha relative mb-5 w-full overflow-hidden rounded-3xl border-rose-300 bg-gradient-to-r from-rose-50 via-orange-50 to-amber-50 p-5 sm:p-6 text-left shadow-md"
+              >
+                <span className="tejido-andino absolute inset-y-0 left-0 w-2" aria-hidden="true" />
+                <span className="flex items-center gap-4">
+                  <span className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white flex items-center justify-center shadow-md transition-transform group-hover:-rotate-6" aria-hidden="true">
+                    <RotateCcw className="w-7 h-7" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-xl sm:text-2xl font-black">Tus palabras difíciles</span>
+                    <span className="block text-stone-700">
+                      Tienes <strong>{difficult.length}</strong> {difficult.length === 1 ? 'palabra' : 'palabras'} que fallaste en las lecciones. Acierta cada una 2 veces y sale de la lista.
+                    </span>
+                  </span>
+                  <span className="hidden sm:inline-flex rounded-full bg-gradient-to-r from-rose-500 to-orange-500 px-5 py-2 text-sm font-black text-white shadow-md">Repasar</span>
+                </span>
+              </m.button>
+            )}
             <ul className="grid gap-5 sm:grid-cols-2">
               {GAMES.map(({ id, Icon, pose, title, text, color, shadow, best }, i) => {
                 const value = best ? readBest(bestKey(id, idioma)) : 0;

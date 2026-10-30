@@ -15,6 +15,7 @@ import { queueProgress } from '../services/offlineSync';
 import { playCorrect, playWrong, playComplete, soundEnabled, setSoundEnabled } from '../utils/sounds';
 import GradientText from '../components/reactbits/GradientText';
 import Decor from '../components/Decor';
+import { saveMistakes } from '../utils/difficultWords';
 
 const PASS_PERCENT = 80;
 const XP_CORRECT = 10;
@@ -192,6 +193,7 @@ const LessonView = ({ user, isGuest }) => {
     if (showResults && !savedRef.current) {
       savedRef.current = true;
       lessonEnd.current = Date.now();
+      saveMistakes(lesson?.idioma, mistakes, vocabulary);
       playComplete();
       track('lesson_completed', {
         idioma: lesson?.idioma,
