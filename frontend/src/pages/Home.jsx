@@ -15,7 +15,7 @@ import logo from '../assets/logo.webp';
 import llamaHero from '../assets/llama/bienvenida-sticker.webp';
 import { LlamaImage } from '../components/Mascot';
 import LlamaGallery from '../components/LlamaGallery';
-import fotoTiticaca from '../assets/fotos/titicaca-amanecer.webp';
+import fotoUros from '../assets/fotos/uros-puno.webp';
 import fotoPuno from '../assets/fotos/puno-titicaca.webp';
 import fotoTari from '../assets/fotos/tari-aymara.webp';
 import fotoSikuris from '../assets/fotos/sikuris-puno.webp';
@@ -554,7 +554,7 @@ const Home = ({ enableGuestMode }) => {
           <span className="burbuja burbuja-azul" aria-hidden="true" />
           <span className="burbuja burbuja-morada" aria-hidden="true" />
           <div className="container mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-16 items-center lg:items-start">
               {/* Motion: cada bloque entra después del anterior (stagger), subiendo y saliendo de un leve desenfoque */}
               <m.div className="space-y-8" initial="oculto" animate="visible" variants={HERO_LIST}>
                 <m.p variants={HERO_ITEM} className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-green-700/20 rounded-full text-sm font-bold">
@@ -637,7 +637,7 @@ const Home = ({ enableGuestMode }) => {
 
               {/* La llama es la imagen principal (como en la primera versión); el Titicaca va detrás como una foto impresa */}
               <m.div
-                className="relative mx-auto w-full max-w-md py-8 sm:py-10"
+                className="relative mx-auto w-full max-w-md py-8 sm:py-10 lg:pt-6 lg:-mt-6"
                 initial={{ opacity: 0, x: 60, scale: 0.96 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: 0.25 }}
@@ -646,20 +646,21 @@ const Home = ({ enableGuestMode }) => {
                 <span className="absolute -z-10 -top-6 -right-10 w-72 h-72 rounded-full bg-gradient-to-br from-green-400 to-blue-500 blur-3xl opacity-30" aria-hidden="true" />
                 <span className="absolute -z-10 -bottom-6 -left-10 w-72 h-72 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 blur-3xl opacity-25" aria-hidden="true" />
 
-                {/* Foto del Titicaca como copia impresa inclinada, encima de la esquina de la tarjeta */}
+                {/* Foto de Puno (islas flotantes de los Uros) como copia impresa, en la esquina de abajo a la izquierda */}
                 <m.figure
-                  className="absolute z-20 -right-1 sm:-right-12 -top-2 w-40 sm:w-52 bg-white p-2 rounded-2xl shadow-2xl rotate-6"
-                  initial={{ opacity: 0, rotate: 18, y: 20 }}
-                  animate={{ opacity: 1, rotate: 6, y: 0 }}
+                  className="absolute z-20 -left-4 sm:-left-28 -bottom-4 w-36 sm:w-44 bg-white p-2 pb-3 rounded-2xl shadow-2xl -rotate-6"
+                  initial={{ opacity: 0, rotate: -18, y: 20 }}
+                  animate={{ opacity: 1, rotate: -6, y: 0 }}
                   transition={{ type: 'spring', bounce: 0.35, duration: 0.9, delay: 0.7 }}
                 >
                   <img
-                    src={fotoTiticaca}
-                    alt="Amanecer sobre el lago Titicaca, en Puno"
-                    width="1920"
-                    height="929"
+                    src={fotoUros}
+                    alt="Arco de totora en las islas flotantes de los Uros, en el lago Titicaca (Puno)"
+                    width="640"
+                    height="482"
                     className="w-full aspect-[4/3] object-cover rounded-xl"
                   />
+                  <figcaption className="mt-1.5 text-center text-xs font-bold text-stone-600">Islas de los Uros · Puno</figcaption>
                 </m.figure>
 
                 {/* Tarjeta principal con la llama */}
@@ -687,7 +688,7 @@ const Home = ({ enableGuestMode }) => {
 
                 {/* Etiquetas flotantes de la primera versión, con lo que SimiAru sí tiene */}
                 {/* Motion: las etiquetas flotan arriba y abajo, cada una a su ritmo */}
-                <m.div className="etiqueta-flotante absolute z-20 top-10 -left-2 sm:-left-8 -rotate-6 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+                <m.div className="etiqueta-flotante absolute z-20 top-10 -right-2 sm:-right-8 rotate-6 bg-gradient-to-br from-green-600 to-green-800 text-white px-4 sm:px-5 py-2.5 rounded-2xl shadow-lg" aria-hidden="true" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
                   <span className="flex items-center gap-2 font-bold text-sm sm:text-base">
                     <Trophy className="w-5 h-5" />
                     Ayni Points
@@ -1145,9 +1146,10 @@ const Home = ({ enableGuestMode }) => {
 
           <p className="mt-8 text-stone-400 text-sm leading-relaxed max-w-4xl [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-white">
             Fotos y video de Wikimedia Commons, recortados para esta página:{' '}
-            <a href="https://commons.wikimedia.org/wiki/File:Amanecer_en_el_lago_Titicaca,_Puno,_Per%C3%BA,_2015-08-01,_DD_01.JPG">amanecer en el Titicaca</a> y{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Isla_Uros,_Puno_16.jpg">islas de los Uros</a>, de Ordzonhyd Rudyard Tarco Palomino (
+            <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>);{' '}
             <a href="https://commons.wikimedia.org/wiki/File:Vista_de_Puno_y_el_Titicaca,_Per%C3%BA,_2015-08-01,_DD_53-54_PAN.JPG">vista de Puno</a>, de Diego Delso;{' '}
-            <a href="https://commons.wikimedia.org/wiki/File:Tari_textil_Aymara.jpg">tari aymara</a>, de Jhulis (las tres{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Tari_textil_Aymara.jpg">tari aymara</a>, de Jhulis (las dos{' '}
             <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>);{' '}
             <a href="https://commons.wikimedia.org/wiki/File:Types_of_Potatoes_in_Peru.jpg">papas nativas</a>, de Cathetovar (
             <a href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0</a>);{' '}

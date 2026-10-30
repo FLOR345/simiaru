@@ -2,8 +2,8 @@
 // Mezcla varias familias de react-icons (Game Icons, Phosphor, Tabler) y Lucide para tener más variedad:
 // animales, comida, cuerpo, ropa, naturaleza, música, números... Si no hay uno exacto, se usa el de su categoría.
 import {
-  GiCondorEmblem, GiFox, GiFrog, GiSnake, GiSpiderWeb, GiOwl, GiHorseHead, GiGoat, GiSheep, GiCow, GiPig, GiRabbit, GiMouse,
-  GiSittingDog, GiChicken, GiRooster, GiDuck, GiTropicalFish, GiButterfly, GiFly, GiHummingbird, GiDeer, GiBearHead, GiLion,
+  GiCondorEmblem, GiFox, GiFrog, GiSnake, GiSpiderWeb, GiOwl, GiHorseHead, GiGoat, GiSheep, GiCow, GiPig, GiRabbit,
+  GiSittingDog, GiSeatedMouse, GiChicken, GiRooster, GiDuck, GiTropicalFish, GiButterfly, GiFly, GiHummingbird, GiDeer, GiBearHead, GiLion,
   GiEarthWorm, GiSnail, GiCorn, GiPotato, GiChiliPepper, GiGarlic, GiBread, GiBubblingBowl, GiWaterSplash, GiWheat, GiSteak,
   GiFriedEggs, GiCheeseWedge, GiMilkCarton, GiShinyApple, GiBanana, GiCarrot, GiCoffeeMug, GiSaltShaker, GiSugarCane, GiSmallFire,
   GiCookingPot, GiKnifeFork, GiMountains, GiVolcano, GiRiver, GiPineTree, GiCactus, GiFlowers, GiOakLeaf, GiSun, GiSunrise,
@@ -18,6 +18,7 @@ import {
 import { PiHandWaving, PiHandshake, PiQuestion, PiChatsCircle, PiNumberCircleOne, PiPalette, PiUsersThree, PiHouseLine, PiSmiley, PiArrowsOutCardinal, PiCompassRose, PiTShirt, PiHandHeart } from 'react-icons/pi';
 import { TbArrowBigUp, TbArrowBigDown, TbArrowBigLeft, TbArrowBigRight, TbTargetArrow, TbClockHour4, TbHeartHandshake, TbPlant2 } from 'react-icons/tb';
 import { BookOpen, Sparkles, Mountain, Drama } from 'lucide-react';
+import EXACT from './wordIconMap.js';
 
 // Si alguno no existe en la versión instalada, se cae al ícono de la categoría
 const ok = (Icon) => (typeof Icon === 'function' || typeof Icon === 'object' ? Icon : null);
@@ -39,7 +40,7 @@ const RULES = [
   [/\b(vaca|toro|buey|ternero)/, GiCow],
   [/\b(cerdo|chancho|puerco)/, GiPig],
   [/\b(conejo|liebre|vizcacha|chinchilla)/, GiRabbit],
-  [/\b(ratón|raton|rata|cuy|cobayo)/, GiMouse],
+  [/\b(ratón|raton|rata|cuy|cobayo)/, GiSeatedMouse],
   [/\b(perro|can\b)/, GiSittingDog],
   [/\b(gallo)/, GiRooster],
   [/\b(gallina|pollo|pollito)/, GiChicken],
@@ -177,8 +178,11 @@ const PLAIN_RULES = RULES.map(([re, Icon]) => [new RegExp(plain(re.source), re.f
 export const wordIcon = (word) => {
   const text = norm(word?.palabra_espanol);
   const cat = norm(word?.categoria);
-  // Los colores se muestran con su paleta; los números con el ábaco (antes que cualquier otra coincidencia)
-  if (cat === 'colores' || cat === 'color') return PiPalette;
+  // Primero el significado exacto (tabla revisada palabra por palabra), luego las reglas generales
+  const first = text.split(/[,(/;]/)[0].replace(/[¿?¡!]/g, '').trim();
+  const exact = EXACT[first] || EXACT[text.replace(/[¿?¡!]/g, '').trim()];
+  if (exact) return exact;
+  if ((cat === 'colores' || cat === 'color') && colorOf(word)) return PiPalette;
   for (const [re, Icon] of PLAIN_RULES) if (re.test(text) && ok(Icon)) return Icon;
   return ok(CATEGORY[cat]) || (cat === 'numeros' ? PiNumberCircleOne : BookOpen);
 };
@@ -202,3 +206,25 @@ export const colorOf = (word) => {
 };
 
 export default wordIcon;
+
+// Los números se muestran con su cifra en vez de un ícono ("catorce" → 14)
+const UNI = { cero: 0, uno: 1, un: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, dieciseis: 16, diecisiete: 17, dieciocho: 18, diecinueve: 19, veinte: 20, veintiuno: 21, veintidos: 22, veintitres: 23, veinticuatro: 24, veinticinco: 25, veintiseis: 26, veintisiete: 27, veintiocho: 28, veintinueve: 29, treinta: 30, cuarenta: 40, cincuenta: 50, sesenta: 60, setenta: 70, ochenta: 80, noventa: 90, cien: 100, ciento: 100, doscientos: 200, trescientos: 300, cuatrocientos: 400, quinientos: 500, seiscientos: 600, setecientos: 700, ochocientos: 800, novecientos: 900 };
+export const numberOf = (word) => {
+  const t = plain(word?.palabra_espanol).split(/[,(/;]/)[0].trim();
+  if (t === 'primero') return '1.º';
+  if (t === 'segundo') return '2.º';
+  const parts = t.split(/\s+/).filter((p) => p !== 'y');
+  if (!parts.length || !parts.every((p) => p in UNI || p === 'mil' || p === 'millon')) return null;
+  let total = 0;
+  let cur = 0;
+  for (const p of parts) {
+    if (p === 'mil') {
+      total += (cur || 1) * 1000;
+      cur = 0;
+    } else if (p === 'millon') {
+      total += (cur || 1) * 1000000;
+      cur = 0;
+    } else cur += UNI[p];
+  }
+  return (total + cur).toLocaleString('es-PE');
+};

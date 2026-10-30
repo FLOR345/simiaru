@@ -1,8 +1,8 @@
 // Fotos para las respuestas de las adivinanzas e íconos para los proverbios (solo íconos, sin emojis).
 // Las fotos son de Wikimedia Commons con licencia abierta; su crédito está en adivinanzasCreditos.json
 // (el maíz y las estrellas reutilizan las fotos de los cuentos, con su crédito en cuentosCreditos.json).
-import { GiShakingHands, GiSickle, GiOwl, GiEarthAmerica, GiWheat, GiFootprint, GiCookingPot, GiSun, GiScales, GiField, GiCondorEmblem, GiFamilyHouse } from 'react-icons/gi';
-import { PiHandHeart, PiUsersThree } from 'react-icons/pi';
+import { GiShakingHands, GiSickle, GiOwl, GiEarthAmerica, GiWheat, GiFootprint, GiCookingPot, GiSun, GiScales, GiField, GiCondorEmblem, GiFamilyHouse, GiBrickWall, GiWaterDrop, GiFrog, GiSpinningWheel, GiPlantSeed, GiMountains, GiHouse, GiCamelHead } from 'react-icons/gi';
+import { PiHandHeart, PiUsersThree, PiChatTeardropText, PiEar, PiUsersFour } from 'react-icons/pi';
 import { Quote } from 'lucide-react';
 import CREDITOS_ADIV from './adivinanzasCreditos.json';
 import CREDITOS_CUENTOS from './cuentosCreditos.json';
@@ -41,8 +41,23 @@ const credito = (key) => {
   return c ? { autor: c.autor || 'Autor desconocido', licencia: c.licencia, pagina: c.pagina } : null;
 };
 
-// Busca primero en lo que dice la explicación sobre la respuesta y luego en el título
+// Adivinanzas del servidor que comparten respuesta: a cada una su propia foto (ninguna se repite)
+const FOTO_POR_ID = { 4: 'sara', 77: 'maiz2', 1: 'ojo', 73: 'ojo2', 78: 'ojo3', 5: 'warana', 76: 'estrellas2', 74: 'rio', 79: 'rio2', 81: 'rio3', 75: 'cometa', 80: 'cometa2' };
+const ALT = {
+  maiz2: 'Maíz andino secándose en la chacra, en Puno', ojo2: 'Un ojo café visto de cerca', ojo3: 'El iris de un ojo, muy de cerca',
+  estrellas2: 'Cielo estrellado sobre las antenas de ALMA, en el altiplano', rio2: 'El río Pucará', rio3: 'Una catarata entre los cerros',
+  cometa2: 'Niños haciendo volar una cometa', llama: 'Una llama junto a una señora del Cusco', nube: 'Nubes sobre la cordillera',
+  luna: 'La luna llena', llave: 'Una llave antigua de hierro', aji: 'Ajíes amarillos', nevado: 'El nevado Ausangate', arcoiris: 'Un arcoíris sobre los cerros',
+  rana: 'La rana gigante del Titicaca (Telmatobius culeus)', alpaca: 'Alpacas en un bofedal', lago: 'Orillas del lago Titicaca en Bolivia',
+  condor: 'Retrato de un cóndor andino', nieve: 'Cumbres nevadas de los Andes', chuno: 'Chuño negro secándose', siku: 'Sikus de varios tamaños sobre un aguayo',
+  wiphala: 'La wiphala ondeando', totora: 'Un pescador en su balsa de totora',
+};
+const fotoDe = (key) => (FOTOS[key] ? { src: FOTOS[key], alt: ALT[key] || RESPUESTAS.find((r) => r[1] === key)?.[2] || '', credito: credito(key), posicion: key === 'lengua' ? '50% 72%' : '50% 50%' } : null);
+
+// Busca primero la foto propia de la adivinanza, luego lo que dice la explicación y luego el título
 export const riddlePhoto = (item) => {
+  const propia = item?.foto || FOTO_POR_ID[item?.id];
+  if (propia && FOTOS[propia]) return fotoDe(propia);
   const exp = plain(item?.explicacion);
   const answerPart = /respuesta(?: es|:)?\s*([^.]+)/.exec(exp)?.[1] || /describe al?\s*([^.]+)/.exec(exp)?.[1] || '';
   for (const text of [answerPart, plain(item?.titulo), exp]) {
@@ -71,7 +86,14 @@ const PROVERBIOS = [
   [/\b(familia|ayllu)/, GiFamilyHouse],
 ];
 
+const ICONOS = {
+  muro: GiBrickWall, camino: GiFootprint, agua: GiWaterDrop, tierra: GiEarthAmerica, sapo: GiFrog, manos: GiShakingHands, hablar: PiChatTeardropText,
+  hoz: GiSickle, buho: GiOwl, oir: PiEar, semilla: GiPlantSeed, telar: GiSpinningWheel, sol: GiSun, casa: GiHouse, cerro: GiMountains,
+  gente: PiUsersFour, llama: GiCamelHead,
+};
+
 export const proverbIcon = (item) => {
+  if (item?.icono && ICONOS[item.icono]) return ICONOS[item.icono];
   const text = plain(`${item?.titulo} ${item?.traduccion} ${item?.explicacion}`);
   return PROVERBIOS.find(([re]) => re.test(text))?.[1] || Quote;
 };

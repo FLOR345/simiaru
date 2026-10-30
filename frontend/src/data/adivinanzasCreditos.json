@@ -1,4 +1,22 @@
 {
+ "aji": {
+  "titulo": "Aji Amarillo pepper",
+  "autor": "Luis Tamayo",
+  "licencia": "CC BY-SA 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Aji_Amarillo_pepper.jpg"
+ },
+ "alpaca": {
+  "titulo": "Alpaca White Peru",
+  "autor": "Jagandrk",
+  "licencia": "CC BY-SA 3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Alpaca_White_Peru.JPG"
+ },
+ "arcoiris": {
+  "titulo": "Rainbow appears over mountains after rain shower in early evening",
+  "autor": "Shixart1985",
+  "licencia": "CC BY 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Rainbow_appears_over_mountains_after_rain_shower_in_early_evening.jpg"
+ },
  "camino": {
   "titulo": "Qhapaq Ñan Chinchaysuyo , MAR 2026",
   "autor": "JEAMpisho",
@@ -11,11 +29,35 @@
   "licencia": "CC BY 2.0",
   "pagina": "https://commons.wikimedia.org/wiki/File:Red_Onions_(2724039538).jpg"
  },
+ "chuno": {
+  "titulo": "Chuño",
+  "autor": "Eric in SF",
+  "licencia": "CC BY-SA 3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Chu%C3%B1o.jpg"
+ },
  "cometa": {
   "titulo": "Flying Kite",
   "autor": "Manju Thilagavathi",
   "licencia": "CC0",
   "pagina": "https://commons.wikimedia.org/wiki/File:Flying_Kite.jpg"
+ },
+ "cometa2": {
+  "titulo": "Jules and Gabriel flying a kite at Alameda Afonso Henriques, Lisbon, Portugal (PPL3-Altered) julesvernex2",
+  "autor": "Jules Verne Times Two",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Jules_and_Gabriel_flying_a_kite_at_Alameda_Afonso_Henriques,_Lisbon,_Portugal_(PPL3-Altered)_julesvernex2.jpg"
+ },
+ "condor": {
+  "titulo": "Andean Condor Old Timey Portrait (18141223325)",
+  "autor": "Eric Kilby from Somerville, MA, USA",
+  "licencia": "CC BY-SA 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Andean_Condor_Old_Timey_Portrait_(18141223325).jpg"
+ },
+ "estrellas2": {
+  "titulo": "ALMA and a Starry Night",
+  "autor": "ESO/B. Tafreshi (twanight.org)",
+  "licencia": "CC BY 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:ALMA_and_a_Starry_Night.jpg"
  },
  "huevo": {
   "titulo": "Chicken eggs in nest (4782183732)",
@@ -23,17 +65,77 @@
   "licencia": "CC BY 2.0",
   "pagina": "https://commons.wikimedia.org/wiki/File:Chicken_eggs_in_nest_(4782183732).jpg"
  },
+ "lago": {
+  "titulo": "Bolivia - On the shores of Lake Titicaca",
+  "autor": "P. Hughes",
+  "licencia": "CC BY 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Bolivia_-_On_the_shores_of_Lake_Titicaca.jpg"
+ },
  "lengua": {
   "titulo": "Albert Einstein sticking out the tongue",
   "autor": "International News Service",
   "licencia": "public domain",
   "pagina": "https://commons.wikimedia.org/wiki/File:Albert_Einstein_sticks_his_tongue.jpg"
  },
+ "llama": {
+  "titulo": "Everyone Loves a Llama, Cusco Portraits (17160148285)",
+  "autor": "Geraint Rowland from London, United Kingdom",
+  "licencia": "CC BY 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Everyone_Loves_a_Llama,_Cusco_Portraits_(17160148285).jpg"
+ },
+ "llave": {
+  "titulo": "Iron Key",
+  "autor": "The Portable Antiquities Scheme, Adam Daubney, 2003-08-21 14:58:23",
+  "licencia": "CC BY-SA 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Iron_Key_(FindID_51677).jpg"
+ },
+ "luna": {
+  "titulo": "Full Moon Luc Viatour",
+  "autor": "Luc Viatour",
+  "licencia": "CC BY-SA 3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Full_Moon_Luc_Viatour.jpg"
+ },
+ "maiz2": {
+  "titulo": "Andean dwarf maize",
+  "autor": "Michael Hermann",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Andean_dwarf_maize.JPG"
+ },
+ "nevado": {
+  "titulo": "Ausangate Mountain Peru 02",
+  "autor": "Stefanos Nikologianis",
+  "licencia": "CC BY 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Ausangate_Mountain_Peru_02.jpg"
+ },
+ "nieve": {
+  "titulo": "Snow-capped Andes peak seen from Santiago",
+  "autor": "AndesInvierno",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Snow-capped_Andes_peak_seen_from_Santiago.jpg"
+ },
+ "nube": {
+  "titulo": "Over the clouds (31924658797)",
+  "autor": "David Ceballos from Quito, España",
+  "licencia": "CC BY 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Over_the_clouds_(31924658797).jpg"
+ },
  "ojo": {
   "titulo": "Human eye iris 1",
   "autor": "Kamil Saitov",
   "licencia": "CC BY 4.0",
   "pagina": "https://commons.wikimedia.org/wiki/File:Human_eye_iris_1.jpg"
+ },
+ "ojo2": {
+  "titulo": "Brown Eye",
+  "autor": "Benjamin Caviezel",
+  "licencia": "CC BY 3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Brown_Eye_(33298147).jpeg"
+ },
+ "ojo3": {
+  "titulo": "Light brown iris close up",
+  "autor": "Rossche",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Light_brown_iris_close_up.jpg"
  },
  "papa": {
   "titulo": "Labeled native potato varieties in Santa Teresa, Cusco, Peru",
@@ -47,16 +149,52 @@
   "licencia": "public domain",
   "pagina": "https://commons.wikimedia.org/wiki/File:The_Thinker,_Rodin.jpg"
  },
+ "rana": {
+  "titulo": "Telmatobius culeus",
+  "autor": "Samuel Garman (1843-1927)",
+  "licencia": "public domain",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Telmatobius_culeus.jpg"
+ },
  "rio": {
   "titulo": "Río Urubamba cerca de Urcos",
   "autor": "Mx._Granger",
   "licencia": "CC0",
   "pagina": "https://commons.wikimedia.org/wiki/File:R%C3%ADo_Urubamba_cerca_de_Urcos.jpg"
  },
+ "rio2": {
+  "titulo": "RíoPucará",
+  "autor": "Diego Hernan",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:R%C3%ADoPucar%C3%A1.jpg"
+ },
+ "rio3": {
+  "titulo": "Catarata María Jiray",
+  "autor": "Carmen MJ 20",
+  "licencia": "CC BY 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Catarata_Mar%C3%ADa_Jiray.jpg"
+ },
+ "siku": {
+  "titulo": "Sikus familia",
+  "autor": "Ana Orero",
+  "licencia": "CC BY-SA 4.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Sikus_familia.jpg"
+ },
  "sol": {
   "titulo": "Janusz Plewniak PERU Andy o swicie 4910 m npm luty 2017",
   "autor": "Janusz Plewniak",
   "licencia": "CC BY 4.0",
   "pagina": "https://commons.wikimedia.org/wiki/File:Janusz_Plewniak_PERU_Andy_o_swicie_4910_m_npm_luty_2017.jpg"
+ },
+ "totora": {
+  "titulo": "Barco de totora titicaca",
+  "autor": "User: (WT-shared) Sylx100 at wts wikivoyage",
+  "licencia": "public domain",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Barco_de_totora_titicaca.jpg"
+ },
+ "wiphala": {
+  "titulo": "Wiphala flag",
+  "autor": "Ministerio de Cultura de la Nación",
+  "licencia": "CC BY-SA 2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Wiphala_flag.jpg"
  }
 }

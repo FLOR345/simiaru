@@ -34,7 +34,7 @@ import WordOfDay from '../components/WordOfDay';
 import Decor from '../components/Decor';
 import GradientText from '../components/reactbits/GradientText';
 import * as m from 'motion/react-m';
-import { wordIcon, categoryIcon, colorOf } from '../ui/wordIcons';
+import { wordIcon, categoryIcon, colorOf, numberOf } from '../ui/wordIcons';
 // Los ejemplos de todas las palabras (unas 1500) se descargan aparte, cuando ya se ve la página
 let EJEMPLOS = {};
 const loadExamples = () => import('../data/ejemplos.json').then((mod) => (EJEMPLOS = mod.default));
@@ -558,6 +558,7 @@ const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 
   const [isPlaying, setIsPlaying] = useState(false);
   const Icon = wordIcon(word);
   const swatch = colorOf(word);
+  const numeral = numberOf(word);
   const example = exampleOf(word, language.id);
 
   const play = (text = word.palabra_objetivo, url = word.audio_url) => {
@@ -586,7 +587,11 @@ const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 
           aria-hidden="true"
         >
           {!swatch && <span className="absolute inset-0 rounded-2xl opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_5px,transparent_5px_14px)]" />}
-          <Icon className={`relative w-9 h-9 sm:w-10 sm:h-10 ${swatch && /^#(f|e|d)/i.test(swatch) ? 'text-stone-800' : 'text-white'} drop-shadow`} />
+          {numeral ? (
+            <span className={`relative font-black text-white drop-shadow tabular-nums leading-none ${numeral.length > 5 ? 'text-sm' : numeral.length > 3 ? 'text-lg' : 'text-2xl sm:text-3xl'}`}>{numeral}</span>
+          ) : (
+            <Icon className={`relative w-9 h-9 sm:w-10 sm:h-10 ${swatch && /^#(f|e|d)/i.test(swatch) ? 'text-stone-800' : 'text-white'} drop-shadow`} />
+          )}
         </m.span>
         <div className="flex-1 min-w-0">
           <p className={`text-2xl sm:text-3xl font-black break-words leading-tight ${theme.text}`} lang={language.lang}>
@@ -638,7 +643,7 @@ const WordCard = ({ word, language, theme, query, favorite, onFavorite, index = 
             <div className="min-w-0">
               <p className="text-xs font-black uppercase tracking-wider text-stone-500 mb-1">Ejemplo</p>
               <p className="font-semibold text-stone-900 italic" lang={language.lang}>
-                “{example[0]}”
+                {/^["«“¡¿]/.test(example[0]) ? example[0] : `“${example[0]}”`}
               </p>
               {example[1] && <p className="text-stone-600 mt-1">{example[1]}</p>}
             </div>

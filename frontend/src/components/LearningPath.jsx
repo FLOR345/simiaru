@@ -14,6 +14,8 @@ import { useReducedMotion } from 'motion/react';
 import { API_URL } from '../config.js';
 import Mascot, { LlamaImage } from './Mascot';
 import { languageStyle } from '../languages';
+import { GiMountains, GiCondorEmblem, GiCactus, GiCamelHead, GiSun, GiFamilyHouse, GiAbacus, GiKnifeFork, GiVitruvianMan, GiClothes, GiHouse, GiPlantsAndAnimals, GiMusicalNotes, GiEarthAmerica, GiCalendar } from 'react-icons/gi';
+import { PiHandWaving, PiIdentificationCard, PiPalette, PiPawPrint, PiChatsCircle, PiQuestion } from 'react-icons/pi';
 import { LessonView, preloadOn } from '../routes';
 import { playTap, playWrong } from '../utils/sounds';
 
@@ -59,6 +61,28 @@ const authHeaders = () => {
   }
 };
 
+// Ícono del tema de cada lección (según su título), para que el camino se lea de un vistazo
+const LESSON_ICONS = [
+  [/salud|napay|hola|bienven/i, PiHandWaving],
+  [/present|nombre|suti/i, PiIdentificationCard],
+  [/despedid|tupananchik/i, PiHandWaving],
+  [/famil|padre|madre|herman|hij|abuel|ayllu/i, GiFamilyHouse],
+  [/n[uú]mer|cont|yupa|jakhu/i, GiAbacus],
+  [/color|llimp|sami/i, PiPalette],
+  [/animal|uywa/i, PiPawPrint],
+  [/comida|aliment|mikhu|manq/i, GiKnifeFork],
+  [/cuerpo|kurku/i, GiVitruvianMan],
+  [/ropa|vest|p'acha/i, GiClothes],
+  [/casa|hogar|wasi|uta/i, GiHouse],
+  [/naturaleza|pacha|tierra/i, GiEarthAmerica],
+  [/m[uú]sica|canci|taki/i, GiMusicalNotes],
+  [/tiempo|d[ií]a|semana|mes/i, GiCalendar],
+  [/pregunt/i, PiQuestion],
+  [/conversa|di[aá]log|frase/i, PiChatsCircle],
+  [/planta|chacra|campo/i, GiPlantsAndAnimals],
+];
+const lessonIcon = (lesson) => LESSON_ICONS.find(([re]) => re.test(`${lesson?.titulo ?? ''} ${lesson?.descripcion ?? ''}`))?.[1] || Star;
+
 // Curva suave que pasa por el centro de cada botón
 const trailPath = (points) =>
   points.reduce((d, p, i) => {
@@ -77,7 +101,7 @@ const LessonNode = ({ lesson, state, styleSet, isFirstAvailable, reduceMotion, i
     open: `${base} bg-gradient-to-b ${styleSet.gradient} text-white opacity-90 shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1`,
     locked: `${base} bg-gradient-to-b from-stone-200 to-stone-300 text-stone-400 shadow-[0_6px_0_#a8a29e] cursor-not-allowed`,
   };
-  const Icon = state === 'done' ? Check : state === 'locked' ? Lock : Star;
+  const Icon = state === 'done' ? Check : state === 'locked' ? Lock : lessonIcon(lesson);
   const label = `${lesson.titulo}: ${state === 'done' ? 'completada' : state === 'locked' ? 'bloqueada' : 'disponible'}`;
 
   const node = (
@@ -100,7 +124,15 @@ const LessonNode = ({ lesson, state, styleSet, isFirstAvailable, reduceMotion, i
         </>
       )}
       {state === 'done' && <span className="brillo-nodo" aria-hidden="true" />}
-      <Icon className="relative w-9 h-9 drop-shadow" strokeWidth={state === 'done' ? 3.5 : 2.5} fill={state === 'current' || state === 'open' ? 'currentColor' : 'none'} aria-hidden="true" />
+      {Icon === Star ? (
+        <Icon className="relative w-9 h-9 drop-shadow" strokeWidth={2.5} fill={state === 'current' || state === 'open' ? 'currentColor' : 'none'} aria-hidden="true" />
+      ) : (
+        <Icon className="relative w-9 h-9 drop-shadow" strokeWidth={state === 'done' ? 3.5 : undefined} aria-hidden="true" />
+      )}
+      {/* Número de la lección */}
+      <span className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-full text-xs font-black flex items-center justify-center ring-2 ring-white shadow ${state === 'locked' ? 'bg-stone-300 text-stone-500' : state === 'done' ? 'bg-amber-600 text-white' : 'bg-white text-stone-800'}`} aria-hidden="true">
+        {index + 1}
+      </span>
     </span>
   );
 
@@ -168,17 +200,27 @@ const LessonNode = ({ lesson, state, styleSet, isFirstAvailable, reduceMotion, i
 };
 
 // Decoración a los costados del sendero: nubes, destellos y montañas que flotan
-const SideDecor = ({ rows }) => {
-  // (se dibuja dentro del carril, a los lados del sendero)
+const DECOR = [
+  [GiMountains, 'w-16 h-16', 0.22],
+  [Cloud, 'w-12 h-12 text-sky-200 fill-sky-100', 1],
+  [GiCondorEmblem, 'w-12 h-12', 0.2],
+  [Sparkle, 'w-6 h-6 text-amber-300 fill-amber-200', 1],
+  [GiCamelHead, 'w-12 h-12', 0.2],
+  [GiSun, 'w-12 h-12 text-amber-300', 0.6],
+  [GiCactus, 'w-11 h-11', 0.2],
+  [Mountain, 'w-10 h-10 text-stone-200 fill-stone-100', 1],
+];
+const SideDecor = ({ rows, color }) => {
+  // (se dibuja dentro del carril, a los lados del sendero: cerros, cóndor, llama, sol y cactus andinos)
   const items = [];
   for (let i = 0; i < rows; i++) {
     const left = i % 2 === 0;
-    const Icon = [Cloud, Sparkle, Mountain][i % 3];
+    const [Icon, cls, alpha] = DECOR[i % DECOR.length];
     items.push(
       <Icon
         key={i}
-        className={`absolute anim-flotar ${i % 3 === 1 ? 'w-6 h-6 text-amber-300 fill-amber-200' : i % 3 === 0 ? 'w-12 h-12 text-sky-200 fill-sky-100' : 'w-10 h-10 text-green-200 fill-green-100'}`}
-        style={{ top: i * ROW + 30, [left ? 'left' : 'right']: `${4 + (i % 3) * 5}%`, animationDelay: `${-i * 0.9}s` }}
+        className={`absolute anim-flotar ${cls}`}
+        style={{ top: i * ROW + 30, [left ? 'left' : 'right']: `${3 + (i % 3) * 5}%`, animationDelay: `${-i * 0.9}s`, ...(alpha < 1 ? { color, opacity: alpha } : {}) }}
         aria-hidden="true"
       />
     );
@@ -199,7 +241,7 @@ const UnitTrail = ({ unit, lessons, unitIndex, lockedUnit, styleSet, stateOf, fi
 
   return (
     <div ref={laneRef} className="relative mx-auto pt-12 w-full max-w-[560px]" style={{ height: height + 48 }}>
-      <SideDecor rows={lessons.length + 1} />
+      <SideDecor rows={lessons.length + 1} color={styleSet.hex} />
       <svg className="absolute left-0 top-12 overflow-visible" width={LANE} height={height} aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -223,6 +265,17 @@ const UnitTrail = ({ unit, lessons, unitIndex, lockedUnit, styleSet, stateOf, fi
             viewport={{ once: true }}
             transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
           />
+        )}
+        {reached > 1 && !reduceMotion && (
+          <g>
+            <circle r="9" fill="#fff" opacity="0.95">
+              <animateMotion dur={`${2 + reached * 0.6}s`} repeatCount="indefinite" path={trailPath(points.slice(0, reached))} />
+            </circle>
+            <circle r="16" fill="#fde68a" opacity="0.45">
+              <animateMotion dur={`${2 + reached * 0.6}s`} repeatCount="indefinite" path={trailPath(points.slice(0, reached))} />
+              <animate attributeName="r" values="12;18;12" dur="1.2s" repeatCount="indefinite" />
+            </circle>
+          </g>
         )}
       </svg>
 

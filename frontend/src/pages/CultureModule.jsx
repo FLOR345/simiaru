@@ -11,6 +11,7 @@ import BookLibrary from '../components/BookLibrary';
 import { StoryGrid, StoryReader } from '../components/Stories';
 import { conCuentosExtra } from '../data/cuentos';
 import { riddlePhoto, proverbIcon } from '../data/cultura';
+import { conExtras } from '../data/culturaExtra';
 import { Confetti } from '../components/GameFx';
 import * as m from 'motion/react-m';
 import Decor from '../components/Decor';
@@ -212,7 +213,7 @@ const ProverbCard = ({ item, index, language, theme, fav }) => {
       className="group relative overflow-hidden bg-white rounded-3xl border border-stone-200 shadow-sm p-5 sm:p-6 hover:shadow-xl hover:shadow-stone-900/10 transition-shadow"
     >
       <span className={`pointer-events-none absolute -right-14 -top-14 h-44 w-44 rounded-full bg-gradient-to-br ${theme.gradient} opacity-10 blur-2xl transition-opacity group-hover:opacity-25`} aria-hidden="true" />
-      <Quote className={`pointer-events-none absolute right-5 bottom-4 w-24 h-24 ${theme.text} opacity-[0.06]`} aria-hidden="true" />
+      <Quote className={`pointer-events-none absolute right-6 top-20 w-24 h-24 ${theme.text} opacity-[0.07]`} aria-hidden="true" />
       <div className="relative flex items-start justify-between gap-3">
         {/* Ícono de lo que habla el proverbio */}
         <m.span
@@ -233,28 +234,32 @@ const ProverbCard = ({ item, index, language, theme, fav }) => {
       <div className="mt-3 flex flex-wrap gap-2">
         <ListenButton text={item.contenido_original} language={language} />
       </div>
-      {open ? (
-        <div className="mt-4 space-y-3 anim-despliega">
-          {item.traduccion && <p className="text-lg italic text-stone-800">“{item.traduccion}”</p>}
-          {item.explicacion && (
-            <div className="rounded-2xl bg-amber-50 border-l-4 border-amber-500 p-4">
-              <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-1">Lo que enseña</p>
-              <p className="text-stone-800">{item.explicacion}</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => {
-            playTap();
-            setOpen(true);
-          }}
-          className={`ficha mt-4 w-full min-h-12 rounded-xl ${theme.border} ${theme.soft} ${theme.text} font-black`}
-        >
-          ¿Qué significará? Descúbrelo
-        </button>
+      {/* Traducción completa, siempre a la vista */}
+      {item.traduccion && (
+        <p className={`relative mt-4 rounded-2xl ${theme.soft} border-l-4 ${theme.border} px-4 py-3 text-lg italic text-stone-800`}>“{item.traduccion}”</p>
       )}
+      {item.explicacion &&
+        (open ? (
+          <m.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative mt-3 rounded-2xl bg-amber-50 border-l-4 border-amber-500 p-4"
+          >
+            <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-1">Lo que enseña</p>
+            <p className="text-stone-800">{item.explicacion}</p>
+          </m.div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              playTap();
+              setOpen(true);
+            }}
+            className={`ficha relative mt-3 w-full min-h-12 rounded-xl ${theme.border} bg-white ${theme.text} font-black hover:bg-stone-50`}
+          >
+            ¿Qué nos enseña? Descúbrelo
+          </button>
+        ))}
     </m.li>
   );
 };
@@ -265,13 +270,42 @@ const SongCard = ({ item, index, language, theme, fav }) => {
   const translated = (item.traduccion || '').split('\n').filter((l) => l.trim());
   const sameLength = original.length > 1 && original.length === translated.length;
   const [line, setLine] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  const timer = useRef(null);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  // Canta la canción entera: cada verso se escucha y se resalta, como un karaoke
+  const playAll = () => {
+    clearTimeout(timer.current);
+    if (playing) {
+      setPlaying(false);
+      setLine(-1);
+      return;
+    }
+    setPlaying(true);
+    const step = (i) => {
+      if (i >= original.length) {
+        setPlaying(false);
+        setLine(-1);
+        return;
+      }
+      setLine(i);
+      speak(original[i], { lang: language.voz?.respaldo });
+      timer.current = setTimeout(() => step(i + 1), 1200 + original[i].length * 85);
+    };
+    step(0);
+  };
   return (
     <li id={`cultura-${item.id}`} className="anim-entra bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden" style={{ '--i': Math.min(index, 8) }}>
       <div className="flex items-start justify-between gap-3 p-5 sm:p-6 border-b border-stone-100">
         <div className="flex items-center gap-3">
-          <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-700 flex items-center justify-center shadow-md" aria-hidden="true">
-            <Music className="w-6 h-6 text-white" />
-          </span>
+          <m.span
+            className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center shadow-lg ring-4 ring-white`}
+            animate={playing ? { rotate: [0, -8, 8, 0], scale: [1, 1.08, 1] } : { rotate: 0, scale: 1 }}
+            transition={playing ? { duration: 0.9, repeat: Infinity } : { duration: 0.2 }}
+            aria-hidden="true"
+          >
+            <Music className="w-7 h-7 text-white" />
+          </m.span>
           <div>
             <h3 className="text-xl font-black">{item.titulo || 'Canción'}</h3>
             {item.region && (
@@ -312,7 +346,19 @@ const SongCard = ({ item, index, language, theme, fav }) => {
             <p className="text-stone-700 italic whitespace-pre-line leading-relaxed">{item.traduccion}</p>
           </div>
         )}
-        {sameLength && <p className="mt-3 text-sm text-stone-500">Toca un verso para escucharlo.</p>}
+        {sameLength && (
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={playAll}
+              aria-pressed={playing}
+              className={`ficha inline-flex items-center gap-2 min-h-11 px-4 rounded-xl font-black text-white ${theme.solid} border-black/20`}
+            >
+              <Volume2 className={`w-5 h-5 ${playing ? 'anim-latido' : ''}`} aria-hidden="true" /> {playing ? 'Detener' : 'Escuchar toda la canción'}
+            </button>
+            <p className="text-sm text-stone-500">O toca un verso para escucharlo solo.</p>
+          </div>
+        )}
         {item.explicacion && (
           <div className="mt-4 rounded-2xl bg-amber-50 border-l-4 border-amber-500 p-4">
             <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-1">Significado cultural</p>
@@ -370,11 +416,12 @@ const CultureModule = ({ user }) => {
       const response = await api.getCulturalContent(selectedType, selectedLanguage);
       const list = response?.data?.content || [];
       // A los cuentos del servidor se suman los de SimiAru, cada uno con su portada
-      setContent(selectedType === 'cuento' ? conCuentosExtra(list, selectedLanguage) : list);
+      setContent(selectedType === 'cuento' ? conCuentosExtra(list, selectedLanguage) : conExtras(selectedType, list, selectedLanguage));
     } catch (error) {
       console.error('Error loading cultural content:', error);
       // Sin servidor, los cuentos de SimiAru se pueden leer igual
       if (selectedType === 'cuento') setContent(conCuentosExtra([], selectedLanguage));
+      else if (conExtras(selectedType, [], selectedLanguage).length) setContent(conExtras(selectedType, [], selectedLanguage));
       else {
         setContent([]);
         setLoadError(true);
@@ -648,7 +695,7 @@ const CultureModule = ({ user }) => {
             {/* Encabezado de la sección: entra con GSAP (Animated Content) y el título con Blur Text */}
             {selectedType !== 'cuento' && !loading && !loadError && content.length > 0 && (
               <AnimatedContent key={`${selectedType}-${selectedLanguage}`} distance={40} duration={0.7} ease="back.out(1.4)" scale={0.96} blur={4} threshold={0.05}>
-                <div className={`relative mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br ${type.color} p-6 sm:p-8 text-white shadow-xl shadow-stone-900/10`}>
+                <div className={`relative mb-6 overflow-hidden rounded-[2rem] bg-gradient-to-br ${theme.gradient} p-6 sm:p-8 text-white shadow-xl shadow-stone-900/10`}>
                   <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
                   <m.span className="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/25 blur-3xl" animate={{ x: [0, -30, 0], y: [0, 20, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} aria-hidden="true" />
                   <span className="tejido-andino absolute inset-x-0 bottom-0 h-2" aria-hidden="true" />
