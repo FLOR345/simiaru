@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '../utils/notify';
-import { Volume2, Heart, Search, ArrowLeft, AlertCircle, RefreshCw, BookOpen, Lightbulb, Quote, Music, Dices, Eye, Languages, Minus, Plus, Check, MapPin } from 'lucide-react';
+import { Volume2, Heart, Search, ArrowLeft, AlertCircle, RefreshCw, BookOpen, Lightbulb, Quote, Music, Dices, Eye, Check, MapPin } from 'lucide-react';
 import { api } from '../services/api';
 import { LANGUAGES, getLanguage, languageStyle } from '../languages';
 import { playTap, playCorrect, playWrong } from '../utils/sounds';
 import { speak } from '../utils/speech';
 import Mascot from '../components/Mascot';
 import BookLibrary from '../components/BookLibrary';
+import { StoryGrid, StoryReader } from '../components/Stories';
+import { conCuentosExtra } from '../data/cuentos';
 import Decor from '../components/Decor';
 import GradientText from '../components/reactbits/GradientText';
 
@@ -266,87 +268,6 @@ const SongCard = ({ item, index, language, theme, fav }) => {
   );
 };
 
-// ==================== Lector de cuentos ====================
-const SIZES = ['text-base', 'text-lg', 'text-xl', 'text-2xl'];
-
-const StoryReader = ({ story, language, theme, fav, onBack, headingRef }) => {
-  const [size, setSize] = useState(1);
-  const [showTranslation, setShowTranslation] = useState(true);
-  const paragraphs = (story.contenido_original || '').split(/\n\s*\n|\n/).filter((p) => p.trim());
-  const translations = (story.traduccion || '').split(/\n\s*\n|\n/).filter((p) => p.trim());
-  const aligned = paragraphs.length === translations.length;
-
-  return (
-    <article className="bg-white rounded-[2rem] border border-stone-200 shadow-sm overflow-hidden" aria-labelledby="cuento-titulo">
-      <div className={`relative overflow-hidden bg-gradient-to-br ${theme.gradient} text-white p-6 sm:p-8`}>
-        <span className="pointer-events-none absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10" aria-hidden="true" />
-        <button type="button" onClick={onBack} className="relative inline-flex items-center gap-2 min-h-11 mb-3 font-bold text-white/90 hover:text-white">
-          <ArrowLeft className="w-5 h-5" aria-hidden="true" /> Volver a los cuentos
-        </button>
-        <div className="relative flex items-start justify-between gap-4">
-          <div>
-            <h2 id="cuento-titulo" ref={headingRef} tabIndex={-1} className="text-3xl sm:text-4xl font-black focus:outline-none">
-              {story.titulo}
-            </h2>
-            <p className="mt-1 font-semibold text-white/85">
-              Cuento en {language.nombre.toLowerCase()}
-              {story.region ? ` · ${story.region}` : ''}
-            </p>
-          </div>
-          <FavoriteButton {...fav} />
-        </div>
-      </div>
-
-      {/* Herramientas de lectura */}
-      <div className="sticky top-[4.5rem] z-10 flex flex-wrap items-center gap-2 border-b border-stone-200 bg-white/95 backdrop-blur px-6 py-3">
-        <span className="text-sm font-bold text-stone-600 mr-1">Tamaño</span>
-        <button type="button" onClick={() => setSize((s) => Math.max(0, s - 1))} disabled={size === 0} aria-label="Letra más pequeña" className="ficha w-10 h-10 rounded-xl border-stone-300 bg-white flex items-center justify-center disabled:opacity-40">
-          <Minus className="w-4 h-4" aria-hidden="true" />
-        </button>
-        <button type="button" onClick={() => setSize((s) => Math.min(SIZES.length - 1, s + 1))} disabled={size === SIZES.length - 1} aria-label="Letra más grande" className="ficha w-10 h-10 rounded-xl border-stone-300 bg-white flex items-center justify-center disabled:opacity-40">
-          <Plus className="w-4 h-4" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          aria-pressed={showTranslation}
-          onClick={() => setShowTranslation((v) => !v)}
-          className={`ficha ml-auto inline-flex items-center gap-2 min-h-10 px-4 rounded-xl font-bold ${showTranslation ? `${theme.border} ${theme.soft} ${theme.text}` : 'border-stone-300 bg-white text-stone-700'}`}
-        >
-          <Languages className="w-4 h-4" aria-hidden="true" /> Traducción
-        </button>
-      </div>
-
-      <div className="p-6 sm:p-8">
-        {aligned ? (
-          <div className="space-y-5">
-            {paragraphs.map((p, i) => (
-              <div key={i} className={`grid gap-2 ${showTranslation ? 'lg:grid-cols-2 lg:gap-10' : ''}`}>
-                <p className={`${SIZES[size]} leading-relaxed font-medium`} lang={language.lang}>
-                  {p}
-                </p>
-                {showTranslation && <p className={`${SIZES[size]} leading-relaxed text-stone-600 italic`}>{translations[i]}</p>}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className={`grid gap-8 ${showTranslation ? 'lg:grid-cols-2' : ''}`}>
-            <p className={`${SIZES[size]} leading-relaxed font-medium whitespace-pre-line`} lang={language.lang}>
-              {story.contenido_original}
-            </p>
-            {showTranslation && story.traduccion && <p className={`${SIZES[size]} leading-relaxed text-stone-600 italic whitespace-pre-line`}>{story.traduccion}</p>}
-          </div>
-        )}
-        {story.explicacion && (
-          <div className="mt-8 rounded-2xl bg-amber-50 border-l-4 border-amber-500 p-5">
-            <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-1">Lo que nos enseña</p>
-            <p className="text-stone-800 leading-relaxed">{story.explicacion}</p>
-          </div>
-        )}
-      </div>
-    </article>
-  );
-};
-
 const CultureModule = ({ user }) => {
   const [content, setContent] = useState([]);
   const [selectedType, setSelectedType] = useState('adivinanza');
@@ -379,9 +300,11 @@ const CultureModule = ({ user }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedType, selectedLanguage]);
 
-  // Al abrir un cuento, el foco va a su título
+  // Al abrir un cuento: se sube al inicio y el foco va a su título
   useEffect(() => {
-    if (selectedStory) storyHeadingRef.current?.focus();
+    if (!selectedStory) return;
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    storyHeadingRef.current?.focus({ preventScroll: true });
   }, [selectedStory]);
 
   const loadContent = async () => {
@@ -389,11 +312,17 @@ const CultureModule = ({ user }) => {
     setLoadError(false);
     try {
       const response = await api.getCulturalContent(selectedType, selectedLanguage);
-      setContent(response?.data?.content || []);
+      const list = response?.data?.content || [];
+      // A los cuentos del servidor se suman los de SimiAru, cada uno con su portada
+      setContent(selectedType === 'cuento' ? conCuentosExtra(list, selectedLanguage) : list);
     } catch (error) {
       console.error('Error loading cultural content:', error);
-      setContent([]);
-      setLoadError(true);
+      // Sin servidor, los cuentos de SimiAru se pueden leer igual
+      if (selectedType === 'cuento') setContent(conCuentosExtra([], selectedLanguage));
+      else {
+        setContent([]);
+        setLoadError(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -510,42 +439,8 @@ const CultureModule = ({ user }) => {
       );
     }
 
-    if (selectedType === 'cuento' && selectedStory) {
-      return <StoryReader story={selectedStory} language={language} theme={theme} fav={fav(selectedStory)} onBack={() => setSelectedStory(null)} headingRef={storyHeadingRef} />;
-    }
-
     if (selectedType === 'cuento') {
-      return (
-        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredContent.map((story, i) => (
-            <li key={story.id} id={`cultura-${story.id}`} className="anim-entra" style={{ '--i': Math.min(i, 8) }}>
-              <button
-                type="button"
-                onClick={() => {
-                  playTap();
-                  setSelectedStory(story);
-                }}
-                className="group tarjeta-viva w-full h-full text-left rounded-3xl bg-white border border-stone-200 shadow-sm overflow-hidden"
-              >
-                <span className={`relative block h-24 bg-gradient-to-br ${theme.gradient}`}>
-                  <span className="absolute inset-0 opacity-20 [background:repeating-linear-gradient(135deg,#fff_0_8px,transparent_8px_22px)]" aria-hidden="true" />
-                  <BookOpen className="absolute bottom-3 left-5 w-9 h-9 text-white transition-transform duration-200 group-hover:-rotate-6" aria-hidden="true" />
-                  {favorites.includes(story.id) && <Heart className="absolute top-3 right-4 w-5 h-5 fill-white text-white" aria-label="En favoritos" />}
-                </span>
-                <span className="block p-5">
-                  <span className="block font-black text-xl">{story.titulo || 'Sin título'}</span>
-                  <span className="block mt-2 text-sm text-stone-600 line-clamp-3" lang={language.lang}>
-                    {story.contenido_original}
-                  </span>
-                  <span className={`block mt-4 text-sm font-black ${theme.text}`}>
-                    Leer cuento <span aria-hidden="true">→</span>
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      );
+      return <StoryGrid stories={filteredContent} language={language} theme={theme} favorites={favorites} onOpen={setSelectedStory} />;
     }
 
     const Card = selectedType === 'adivinanza' ? RiddleCard : selectedType === 'proverbio' ? ProverbCard : SongCard;
@@ -595,6 +490,18 @@ const CultureModule = ({ user }) => {
 
       <main className="container mx-auto max-w-7xl py-8 relative isolate">
         <Decor palette="frio" />
+        {selectedType === 'cuento' && selectedStory ? (
+          <StoryReader
+            story={selectedStory}
+            stories={filteredContent.length ? filteredContent : content}
+            language={language}
+            theme={theme}
+            fav={fav(selectedStory)}
+            onBack={() => setSelectedStory(null)}
+            onOpen={setSelectedStory}
+            headingRef={storyHeadingRef}
+          />
+        ) : (
         <div className="grid gap-8 lg:grid-cols-[19rem_minmax(0,1fr)] items-start">
           {/* ==================== COLUMNA LATERAL ==================== */}
           <aside className="space-y-5 lg:sticky lg:top-24">
@@ -643,7 +550,7 @@ const CultureModule = ({ user }) => {
 
           {/* ==================== CONTENIDO ==================== */}
           <div className="min-w-0">
-            {!selectedStory && (
+            {(
               <section className="mb-6 flex flex-col sm:flex-row gap-3" aria-label="Filtros">
                 <div className="relative flex-1">
                   <label htmlFor="buscar-cultura" className="sr-only">
@@ -683,12 +590,17 @@ const CultureModule = ({ user }) => {
             )}
 
             {renderResults()}
-
-            {/* Biblioteca: libros en quechua y aimara de fuentes oficiales (solo enlaces) */}
-            {selectedType === 'cuento' && !selectedStory && <BookLibrary idioma={selectedLanguage} />}
           </div>
         </div>
+        )}
       </main>
+
+      {/* Biblioteca andina: a todo lo ancho de la pantalla, debajo de los cuentos */}
+      {selectedType === 'cuento' && !selectedStory && (
+        <section className="relative mx-auto w-full max-w-[112rem] px-4 sm:px-8 lg:px-12 pb-20">
+          <BookLibrary idioma={selectedLanguage} />
+        </section>
+      )}
     </div>
   );
 };

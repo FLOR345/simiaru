@@ -44,7 +44,7 @@ const TYPE_STYLE = {
   Retahílas: { Icon: Smile, bg: 'from-lime-400 via-green-500 to-emerald-600' },
   Fábulas: { Icon: Rabbit, bg: 'from-yellow-400 via-amber-500 to-orange-600' },
 };
-const SHELF_PREVIEW = 10; // libros visibles por estante antes de "Ver todos"
+const SHELF_PREVIEW = 12; // libros visibles por estante antes de "Ver todos"
 const styleOf = (tipo) => TYPE_STYLE[tipo] ?? { Icon: BookOpen, bg: 'from-stone-500 to-stone-700' };
 
 const SHELVES = [
@@ -282,7 +282,7 @@ const BookLibrary = ({ idioma }) => {
   ).slice(0, 8);
 
   const grid = (list) => (
-    <ul className="grid grid-cols-2 min-[480px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-5 gap-y-8">
+    <ul className="grid grid-cols-2 min-[480px]:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10">
       {list.map((libro) => (
         <ShelfBook key={libro.id} libro={libro} onOpen={(l) => (playTap(), setOpen(l))} saved={saved.includes(libro.id)} />
       ))}
@@ -290,7 +290,7 @@ const BookLibrary = ({ idioma }) => {
   );
 
   return (
-    <section className="mt-12" aria-labelledby="biblioteca-titulo">
+    <section className="mt-16" aria-labelledby="biblioteca-titulo">
       {/* Portada de la biblioteca: título, cifras y las portadas más recientes en abanico */}
       <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-stone-950 via-stone-900 to-amber-950 p-6 sm:p-10 text-white">
         <span className="tejido-andino absolute inset-x-0 top-0 h-2.5" aria-hidden="true" />
