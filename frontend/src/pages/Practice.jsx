@@ -15,6 +15,8 @@ import ShinyText from '../components/reactbits/ShinyText';
 import Decor from '../components/Decor';
 import SplitText from '../components/reactbits/SplitText';
 import { readDifficult, reviewDifficult } from '../utils/difficultWords';
+import { BodyNumbers, preloadOn } from '../routes';
+import { GiVitruvianMan, GiAbacus } from 'react-icons/gi';
 
 // ==================== Juegos de práctica ====================
 // Repasan las palabras de las lecciones que la persona ya completó (o de la Unidad 1 si aún no hay).
@@ -1174,6 +1176,32 @@ const Practice = ({ user, isGuest }) => {
             <h2 className="mb-5 text-3xl sm:text-4xl font-black">
               <SplitText text="¡Elige tu juego!" tag="span" effect="wave" delay={45} duration={0.8} textAlign="left" rootMargin="0px" hoverEffect="wave" />
             </h2>
+            {/* Nuevo: cuerpo y números, con su propia página de juegos */}
+            <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ y: -4 }} className="mb-5">
+              <Link
+                to={`/cuerpo-numeros?idioma=${idioma}`}
+                {...preloadOn(BodyNumbers)}
+                onClick={playTap}
+                className={`group relative flex items-center gap-5 overflow-hidden rounded-3xl bg-gradient-to-r ${theme.gradient} p-5 sm:p-6 text-white shadow-xl`}
+              >
+                <span className="absolute inset-0 opacity-15 [background:repeating-linear-gradient(135deg,#fff_0_6px,transparent_6px_22px)]" aria-hidden="true" />
+                <span className="tejido-andino absolute inset-x-0 bottom-0 h-2" aria-hidden="true" />
+                <span className="relative flex shrink-0 -space-x-3" aria-hidden="true">
+                  <span className="w-14 h-14 rounded-2xl bg-white/20 ring-2 ring-white/40 flex items-center justify-center backdrop-blur transition-transform group-hover:-rotate-6">
+                    <GiVitruvianMan className="w-8 h-8" />
+                  </span>
+                  <span className="w-14 h-14 rounded-2xl bg-amber-400 text-amber-950 ring-2 ring-white/40 flex items-center justify-center transition-transform group-hover:rotate-6">
+                    <GiAbacus className="w-8 h-8" />
+                  </span>
+                </span>
+                <span className="relative flex-1 min-w-0">
+                  <span className="inline-block rounded-full bg-amber-300 px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-amber-950">Nuevo</span>
+                  <span className="mt-1 block text-xl sm:text-2xl font-black">Mi cuerpo y los números</span>
+                  <span className="block text-white/90">Toca el dibujo para aprender las partes del cuerpo y cuenta llamitas. ¡4 juegos!</span>
+                </span>
+                <span className="relative hidden sm:inline-flex rounded-full bg-white px-5 py-2 text-sm font-black text-stone-900 shadow-md">Jugar</span>
+              </Link>
+            </m.div>
             {difficult.length > 0 && (
               <m.button
                 type="button"

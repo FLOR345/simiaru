@@ -12,7 +12,7 @@ const loadMotionFeatures = () => import('./ui/motionFeatures').then((mod) => mod
 // Notificaciones (React-Toastify): se descargan aparte, después de la primera pantalla
 const Notifications = lazy(() => import('./components/Notifications'));
 import Home from './pages/Home';
-import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice, NotFound } from './routes';
+import { Login, Register, Dashboard, LessonView, Profile, Dictionary, CultureModule, Classroom, Teacher, Practice, NotFound, BodyNumbers } from './routes';
 import { LlamaImage } from './components/Mascot';
 import { startTelemetry } from './services/telemetry';
 import OfflineBanner from './components/OfflineBanner';
@@ -171,6 +171,14 @@ function App() {
           element={
             <ProtectedRoute auth={auth}>
               <Practice user={user} isGuest={isGuest} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cuerpo-numeros"
+          element={
+            <ProtectedRoute auth={auth}>
+              <BodyNumbers user={user} isGuest={isGuest} />
             </ProtectedRoute>
           }
         />

@@ -27,3 +27,4 @@ export const Classroom = lazyWithPreload(() => import('./pages/Classroom'));
 export const Teacher = lazyWithPreload(() => import('./pages/Teacher'));
 export const Practice = lazyWithPreload(() => import('./pages/Practice'));
 export const NotFound = lazyWithPreload(() => import('./pages/NotFound'));
+export const BodyNumbers = lazyWithPreload(() => import('./pages/BodyNumbers'));
